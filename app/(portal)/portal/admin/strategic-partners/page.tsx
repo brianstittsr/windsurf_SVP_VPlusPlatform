@@ -141,12 +141,17 @@ export default function StrategicPartnersPage() {
 
   // Fetch partners from Firebase
   const fetchPartners = async () => {
+    if (!db) {
+      console.error("Firebase not initialized");
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const querySnapshot = await getDocs(collection(db, COLLECTIONS.STRATEGIC_PARTNERS));
       const partnersData: StrategicPartnerDoc[] = [];
-      querySnapshot.forEach((doc) => {
-        partnersData.push({ id: doc.id, ...doc.data() } as StrategicPartnerDoc);
+      querySnapshot.forEach((docSnap) => {
+        partnersData.push({ id: docSnap.id, ...docSnap.data() } as StrategicPartnerDoc);
       });
       setPartners(partnersData);
     } catch (error) {
@@ -162,6 +167,10 @@ export default function StrategicPartnersPage() {
 
   // Seed initial data
   const handleSeedData = async () => {
+    if (!db) {
+      alert("Firebase not initialized. Check your environment variables.");
+      return;
+    }
     setSeeding(true);
     try {
       const batch = writeBatch(db);
@@ -189,6 +198,10 @@ export default function StrategicPartnersPage() {
 
   // Add or update partner
   const handleSavePartner = async () => {
+    if (!db) {
+      alert("Firebase not initialized");
+      return;
+    }
     try {
       if (editingPartner) {
         // Update existing
@@ -216,6 +229,7 @@ export default function StrategicPartnersPage() {
 
   // Delete partner
   const handleDeletePartner = async (id: string) => {
+    if (!db) return;
     if (!confirm("Are you sure you want to delete this partner?")) return;
     try {
       await deleteDoc(doc(db, COLLECTIONS.STRATEGIC_PARTNERS, id));

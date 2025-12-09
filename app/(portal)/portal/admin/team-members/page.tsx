@@ -133,12 +133,17 @@ export default function TeamMembersPage() {
 
   // Fetch members from Firebase
   const fetchMembers = async () => {
+    if (!db) {
+      console.error("Firebase not initialized");
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const querySnapshot = await getDocs(collection(db, COLLECTIONS.TEAM_MEMBERS));
       const membersData: TeamMemberDoc[] = [];
-      querySnapshot.forEach((doc) => {
-        membersData.push({ id: doc.id, ...doc.data() } as TeamMemberDoc);
+      querySnapshot.forEach((docSnap) => {
+        membersData.push({ id: docSnap.id, ...docSnap.data() } as TeamMemberDoc);
       });
       // Sort by last name
       membersData.sort((a, b) => a.lastName.localeCompare(b.lastName));
@@ -156,6 +161,10 @@ export default function TeamMembersPage() {
 
   // Seed initial data
   const handleSeedData = async () => {
+    if (!db) {
+      alert("Firebase not initialized. Check your environment variables.");
+      return;
+    }
     if (!confirm(`This will import ${seedTeamMembers.length} team members. Continue?`)) return;
     
     setSeeding(true);
@@ -185,6 +194,10 @@ export default function TeamMembersPage() {
 
   // Add or update member
   const handleSaveMember = async () => {
+    if (!db) {
+      alert("Firebase not initialized");
+      return;
+    }
     try {
       if (editingMember) {
         const docRef = doc(db, COLLECTIONS.TEAM_MEMBERS, editingMember.id);
@@ -210,6 +223,7 @@ export default function TeamMembersPage() {
 
   // Delete member
   const handleDeleteMember = async (id: string) => {
+    if (!db) return;
     if (!confirm("Are you sure you want to delete this team member?")) return;
     try {
       await deleteDoc(doc(db, COLLECTIONS.TEAM_MEMBERS, id));

@@ -148,6 +148,11 @@ export default function SettingsPage() {
   // Load settings from Firebase on mount
   useEffect(() => {
     const loadSettings = async () => {
+      if (!db) {
+        console.error("Firebase not initialized");
+        setLoading(false);
+        return;
+      }
       try {
         const docRef = doc(db, COLLECTIONS.PLATFORM_SETTINGS, SETTINGS_DOC_ID);
         const docSnap = await getDoc(docRef);
@@ -219,42 +224,47 @@ export default function SettingsPage() {
 
   // Save settings to Firebase
   const saveSettings = async () => {
+    if (!db) {
+      alert("Firebase not initialized. Check your environment variables.");
+      return;
+    }
     setSaving(true);
     try {
       const docRef = doc(db, COLLECTIONS.PLATFORM_SETTINGS, SETTINGS_DOC_ID);
       
-      const settingsData: Partial<PlatformSettingsDoc> = {
+      // Build settings data, using empty strings instead of undefined
+      const settingsData = {
         id: SETTINGS_DOC_ID,
         integrations: {
           mattermost: {
-            apiKey: apiKeys.mattermost?.apiKey,
-            webhookUrl: apiKeys.mattermost?.webhook,
-            serverUrl: apiKeys.mattermost?.serverUrl,
-            teamId: apiKeys.mattermost?.teamId,
+            apiKey: apiKeys.mattermost?.apiKey || "",
+            webhookUrl: apiKeys.mattermost?.webhook || "",
+            serverUrl: apiKeys.mattermost?.serverUrl || "",
+            teamId: apiKeys.mattermost?.teamId || "",
             status: testingStatus.mattermost === "success" ? "connected" : "disconnected",
           },
           apollo: {
-            apiKey: apiKeys.apollo?.apiKey,
-            accountId: apiKeys.apollo?.accountId,
+            apiKey: apiKeys.apollo?.apiKey || "",
+            accountId: apiKeys.apollo?.accountId || "",
             status: testingStatus.apollo === "success" ? "connected" : "disconnected",
           },
           gohighlevel: {
-            apiKey: apiKeys.gohighlevel?.apiKey,
-            locationId: apiKeys.gohighlevel?.locationId,
-            agencyId: apiKeys.gohighlevel?.agencyId,
+            apiKey: apiKeys.gohighlevel?.apiKey || "",
+            locationId: apiKeys.gohighlevel?.locationId || "",
+            agencyId: apiKeys.gohighlevel?.agencyId || "",
             status: testingStatus.gohighlevel === "success" ? "connected" : "disconnected",
           },
           zoom: {
-            apiKey: apiKeys.zoom?.apiKey,
-            apiSecret: apiKeys.zoom?.apiSecret,
-            accountId: apiKeys.zoom?.accountId,
+            apiKey: apiKeys.zoom?.apiKey || "",
+            apiSecret: apiKeys.zoom?.apiSecret || "",
+            accountId: apiKeys.zoom?.accountId || "",
             status: testingStatus.zoom === "success" ? "connected" : "disconnected",
           },
         },
         llmConfig: {
           provider: llmConfig.provider,
           model: llmConfig.model,
-          apiKey: llmConfig.apiKey,
+          apiKey: llmConfig.apiKey || "",
           ollamaUrl: llmConfig.ollamaUrl,
           useOllama: llmConfig.useOllama,
         },
