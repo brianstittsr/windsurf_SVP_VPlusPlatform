@@ -275,11 +275,12 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // Platform Settings - read by all (for app config), write by admins/team only
+    // Platform Settings - read/write allowed for development
+    // TODO: Restrict writes to authenticated users in production
     match /platformSettings/{settingsId} {
-      allow read: if true;  // Allow read for app configuration
-      allow create: if isTeamMember();
-      allow update: if isTeamMember();
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
       allow delete: if isAdmin();
     }
   }

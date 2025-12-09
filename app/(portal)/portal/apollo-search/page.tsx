@@ -377,7 +377,7 @@ export default function ApolloSearchPage() {
           return;
         }
         
-        const docRef = doc(db, COLLECTIONS.PLATFORM_SETTINGS, "main");
+        const docRef = doc(db, COLLECTIONS.PLATFORM_SETTINGS, "global");
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists()) {
