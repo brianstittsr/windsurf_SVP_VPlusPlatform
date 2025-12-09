@@ -60,24 +60,22 @@ export const WEBHOOK_EVENTS: WebhookEvent[] = [
 
 /**
  * Send a message to Mattermost via incoming webhook
+ * Uses API route to avoid CORS issues when called from browser
  */
 export async function sendToMattermost(
   webhookUrl: string,
   message: MattermostMessage
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await fetch(webhookUrl, {
+    // Use API route to proxy the request (avoids CORS issues)
+    const response = await fetch("/api/mattermost", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(message),
+      body: JSON.stringify({ webhookUrl, message }),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      return { success: false, error: `HTTP ${response.status}: ${errorText}` };
-    }
-
-    return { success: true };
+    const result = await response.json();
+    return result;
   } catch (error) {
     return { 
       success: false, 
