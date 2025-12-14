@@ -38,24 +38,60 @@ export type WebhookEventType =
   | "meeting_completed"
   | "document_uploaded"
   | "referral_submitted"
-  | "send_to_brian_stitt";
+  | "send_to_brian_stitt"
+  // Traction/EOS Events
+  | "rock_created"
+  | "rock_status_changed"
+  | "rock_completed"
+  | "rock_at_risk"
+  | "rock_off_track"
+  | "scorecard_updated"
+  | "scorecard_below_goal"
+  | "scorecard_above_goal"
+  | "issue_created"
+  | "issue_solved"
+  | "todo_created"
+  | "todo_completed"
+  | "todo_overdue"
+  | "level10_meeting_logged"
+  | "team_member_added"
+  | "team_member_gwc_updated";
 
 export interface WebhookEvent {
   type: WebhookEventType;
   label: string;
   description: string;
   enabled: boolean;
+  category?: "general" | "traction";
 }
 
 export const WEBHOOK_EVENTS: WebhookEvent[] = [
-  { type: "new_lead", label: "New Lead Created", description: "When a new lead is added to the pipeline", enabled: true },
-  { type: "deal_status_changed", label: "Deal Status Changed", description: "When a deal moves to a new stage", enabled: true },
-  { type: "one_to_one_scheduled", label: "One-to-One Scheduled", description: "When an affiliate schedules a 1:1 meeting", enabled: true },
-  { type: "affiliate_joined", label: "Affiliate Joined", description: "When a new affiliate joins the network", enabled: true },
-  { type: "meeting_completed", label: "Meeting Completed", description: "When a meeting is marked as completed", enabled: true },
-  { type: "document_uploaded", label: "Document Uploaded", description: "When a document is uploaded to a project", enabled: false },
-  { type: "referral_submitted", label: "Referral Submitted", description: "When an affiliate submits a referral", enabled: true },
-  { type: "send_to_brian_stitt", label: "Send to Brian Stitt", description: "Direct message to Brian Stitt's channel", enabled: true },
+  // General Events
+  { type: "new_lead", label: "New Lead Created", description: "When a new lead is added to the pipeline", enabled: true, category: "general" },
+  { type: "deal_status_changed", label: "Deal Status Changed", description: "When a deal moves to a new stage", enabled: true, category: "general" },
+  { type: "one_to_one_scheduled", label: "One-to-One Scheduled", description: "When an affiliate schedules a 1:1 meeting", enabled: true, category: "general" },
+  { type: "affiliate_joined", label: "Affiliate Joined", description: "When a new affiliate joins the network", enabled: true, category: "general" },
+  { type: "meeting_completed", label: "Meeting Completed", description: "When a meeting is marked as completed", enabled: true, category: "general" },
+  { type: "document_uploaded", label: "Document Uploaded", description: "When a document is uploaded to a project", enabled: false, category: "general" },
+  { type: "referral_submitted", label: "Referral Submitted", description: "When an affiliate submits a referral", enabled: true, category: "general" },
+  { type: "send_to_brian_stitt", label: "Send to Brian Stitt", description: "Direct message to Brian Stitt's channel", enabled: true, category: "general" },
+  // Traction/EOS Events
+  { type: "rock_created", label: "Rock Created", description: "When a new quarterly Rock is added", enabled: true, category: "traction" },
+  { type: "rock_status_changed", label: "Rock Status Changed", description: "When a Rock's status changes", enabled: true, category: "traction" },
+  { type: "rock_completed", label: "Rock Completed", description: "When a Rock is marked complete", enabled: true, category: "traction" },
+  { type: "rock_at_risk", label: "Rock At Risk", description: "When a Rock moves to at-risk status", enabled: true, category: "traction" },
+  { type: "rock_off_track", label: "Rock Off Track", description: "When a Rock moves to off-track status", enabled: true, category: "traction" },
+  { type: "scorecard_updated", label: "Scorecard Updated", description: "When a scorecard metric is updated", enabled: false, category: "traction" },
+  { type: "scorecard_below_goal", label: "Scorecard Below Goal", description: "When a metric falls below its goal", enabled: true, category: "traction" },
+  { type: "scorecard_above_goal", label: "Scorecard Above Goal", description: "When a metric exceeds its goal", enabled: false, category: "traction" },
+  { type: "issue_created", label: "Issue Created", description: "When a new IDS issue is identified", enabled: true, category: "traction" },
+  { type: "issue_solved", label: "Issue Solved", description: "When an issue is marked as solved", enabled: true, category: "traction" },
+  { type: "todo_created", label: "To-Do Created", description: "When a new to-do is added", enabled: false, category: "traction" },
+  { type: "todo_completed", label: "To-Do Completed", description: "When a to-do is marked complete", enabled: false, category: "traction" },
+  { type: "todo_overdue", label: "To-Do Overdue", description: "When a to-do passes its due date", enabled: true, category: "traction" },
+  { type: "level10_meeting_logged", label: "Level 10 Meeting Logged", description: "When a Level 10 meeting is recorded", enabled: true, category: "traction" },
+  { type: "team_member_added", label: "Team Member Added", description: "When a new team member is added", enabled: true, category: "traction" },
+  { type: "team_member_gwc_updated", label: "GWC Assessment Updated", description: "When a team member's GWC is updated", enabled: false, category: "traction" },
 ];
 
 /**
@@ -235,6 +271,297 @@ function formatEventMessage(
             { title: "Size", value: String(data.size || "N/A"), short: true },
           ],
           footer: "SVP Platform • Documents",
+        }],
+      };
+
+    // =========================================================================
+    // TRACTION/EOS EVENTS
+    // =========================================================================
+
+    case "rock_created":
+      return {
+        ...baseConfig,
+        icon_emoji: ":mountain:",
+        text: `### 🏔️ New Rock Created`,
+        attachments: [{
+          color: "#9b59b6",
+          fields: [
+            { title: "Rock", value: String(data.description || "N/A"), short: false },
+            { title: "Owner", value: String(data.owner || "N/A"), short: true },
+            { title: "Quarter", value: String(data.quarter || "N/A"), short: true },
+            { title: "Due Date", value: String(data.dueDate || "N/A"), short: true },
+            { title: "Status", value: String(data.status || "on-track"), short: true },
+          ],
+          footer: "SVP Platform • Traction Dashboard",
+        }],
+      };
+
+    case "rock_status_changed":
+      const statusColor = data.newStatus === "complete" ? "#27ae60" : 
+                          data.newStatus === "on-track" ? "#3498db" :
+                          data.newStatus === "at-risk" ? "#f39c12" : "#e74c3c";
+      const statusEmoji = data.newStatus === "complete" ? "✅" : 
+                          data.newStatus === "on-track" ? "🟢" :
+                          data.newStatus === "at-risk" ? "🟡" : "🔴";
+      return {
+        ...baseConfig,
+        icon_emoji: ":mountain:",
+        text: `### ${statusEmoji} Rock Status Changed`,
+        attachments: [{
+          color: statusColor,
+          fields: [
+            { title: "Rock", value: String(data.description || "N/A"), short: false },
+            { title: "Owner", value: String(data.owner || "N/A"), short: true },
+            { title: "New Status", value: String(data.newStatus || "N/A").replace("-", " ").toUpperCase(), short: true },
+            { title: "Previous Status", value: String(data.previousStatus || "N/A").replace("-", " ").toUpperCase(), short: true },
+            { title: "Progress", value: `${data.progress || 0}%`, short: true },
+          ],
+          footer: "SVP Platform • Traction Dashboard",
+        }],
+      };
+
+    case "rock_completed":
+      return {
+        ...baseConfig,
+        icon_emoji: ":tada:",
+        text: `### 🎉 Rock Completed!`,
+        attachments: [{
+          color: "#27ae60",
+          fields: [
+            { title: "Rock", value: String(data.description || "N/A"), short: false },
+            { title: "Owner", value: String(data.owner || "N/A"), short: true },
+            { title: "Quarter", value: String(data.quarter || "N/A"), short: true },
+            { title: "Completed", value: new Date().toLocaleDateString(), short: true },
+          ],
+          footer: "SVP Platform • Traction Dashboard • 🏆 Achievement Unlocked!",
+        }],
+      };
+
+    case "rock_at_risk":
+      return {
+        ...baseConfig,
+        icon_emoji: ":warning:",
+        text: `### ⚠️ Rock At Risk`,
+        attachments: [{
+          color: "#f39c12",
+          fields: [
+            { title: "Rock", value: String(data.description || "N/A"), short: false },
+            { title: "Owner", value: String(data.owner || "N/A"), short: true },
+            { title: "Progress", value: `${data.progress || 0}%`, short: true },
+            { title: "Due Date", value: String(data.dueDate || "N/A"), short: true },
+            { title: "Quarter", value: String(data.quarter || "N/A"), short: true },
+          ],
+          footer: "SVP Platform • Traction Dashboard • Action Required",
+        }],
+      };
+
+    case "rock_off_track":
+      return {
+        ...baseConfig,
+        icon_emoji: ":rotating_light:",
+        text: `### 🚨 Rock Off Track`,
+        attachments: [{
+          color: "#e74c3c",
+          fields: [
+            { title: "Rock", value: String(data.description || "N/A"), short: false },
+            { title: "Owner", value: String(data.owner || "N/A"), short: true },
+            { title: "Progress", value: `${data.progress || 0}%`, short: true },
+            { title: "Due Date", value: String(data.dueDate || "N/A"), short: true },
+            { title: "Quarter", value: String(data.quarter || "N/A"), short: true },
+          ],
+          footer: "SVP Platform • Traction Dashboard • URGENT: Needs Immediate Attention",
+        }],
+      };
+
+    case "scorecard_updated":
+      return {
+        ...baseConfig,
+        icon_emoji: ":bar_chart:",
+        text: `### 📊 Scorecard Updated`,
+        attachments: [{
+          color: "#3498db",
+          fields: [
+            { title: "Metric", value: String(data.name || "N/A"), short: true },
+            { title: "Owner", value: String(data.owner || "N/A"), short: true },
+            { title: "Goal", value: `${data.unit || ""}${data.goal || 0}`, short: true },
+            { title: "Actual", value: `${data.unit || ""}${data.actual || 0}`, short: true },
+          ],
+          footer: "SVP Platform • Traction Dashboard",
+        }],
+      };
+
+    case "scorecard_below_goal":
+      return {
+        ...baseConfig,
+        icon_emoji: ":chart_with_downwards_trend:",
+        text: `### 📉 Scorecard Metric Below Goal`,
+        attachments: [{
+          color: "#e74c3c",
+          fields: [
+            { title: "Metric", value: String(data.name || "N/A"), short: true },
+            { title: "Owner", value: String(data.owner || "N/A"), short: true },
+            { title: "Goal", value: `${data.unit || ""}${Number(data.goal || 0).toLocaleString()}`, short: true },
+            { title: "Actual", value: `${data.unit || ""}${Number(data.actual || 0).toLocaleString()}`, short: true },
+            { title: "Gap", value: `${data.unit || ""}${Number((data.goal as number) - (data.actual as number)).toLocaleString()}`, short: true },
+            { title: "Trend", value: String(data.trend || "flat"), short: true },
+          ],
+          footer: "SVP Platform • Traction Dashboard • Review in Level 10",
+        }],
+      };
+
+    case "scorecard_above_goal":
+      return {
+        ...baseConfig,
+        icon_emoji: ":chart_with_upwards_trend:",
+        text: `### 📈 Scorecard Metric Above Goal!`,
+        attachments: [{
+          color: "#27ae60",
+          fields: [
+            { title: "Metric", value: String(data.name || "N/A"), short: true },
+            { title: "Owner", value: String(data.owner || "N/A"), short: true },
+            { title: "Goal", value: `${data.unit || ""}${Number(data.goal || 0).toLocaleString()}`, short: true },
+            { title: "Actual", value: `${data.unit || ""}${Number(data.actual || 0).toLocaleString()}`, short: true },
+          ],
+          footer: "SVP Platform • Traction Dashboard • Great Work! 🌟",
+        }],
+      };
+
+    case "issue_created":
+      const priorityColor = data.priority === "high" ? "#e74c3c" : 
+                            data.priority === "medium" ? "#f39c12" : "#3498db";
+      return {
+        ...baseConfig,
+        icon_emoji: ":exclamation:",
+        text: `### ❗ New Issue Identified`,
+        attachments: [{
+          color: priorityColor,
+          fields: [
+            { title: "Issue", value: String(data.description || "N/A"), short: false },
+            { title: "Owner", value: String(data.owner || "N/A"), short: true },
+            { title: "Priority", value: String(data.priority || "medium").toUpperCase(), short: true },
+            { title: "Identified", value: String(data.identifiedDate || new Date().toLocaleDateString()), short: true },
+          ],
+          footer: "SVP Platform • Traction Dashboard • IDS: Identify, Discuss, Solve",
+        }],
+      };
+
+    case "issue_solved":
+      return {
+        ...baseConfig,
+        icon_emoji: ":white_check_mark:",
+        text: `### ✅ Issue Solved!`,
+        attachments: [{
+          color: "#27ae60",
+          fields: [
+            { title: "Issue", value: String(data.description || "N/A"), short: false },
+            { title: "Owner", value: String(data.owner || "N/A"), short: true },
+            { title: "Solved", value: new Date().toLocaleDateString(), short: true },
+          ],
+          footer: "SVP Platform • Traction Dashboard • IDS Complete",
+        }],
+      };
+
+    case "todo_created":
+      return {
+        ...baseConfig,
+        icon_emoji: ":clipboard:",
+        text: `### 📋 New To-Do Created`,
+        attachments: [{
+          color: "#3498db",
+          fields: [
+            { title: "To-Do", value: String(data.description || "N/A"), short: false },
+            { title: "Owner", value: String(data.owner || "N/A"), short: true },
+            { title: "Due Date", value: String(data.dueDate || "N/A"), short: true },
+          ],
+          footer: "SVP Platform • Traction Dashboard",
+        }],
+      };
+
+    case "todo_completed":
+      return {
+        ...baseConfig,
+        icon_emoji: ":ballot_box_with_check:",
+        text: `### ☑️ To-Do Completed`,
+        attachments: [{
+          color: "#27ae60",
+          fields: [
+            { title: "To-Do", value: String(data.description || "N/A"), short: false },
+            { title: "Owner", value: String(data.owner || "N/A"), short: true },
+            { title: "Completed", value: new Date().toLocaleDateString(), short: true },
+          ],
+          footer: "SVP Platform • Traction Dashboard",
+        }],
+      };
+
+    case "todo_overdue":
+      return {
+        ...baseConfig,
+        icon_emoji: ":alarm_clock:",
+        text: `### ⏰ To-Do Overdue`,
+        attachments: [{
+          color: "#e74c3c",
+          fields: [
+            { title: "To-Do", value: String(data.description || "N/A"), short: false },
+            { title: "Owner", value: String(data.owner || "N/A"), short: true },
+            { title: "Due Date", value: String(data.dueDate || "N/A"), short: true },
+            { title: "Days Overdue", value: String(data.daysOverdue || "1"), short: true },
+          ],
+          footer: "SVP Platform • Traction Dashboard • Action Required",
+        }],
+      };
+
+    case "level10_meeting_logged":
+      return {
+        ...baseConfig,
+        icon_emoji: ":calendar:",
+        text: `### 📅 Level 10 Meeting Logged`,
+        attachments: [{
+          color: "#9b59b6",
+          fields: [
+            { title: "Date", value: String(data.date || "N/A"), short: true },
+            { title: "Rating", value: `${data.rating || 0}/10`, short: true },
+            { title: "Issues Solved", value: String(data.issuesSolved || 0), short: true },
+            { title: "To-Do Completion", value: `${data.todoCompletionRate || 0}%`, short: true },
+            { title: "Rocks Reviewed", value: data.rocksReviewed ? "✅ Yes" : "❌ No", short: true },
+            { title: "Scorecard Reviewed", value: data.scorecardReviewed ? "✅ Yes" : "❌ No", short: true },
+          ],
+          footer: "SVP Platform • Traction Dashboard • Level 10 Meeting",
+        }],
+      };
+
+    case "team_member_added":
+      return {
+        ...baseConfig,
+        icon_emoji: ":busts_in_silhouette:",
+        text: `### 👥 Team Member Added`,
+        attachments: [{
+          color: "#9b59b6",
+          fields: [
+            { title: "Name", value: String(data.name || "N/A"), short: true },
+            { title: "Role", value: String(data.role || "N/A"), short: true },
+            { title: "Category", value: String(data.category || "team"), short: true },
+          ],
+          footer: "SVP Platform • Traction Dashboard • People",
+        }],
+      };
+
+    case "team_member_gwc_updated":
+      const gwcStatus = (data.getsIt && data.wantsIt && data.capacityToDoIt) ? "✅ All Yes" : "⚠️ Needs Review";
+      return {
+        ...baseConfig,
+        icon_emoji: ":clipboard:",
+        text: `### 📋 GWC Assessment Updated`,
+        attachments: [{
+          color: (data.getsIt && data.wantsIt && data.capacityToDoIt) ? "#27ae60" : "#f39c12",
+          fields: [
+            { title: "Team Member", value: String(data.name || "N/A"), short: true },
+            { title: "Role", value: String(data.role || "N/A"), short: true },
+            { title: "Gets It", value: data.getsIt === true ? "✅" : data.getsIt === false ? "❌" : "—", short: true },
+            { title: "Wants It", value: data.wantsIt === true ? "✅" : data.wantsIt === false ? "❌" : "—", short: true },
+            { title: "Capacity", value: data.capacityToDoIt === true ? "✅" : data.capacityToDoIt === false ? "❌" : "—", short: true },
+            { title: "Right Seat", value: data.rightSeat === true ? "✅" : data.rightSeat === false ? "❌" : "—", short: true },
+          ],
+          footer: `SVP Platform • Traction Dashboard • ${gwcStatus}`,
         }],
       };
 

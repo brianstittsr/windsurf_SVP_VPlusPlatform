@@ -11,7 +11,6 @@ import {
   deleteDoc,
   doc,
   Timestamp,
-  where,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import {
@@ -23,6 +22,17 @@ import {
   TractionMeetingDoc,
   TractionTeamMemberDoc,
 } from "@/lib/schema";
+import {
+  notifyRockCreated,
+  notifyRockStatusChanged,
+  notifyMetricUpdated,
+  notifyIssueCreated,
+  notifyIssueSolved,
+  notifyTodoCreated,
+  notifyTodoCompleted,
+  notifyMeetingLogged,
+  notifyTeamMemberAdded,
+} from "@/lib/traction-webhooks";
 
 // Client-side types (with Date instead of Timestamp)
 export interface Rock {
@@ -308,9 +318,19 @@ export function useTractionData() {
       createdAt: now,
       updatedAt: now,
     } as Omit<TractionRockDoc, "id">);
+    
+    // Send webhook notification
+    notifyRockCreated({
+      description: rock.description,
+      owner: rock.owner,
+      quarter: rock.quarter,
+      dueDate: rock.dueDate,
+      status: rock.status,
+      progress: rock.progress,
+    });
   }, []);
 
-  const updateRock = useCallback(async (id: string, rock: Partial<Rock>) => {
+  const updateRock = useCallback(async (id: string, rock: Partial<Rock>, previousStatus?: string) => {
     if (!db) return;
     const updateData: Record<string, unknown> = { updatedAt: Timestamp.now() };
     if (rock.description !== undefined) updateData.description = rock.description;
@@ -321,7 +341,22 @@ export function useTractionData() {
     if (rock.progress !== undefined) updateData.progress = rock.progress;
     if (rock.quarter !== undefined) updateData.quarter = rock.quarter;
     await updateDoc(doc(db, COLLECTIONS.TRACTION_ROCKS, id), updateData);
-  }, []);
+    
+    // Send webhook notification if status changed
+    if (rock.status && previousStatus && rock.status !== previousStatus) {
+      const existingRock = rocks.find(r => r.id === id);
+      if (existingRock) {
+        notifyRockStatusChanged({
+          description: rock.description || existingRock.description,
+          owner: rock.owner || existingRock.owner,
+          quarter: rock.quarter || existingRock.quarter,
+          dueDate: rock.dueDate || existingRock.dueDate,
+          status: rock.status,
+          progress: rock.progress ?? existingRock.progress,
+        }, previousStatus);
+      }
+    }
+  }, [rocks]);
 
   const deleteRock = useCallback(async (id: string) => {
     if (!db) return;
@@ -343,6 +378,18 @@ export function useTractionData() {
       createdAt: now,
       updatedAt: now,
     } as Omit<TractionScorecardMetricDoc, "id">);
+    
+    // Send webhook notification if below goal
+    if (metric.actual < metric.goal) {
+      notifyMetricUpdated({
+        name: metric.name,
+        owner: metric.owner,
+        goal: metric.goal,
+        actual: metric.actual,
+        unit: metric.unit,
+        trend: metric.trend,
+      });
+    }
   }, []);
 
   const updateMetric = useCallback(async (id: string, metric: Partial<ScorecardMetric>) => {
@@ -356,7 +403,26 @@ export function useTractionData() {
     if (metric.trend !== undefined) updateData.trend = metric.trend;
     if (metric.unit !== undefined) updateData.unit = metric.unit;
     await updateDoc(doc(db, COLLECTIONS.TRACTION_SCORECARD_METRICS, id), updateData);
-  }, []);
+    
+    // Send webhook notification if actual value changed
+    if (metric.actual !== undefined) {
+      const existingMetric = metrics.find(m => m.id === id);
+      if (existingMetric) {
+        const goal = metric.goal ?? existingMetric.goal;
+        const actual = metric.actual;
+        if (actual < goal) {
+          notifyMetricUpdated({
+            name: metric.name || existingMetric.name,
+            owner: metric.owner || existingMetric.owner,
+            goal,
+            actual,
+            unit: metric.unit || existingMetric.unit,
+            trend: metric.trend || existingMetric.trend,
+          });
+        }
+      }
+    }
+  }, [metrics]);
 
   const deleteMetric = useCallback(async (id: string) => {
     if (!db) return;
@@ -377,6 +443,14 @@ export function useTractionData() {
       createdAt: now,
       updatedAt: now,
     } as Omit<TractionIssueDoc, "id">);
+    
+    // Send webhook notification
+    notifyIssueCreated({
+      description: issue.description,
+      owner: issue.owner,
+      priority: issue.priority,
+      identifiedDate: issue.identifiedDate,
+    });
   }, []);
 
   const updateIssue = useCallback(async (id: string, issue: Partial<Issue>) => {
@@ -391,10 +465,20 @@ export function useTractionData() {
       updateData.status = issue.status;
       if (issue.status === "solved") {
         updateData.solvedDate = Timestamp.now();
+        // Send webhook notification for solved issue
+        const existingIssue = issues.find(i => i.id === id);
+        if (existingIssue) {
+          notifyIssueSolved({
+            description: issue.description || existingIssue.description,
+            owner: issue.owner || existingIssue.owner,
+            priority: issue.priority || existingIssue.priority,
+            identifiedDate: issue.identifiedDate || existingIssue.identifiedDate,
+          });
+        }
       }
     }
     await updateDoc(doc(db, COLLECTIONS.TRACTION_ISSUES, id), updateData);
-  }, []);
+  }, [issues]);
 
   const deleteIssue = useCallback(async (id: string) => {
     if (!db) return;
@@ -414,6 +498,13 @@ export function useTractionData() {
       createdAt: now,
       updatedAt: now,
     } as Omit<TractionTodoDoc, "id">);
+    
+    // Send webhook notification
+    notifyTodoCreated({
+      description: todo.description,
+      owner: todo.owner,
+      dueDate: todo.dueDate,
+    });
   }, []);
 
   const updateTodo = useCallback(async (id: string, todo: Partial<Todo>) => {
@@ -427,10 +518,19 @@ export function useTractionData() {
       updateData.status = todo.status;
       if (todo.status === "complete") {
         updateData.completedDate = Timestamp.now();
+        // Send webhook notification for completed todo
+        const existingTodo = todos.find(t => t.id === id);
+        if (existingTodo) {
+          notifyTodoCompleted({
+            description: todo.description || existingTodo.description,
+            owner: todo.owner || existingTodo.owner,
+            dueDate: todo.dueDate || existingTodo.dueDate,
+          });
+        }
       }
     }
     await updateDoc(doc(db, COLLECTIONS.TRACTION_TODOS, id), updateData);
-  }, []);
+  }, [todos]);
 
   const deleteTodo = useCallback(async (id: string) => {
     if (!db) return;
@@ -455,6 +555,16 @@ export function useTractionData() {
       createdAt: now,
       updatedAt: now,
     } as Omit<TractionMeetingDoc, "id">);
+    
+    // Send webhook notification
+    notifyMeetingLogged({
+      date: meeting.date,
+      rating: meeting.rating,
+      issuesSolved: meeting.issuesSolved,
+      todoCompletionRate: meeting.todoCompletionRate,
+      rocksReviewed: meeting.rocksReviewed,
+      scorecardReviewed: meeting.scorecardReviewed,
+    });
   }, []);
 
   const updateMeeting = useCallback(async (id: string, meeting: Partial<Meeting>) => {
@@ -492,6 +602,13 @@ export function useTractionData() {
       createdAt: now,
       updatedAt: now,
     } as Omit<TractionTeamMemberDoc, "id">);
+    
+    // Send webhook notification
+    notifyTeamMemberAdded({
+      name: member.name,
+      role: member.role,
+      category: member.category,
+    });
   }, []);
 
   const updateTeamMember = useCallback(async (id: string, member: Partial<TeamMember>) => {
