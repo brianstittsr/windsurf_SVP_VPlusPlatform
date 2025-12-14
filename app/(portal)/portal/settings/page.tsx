@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -160,6 +161,9 @@ const llmProviders = [
 const SETTINGS_DOC_ID = "global";
 
 export default function SettingsPage() {
+  const searchParams = useSearchParams();
+  const defaultTab = searchParams.get("tab") || "integrations";
+  const [activeTab, setActiveTab] = useState(defaultTab);
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
   const [apiKeys, setApiKeys] = useState<Record<string, Record<string, string>>>({});
   const [testingStatus, setTestingStatus] = useState<Record<string, "testing" | "success" | "error" | null>>({});
@@ -447,7 +451,7 @@ export default function SettingsPage() {
         </Button>
       </div>
 
-      <Tabs defaultValue="integrations" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList>
           <TabsTrigger value="integrations">Integrations</TabsTrigger>
           <TabsTrigger value="llm">LLM Configuration</TabsTrigger>
