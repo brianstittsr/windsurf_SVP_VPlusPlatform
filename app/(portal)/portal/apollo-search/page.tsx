@@ -1020,7 +1020,24 @@ export default function ApolloSearchPage() {
         // Reload saved lists
         await loadSavedLists();
       } else {
-        console.error("No email returned from Apollo:", data);
+        // Email not available - mark as unavailable in the list
+        const listRef = doc(db, COLLECTIONS.APOLLO_SAVED_LISTS, listId);
+        const listSnap = await getDoc(listRef);
+        
+        if (listSnap.exists()) {
+          const listData = listSnap.data();
+          const updatedContacts = [...(listData.contacts || [])];
+          const contactIdx = updatedContacts.findIndex((c: { apolloId: string }) => c.apolloId === apolloId);
+          if (contactIdx !== -1) {
+            updatedContacts[contactIdx] = {
+              ...updatedContacts[contactIdx],
+              email: "Not available",
+            };
+            await updateDoc(listRef, { contacts: updatedContacts, updatedAt: Timestamp.now() });
+          }
+        }
+        await loadSavedLists();
+        console.log("Email not available for this contact in Apollo");
       }
     } catch (error) {
       console.error("Error purchasing email for list contact:", error);
@@ -1100,7 +1117,24 @@ export default function ApolloSearchPage() {
         // Reload saved lists
         await loadSavedLists();
       } else {
-        console.error("No phone returned from Apollo:", data);
+        // Phone not available - mark as unavailable in the list
+        const listRef = doc(db, COLLECTIONS.APOLLO_SAVED_LISTS, listId);
+        const listSnap = await getDoc(listRef);
+        
+        if (listSnap.exists()) {
+          const listData = listSnap.data();
+          const updatedContacts = [...(listData.contacts || [])];
+          const contactIdx = updatedContacts.findIndex((c: { apolloId: string }) => c.apolloId === apolloId);
+          if (contactIdx !== -1) {
+            updatedContacts[contactIdx] = {
+              ...updatedContacts[contactIdx],
+              phone: "Not available",
+            };
+            await updateDoc(listRef, { contacts: updatedContacts, updatedAt: Timestamp.now() });
+          }
+        }
+        await loadSavedLists();
+        console.log("Phone not available for this contact in Apollo");
       }
     } catch (error) {
       console.error("Error purchasing phone for list contact:", error);
