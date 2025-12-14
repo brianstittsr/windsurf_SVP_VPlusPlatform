@@ -589,6 +589,12 @@ export interface PlatformSettingsDoc {
       status: "connected" | "disconnected" | "error";
       lastTested?: Timestamp;
     };
+    docuseal?: {
+      apiKey?: string;
+      webhookSecret?: string;
+      status: "connected" | "disconnected" | "error";
+      lastTested?: Timestamp;
+    };
   };
   // LLM Configuration
   llmConfig?: {

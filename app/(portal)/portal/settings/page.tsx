@@ -44,6 +44,7 @@ import {
   Send,
   User,
   Loader2,
+  FileSignature,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WEBHOOK_EVENTS, testWebhookConnection, sendToBrianStitt, type WebhookEventType } from "@/lib/mattermost";
@@ -122,6 +123,17 @@ const apiConfigs: ApiKeyConfig[] = [
       { name: "clientId", label: "Client ID", placeholder: "your-client-id" },
       { name: "clientSecret", label: "Client Secret", placeholder: "your-client-secret" },
       { name: "organizationId", label: "Organization ID (optional)", placeholder: "organization-urn" },
+    ],
+    status: "disconnected",
+  },
+  {
+    id: "docuseal",
+    name: "DocuSeal",
+    description: "Electronic document signing and management",
+    icon: FileSignature,
+    keyField: "API Key",
+    additionalFields: [
+      { name: "webhookSecret", label: "Webhook Secret (optional)", placeholder: "your-webhook-secret" },
     ],
     status: "disconnected",
   },
@@ -205,6 +217,12 @@ export default function SettingsPage() {
                 accountId: data.integrations.zoom.accountId || "",
               };
             }
+            if (data.integrations.docuseal) {
+              loadedApiKeys.docuseal = {
+                apiKey: data.integrations.docuseal.apiKey || "",
+                webhookSecret: data.integrations.docuseal.webhookSecret || "",
+              };
+            }
             
             setApiKeys(loadedApiKeys);
           }
@@ -272,6 +290,11 @@ export default function SettingsPage() {
             apiSecret: apiKeys.zoom?.apiSecret || "",
             accountId: apiKeys.zoom?.accountId || "",
             status: testingStatus.zoom === "success" ? "connected" : "disconnected",
+          },
+          docuseal: {
+            apiKey: apiKeys.docuseal?.apiKey || "",
+            webhookSecret: apiKeys.docuseal?.webhookSecret || "",
+            status: testingStatus.docuseal === "success" ? "connected" : "disconnected",
           },
         },
         llmConfig: {
