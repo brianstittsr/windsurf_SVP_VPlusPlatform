@@ -98,6 +98,105 @@ export interface RockDoc extends Omit<Rock, "createdAt" | "owner" | "milestones"
   ownerId: string; // Reference to user
 }
 
+// ============================================================================
+// Traction/EOS System Types
+// ============================================================================
+
+/** Traction Scorecard Metric document in Firestore */
+export interface TractionScorecardMetricDoc {
+  id: string;
+  name: string;
+  goal: number;
+  actual: number;
+  ownerId: string; // Reference to team member
+  ownerName: string; // Denormalized for display
+  trend: "up" | "down" | "flat";
+  unit?: string; // $, %, #, etc.
+  weekNumber?: number;
+  year?: number;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+/** Traction Issue document in Firestore (IDS: Identify, Discuss, Solve) */
+export interface TractionIssueDoc {
+  id: string;
+  description: string;
+  priority: "high" | "medium" | "low";
+  identifiedDate: Timestamp;
+  ownerId: string; // Reference to team member
+  ownerName: string; // Denormalized for display
+  status: "open" | "in-progress" | "solved";
+  solvedDate?: Timestamp;
+  notes?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+/** Traction To-Do document in Firestore */
+export interface TractionTodoDoc {
+  id: string;
+  description: string;
+  ownerId: string; // Reference to team member
+  ownerName: string; // Denormalized for display
+  dueDate: Timestamp;
+  status: "not-started" | "in-progress" | "complete";
+  completedDate?: Timestamp;
+  meetingId?: string; // Reference to meeting where created
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+/** Traction Level 10 Meeting document in Firestore */
+export interface TractionMeetingDoc {
+  id: string;
+  date: Timestamp;
+  startTime: string;
+  endTime: string;
+  attendeeIds: string[]; // References to team members
+  attendeeNames: string[]; // Denormalized for display
+  rating: number; // 1-10
+  issuesSolved: number;
+  rocksReviewed: boolean;
+  scorecardReviewed: boolean;
+  todoCompletionRate: number; // 0-100
+  notes?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+/** Traction Team Member document (extends base TeamMemberDoc) */
+export interface TractionTeamMemberDoc {
+  id: string;
+  name: string;
+  role: string;
+  category: "team" | "contractor" | "advisor" | "other";
+  getsIt: boolean | null;
+  wantsIt: boolean | null;
+  capacityToDoIt: boolean | null;
+  rightSeat: boolean | null;
+  email?: string;
+  phone?: string;
+  avatar?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+/** Traction Rock document (quarterly priorities) */
+export interface TractionRockDoc {
+  id: string;
+  description: string;
+  ownerId: string; // Reference to team member
+  ownerName: string; // Denormalized for display
+  dueDate: Timestamp;
+  status: "on-track" | "at-risk" | "off-track" | "complete";
+  progress: number; // 0-100
+  quarter: string; // e.g., "Q1 2025"
+  notes?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
 /** Document/File document in Firestore */
 export interface DocumentDoc extends Omit<AppDocument, "createdAt" | "uploadedBy"> {
   createdAt: Timestamp;
@@ -658,6 +757,13 @@ export const COLLECTIONS = {
   THOMASNET_SAVED_SUPPLIERS: "thomasnetSavedSuppliers",
   // ThomasNet Saved Lists
   THOMASNET_SAVED_LISTS: "thomasnetSavedLists",
+  // Traction/EOS Collections
+  TRACTION_ROCKS: "tractionRocks",
+  TRACTION_SCORECARD_METRICS: "tractionScorecardMetrics",
+  TRACTION_ISSUES: "tractionIssues",
+  TRACTION_TODOS: "tractionTodos",
+  TRACTION_MEETINGS: "tractionMeetings",
+  TRACTION_TEAM_MEMBERS: "tractionTeamMembers",
 } as const;
 
 // ============================================================================
@@ -707,6 +813,14 @@ export const teamMembersCollection = () => getCollection<TeamMemberDoc>(COLLECTI
 
 // Platform Settings collection reference
 export const platformSettingsCollection = () => getCollection<PlatformSettingsDoc>(COLLECTIONS.PLATFORM_SETTINGS);
+
+// Traction/EOS collection references
+export const tractionRocksCollection = () => getCollection<TractionRockDoc>(COLLECTIONS.TRACTION_ROCKS);
+export const tractionScorecardMetricsCollection = () => getCollection<TractionScorecardMetricDoc>(COLLECTIONS.TRACTION_SCORECARD_METRICS);
+export const tractionIssuesCollection = () => getCollection<TractionIssueDoc>(COLLECTIONS.TRACTION_ISSUES);
+export const tractionTodosCollection = () => getCollection<TractionTodoDoc>(COLLECTIONS.TRACTION_TODOS);
+export const tractionMeetingsCollection = () => getCollection<TractionMeetingDoc>(COLLECTIONS.TRACTION_MEETINGS);
+export const tractionTeamMembersCollection = () => getCollection<TractionTeamMemberDoc>(COLLECTIONS.TRACTION_TEAM_MEMBERS);
 
 // ============================================================================
 // Subcollection Helpers

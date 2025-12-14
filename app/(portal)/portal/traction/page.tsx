@@ -72,70 +72,19 @@ import {
   Play,
   Save,
   X,
+  AlertTriangle,
+  Database,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-// Types
-interface Rock {
-  id: string;
-  description: string;
-  owner: string;
-  dueDate: string;
-  status: "on-track" | "at-risk" | "off-track" | "complete";
-  progress: number;
-  quarter: string;
-}
-
-interface ScorecardMetric {
-  id: string;
-  name: string;
-  goal: number;
-  actual: number;
-  owner: string;
-  trend: "up" | "down" | "flat";
-  unit?: string;
-}
-
-interface Issue {
-  id: string;
-  description: string;
-  priority: "high" | "medium" | "low";
-  identifiedDate: string;
-  owner: string;
-  status: "open" | "in-progress" | "solved";
-}
-
-interface Todo {
-  id: string;
-  description: string;
-  owner: string;
-  dueDate: string;
-  status: "not-started" | "in-progress" | "complete";
-  createdDate: string;
-}
-
-interface Meeting {
-  id: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  attendees: string[];
-  rating: number;
-  issuesSolved: number;
-  rocksReviewed: boolean;
-  scorecardReviewed: boolean;
-  todoCompletionRate: number;
-}
-
-interface TeamMember {
-  id: string;
-  name: string;
-  role: string;
-  getsIt: boolean | null;
-  wantsIt: boolean | null;
-  capacityToDoIt: boolean | null;
-  rightSeat: boolean | null;
-}
+import {
+  useTractionData,
+  Rock,
+  ScorecardMetric,
+  Issue,
+  Todo,
+  Meeting,
+  TeamMember,
+} from "@/lib/hooks/use-traction-data";
 
 interface ChatMessage {
   id: string;
@@ -145,64 +94,54 @@ interface ChatMessage {
   actions?: { label: string; value: string }[];
 }
 
-// Mock data
-const initialRocks: Rock[] = [
-  { id: "rock-1", description: "Implement new CRM system and migrate all customer data", owner: "John Smith", dueDate: "2025-03-31", status: "on-track", progress: 65, quarter: "Q1 2025" },
-  { id: "rock-2", description: "Launch affiliate partner program with 10 certified partners", owner: "Sarah Johnson", dueDate: "2025-03-31", status: "at-risk", progress: 40, quarter: "Q1 2025" },
-  { id: "rock-3", description: "Achieve ISO 9001 certification for consulting services", owner: "Mike Chen", dueDate: "2025-03-31", status: "on-track", progress: 80, quarter: "Q1 2025" },
-  { id: "rock-4", description: "Develop and launch EDGE™ Platform MVP", owner: "Emily Davis", dueDate: "2025-03-31", status: "off-track", progress: 25, quarter: "Q1 2025" },
-  { id: "rock-5", description: "Hire 3 senior consultants for manufacturing practice", owner: "John Smith", dueDate: "2025-03-31", status: "complete", progress: 100, quarter: "Q1 2025" },
-];
-
-const initialMetrics: ScorecardMetric[] = [
-  { id: "metric-1", name: "Weekly Revenue", goal: 50000, actual: 52000, owner: "John Smith", trend: "up", unit: "$" },
-  { id: "metric-2", name: "New Leads", goal: 25, actual: 18, owner: "Sarah Johnson", trend: "down" },
-  { id: "metric-3", name: "Conversion Rate", goal: 30, actual: 32, owner: "Sarah Johnson", trend: "up", unit: "%" },
-  { id: "metric-4", name: "Customer Satisfaction", goal: 90, actual: 88, owner: "Mike Chen", trend: "flat", unit: "%" },
-  { id: "metric-5", name: "On-Time Delivery", goal: 95, actual: 97, owner: "Emily Davis", trend: "up", unit: "%" },
-  { id: "metric-6", name: "Cash Balance", goal: 100000, actual: 125000, owner: "John Smith", trend: "up", unit: "$" },
-];
-
-const initialIssues: Issue[] = [
-  { id: "issue-1", description: "CRM vendor delayed implementation timeline by 2 weeks", priority: "high", identifiedDate: "2025-01-15", owner: "John Smith", status: "in-progress" },
-  { id: "issue-2", description: "Need additional budget for EDGE™ Platform development", priority: "high", identifiedDate: "2025-01-20", owner: "Emily Davis", status: "open" },
-  { id: "issue-3", description: "Partner onboarding process taking too long", priority: "medium", identifiedDate: "2025-01-10", owner: "Sarah Johnson", status: "in-progress" },
-];
-
-const initialTodos: Todo[] = [
-  { id: "todo-1", description: "Schedule meeting with CRM vendor to discuss timeline", owner: "John Smith", dueDate: "2025-01-22", status: "complete", createdDate: "2025-01-15" },
-  { id: "todo-2", description: "Prepare budget proposal for EDGE™ Platform", owner: "Emily Davis", dueDate: "2025-01-25", status: "in-progress", createdDate: "2025-01-20" },
-  { id: "todo-3", description: "Review and approve partner agreement template", owner: "Sarah Johnson", dueDate: "2025-01-24", status: "not-started", createdDate: "2025-01-18" },
-];
-
-const initialTeam: TeamMember[] = [
-  { id: "tm-1", name: "John Smith", role: "CEO / Integrator", getsIt: true, wantsIt: true, capacityToDoIt: true, rightSeat: true },
-  { id: "tm-2", name: "Sarah Johnson", role: "VP Sales", getsIt: true, wantsIt: true, capacityToDoIt: true, rightSeat: true },
-  { id: "tm-3", name: "Mike Chen", role: "VP Operations", getsIt: true, wantsIt: true, capacityToDoIt: null, rightSeat: null },
-  { id: "tm-4", name: "Emily Davis", role: "VP Technology", getsIt: true, wantsIt: null, capacityToDoIt: true, rightSeat: null },
-];
-
-const initialMeetings: Meeting[] = [
-  { id: "meeting-1", date: "2025-01-20", startTime: "09:00", endTime: "10:30", attendees: ["John Smith", "Sarah Johnson", "Mike Chen", "Emily Davis"], rating: 8, issuesSolved: 3, rocksReviewed: true, scorecardReviewed: true, todoCompletionRate: 85 },
-  { id: "meeting-2", date: "2025-01-13", startTime: "09:00", endTime: "10:30", attendees: ["John Smith", "Sarah Johnson", "Mike Chen", "Emily Davis"], rating: 9, issuesSolved: 4, rocksReviewed: true, scorecardReviewed: true, todoCompletionRate: 90 },
-];
-
 // Empty form states
-const emptyRock: Omit<Rock, "id"> = { description: "", owner: "", dueDate: "", status: "on-track", progress: 0, quarter: "Q1 2025" };
-const emptyMetric: Omit<ScorecardMetric, "id"> = { name: "", goal: 0, actual: 0, owner: "", trend: "flat", unit: "" };
-const emptyIssue: Omit<Issue, "id"> = { description: "", priority: "medium", identifiedDate: new Date().toISOString().split("T")[0], owner: "", status: "open" };
-const emptyTodo: Omit<Todo, "id"> = { description: "", owner: "", dueDate: "", status: "not-started", createdDate: new Date().toISOString().split("T")[0] };
-const emptyMeeting: Omit<Meeting, "id"> = { date: new Date().toISOString().split("T")[0], startTime: "09:00", endTime: "10:30", attendees: [], rating: 8, issuesSolved: 0, rocksReviewed: false, scorecardReviewed: false, todoCompletionRate: 0 };
-const emptyTeamMember: Omit<TeamMember, "id"> = { name: "", role: "", getsIt: null, wantsIt: null, capacityToDoIt: null, rightSeat: null };
+type RockForm = Omit<Rock, "id" | "ownerId"> & { ownerId?: string };
+type MetricForm = Omit<ScorecardMetric, "id" | "ownerId"> & { ownerId?: string };
+type IssueForm = Omit<Issue, "id" | "ownerId"> & { ownerId?: string };
+type TodoForm = Omit<Todo, "id" | "ownerId"> & { ownerId?: string };
+type MeetingForm = Omit<Meeting, "id">;
+type TeamMemberForm = Omit<TeamMember, "id">;
+
+const emptyRock: RockForm = { description: "", owner: "", dueDate: "", status: "on-track", progress: 0, quarter: "Q1 2025" };
+const emptyMetric: MetricForm = { name: "", goal: 0, actual: 0, owner: "", trend: "flat", unit: "" };
+const emptyIssue: IssueForm = { description: "", priority: "medium", identifiedDate: new Date().toISOString().split("T")[0], owner: "", status: "open" };
+const emptyTodo: TodoForm = { description: "", owner: "", dueDate: "", status: "not-started", createdDate: new Date().toISOString().split("T")[0] };
+const emptyMeeting: MeetingForm = { date: new Date().toISOString().split("T")[0], startTime: "09:00", endTime: "10:30", attendees: [], rating: 8, issuesSolved: 0, rocksReviewed: false, scorecardReviewed: false, todoCompletionRate: 0 };
+const emptyTeamMember: TeamMemberForm = { name: "", role: "", category: "team", getsIt: null, wantsIt: null, capacityToDoIt: null, rightSeat: null };
 
 export default function TractionDashboardPage() {
+  // Use Firestore data hook
+  const {
+    rocks,
+    metrics,
+    issues,
+    todos,
+    meetings,
+    team,
+    loading,
+    error,
+    isFirebaseConfigured,
+    addRock: addRockToDb,
+    updateRock: updateRockInDb,
+    deleteRock: deleteRockFromDb,
+    addMetric: addMetricToDb,
+    updateMetric: updateMetricInDb,
+    deleteMetric: deleteMetricFromDb,
+    addIssue: addIssueToDb,
+    updateIssue: updateIssueInDb,
+    deleteIssue: deleteIssueFromDb,
+    addTodo: addTodoToDb,
+    updateTodo: updateTodoInDb,
+    deleteTodo: deleteTodoFromDb,
+    addMeeting: addMeetingToDb,
+    updateMeeting: updateMeetingInDb,
+    deleteMeeting: deleteMeetingFromDb,
+    addTeamMember: addTeamMemberToDb,
+    updateTeamMember: updateTeamMemberInDb,
+    deleteTeamMember: deleteTeamMemberFromDb,
+  } = useTractionData();
+
   const [activeTab, setActiveTab] = useState("overview");
-  const [rocks, setRocks] = useState<Rock[]>(initialRocks);
-  const [metrics, setMetrics] = useState<ScorecardMetric[]>(initialMetrics);
-  const [issues, setIssues] = useState<Issue[]>(initialIssues);
-  const [todos, setTodos] = useState<Todo[]>(initialTodos);
-  const [team, setTeam] = useState<TeamMember[]>(initialTeam);
-  const [meetings, setMeetings] = useState<Meeting[]>(initialMeetings);
   const [currentQuarter, setCurrentQuarter] = useState("Q1 2025");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
@@ -229,20 +168,21 @@ export default function TractionDashboardPage() {
   const [editingTeamMember, setEditingTeamMember] = useState<TeamMember | null>(null);
 
   // Form data states
-  const [rockForm, setRockForm] = useState<Omit<Rock, "id">>(emptyRock);
-  const [metricForm, setMetricForm] = useState<Omit<ScorecardMetric, "id">>(emptyMetric);
-  const [issueForm, setIssueForm] = useState<Omit<Issue, "id">>(emptyIssue);
-  const [todoForm, setTodoForm] = useState<Omit<Todo, "id">>(emptyTodo);
-  const [meetingForm, setMeetingForm] = useState<Omit<Meeting, "id">>(emptyMeeting);
-  const [teamMemberForm, setTeamMemberForm] = useState<Omit<TeamMember, "id">>(emptyTeamMember);
+  const [rockForm, setRockForm] = useState<RockForm>(emptyRock);
+  const [metricForm, setMetricForm] = useState<MetricForm>(emptyMetric);
+  const [issueForm, setIssueForm] = useState<IssueForm>(emptyIssue);
+  const [todoForm, setTodoForm] = useState<TodoForm>(emptyTodo);
+  const [meetingForm, setMeetingForm] = useState<MeetingForm>(emptyMeeting);
+  const [teamMemberForm, setTeamMemberForm] = useState<TeamMemberForm>(emptyTeamMember);
 
   // Delete state
   const [deleteTarget, setDeleteTarget] = useState<{ type: string; id: string; name: string } | null>(null);
 
-  // Team member names for dropdowns
-  const teamMemberNames = team.map(t => t.name);
+  // Team member names for dropdowns (only show members with category "team")
+  const teamMemberNames = team.filter(t => t.category === "team").map(t => t.name);
 
   const calculateOverallHealth = () => {
+    if (rocks.length === 0 || metrics.length === 0) return 0;
     const rockScore = rocks.filter(r => r.status === "on-track" || r.status === "complete").length / rocks.length * 10;
     const metricScore = metrics.filter(m => m.actual >= m.goal).length / metrics.length * 10;
     return Math.round((rockScore + metricScore) / 2 * 10) / 10;
@@ -291,23 +231,23 @@ export default function TractionDashboardPage() {
 
   const openEditRock = (rock: Rock) => {
     setEditingRock(rock);
-    setRockForm({ description: rock.description, owner: rock.owner, dueDate: rock.dueDate, status: rock.status, progress: rock.progress, quarter: rock.quarter });
+    setRockForm({ description: rock.description, owner: rock.owner, ownerId: rock.ownerId, dueDate: rock.dueDate, status: rock.status, progress: rock.progress, quarter: rock.quarter });
     setShowRockForm(true);
   };
 
-  const saveRock = () => {
+  const saveRock = async () => {
     if (!rockForm.description || !rockForm.owner) return;
     if (editingRock) {
-      setRocks(rocks.map(r => r.id === editingRock.id ? { ...editingRock, ...rockForm } : r));
+      await updateRockInDb(editingRock.id, { ...rockForm, ownerId: rockForm.ownerId || "" });
     } else {
-      setRocks([...rocks, { id: `rock-${Date.now()}`, ...rockForm }]);
+      await addRockToDb({ ...rockForm, ownerId: rockForm.ownerId || "" });
     }
     setShowRockForm(false);
     setRockForm(emptyRock);
   };
 
-  const deleteRock = (id: string) => {
-    setRocks(rocks.filter(r => r.id !== id));
+  const deleteRock = async (id: string) => {
+    await deleteRockFromDb(id);
   };
 
   // CRUD Operations for Metrics
@@ -319,23 +259,23 @@ export default function TractionDashboardPage() {
 
   const openEditMetric = (metric: ScorecardMetric) => {
     setEditingMetric(metric);
-    setMetricForm({ name: metric.name, goal: metric.goal, actual: metric.actual, owner: metric.owner, trend: metric.trend, unit: metric.unit });
+    setMetricForm({ name: metric.name, goal: metric.goal, actual: metric.actual, owner: metric.owner, ownerId: metric.ownerId, trend: metric.trend, unit: metric.unit });
     setShowMetricForm(true);
   };
 
-  const saveMetric = () => {
+  const saveMetric = async () => {
     if (!metricForm.name || !metricForm.owner) return;
     if (editingMetric) {
-      setMetrics(metrics.map(m => m.id === editingMetric.id ? { ...editingMetric, ...metricForm } : m));
+      await updateMetricInDb(editingMetric.id, { ...metricForm, ownerId: metricForm.ownerId || "" });
     } else {
-      setMetrics([...metrics, { id: `metric-${Date.now()}`, ...metricForm }]);
+      await addMetricToDb({ ...metricForm, ownerId: metricForm.ownerId || "" });
     }
     setShowMetricForm(false);
     setMetricForm(emptyMetric);
   };
 
-  const deleteMetric = (id: string) => {
-    setMetrics(metrics.filter(m => m.id !== id));
+  const deleteMetric = async (id: string) => {
+    await deleteMetricFromDb(id);
   };
 
   // CRUD Operations for Issues
@@ -347,27 +287,27 @@ export default function TractionDashboardPage() {
 
   const openEditIssue = (issue: Issue) => {
     setEditingIssue(issue);
-    setIssueForm({ description: issue.description, priority: issue.priority, identifiedDate: issue.identifiedDate, owner: issue.owner, status: issue.status });
+    setIssueForm({ description: issue.description, priority: issue.priority, identifiedDate: issue.identifiedDate, owner: issue.owner, ownerId: issue.ownerId, status: issue.status });
     setShowIssueForm(true);
   };
 
-  const saveIssue = () => {
+  const saveIssue = async () => {
     if (!issueForm.description || !issueForm.owner) return;
     if (editingIssue) {
-      setIssues(issues.map(i => i.id === editingIssue.id ? { ...editingIssue, ...issueForm } : i));
+      await updateIssueInDb(editingIssue.id, { ...issueForm, ownerId: issueForm.ownerId || "" });
     } else {
-      setIssues([...issues, { id: `issue-${Date.now()}`, ...issueForm }]);
+      await addIssueToDb({ ...issueForm, ownerId: issueForm.ownerId || "" });
     }
     setShowIssueForm(false);
     setIssueForm(emptyIssue);
   };
 
-  const solveIssue = (id: string) => {
-    setIssues(issues.map(i => i.id === id ? { ...i, status: "solved" as const } : i));
+  const solveIssue = async (id: string) => {
+    await updateIssueInDb(id, { status: "solved" });
   };
 
-  const deleteIssue = (id: string) => {
-    setIssues(issues.filter(i => i.id !== id));
+  const deleteIssue = async (id: string) => {
+    await deleteIssueFromDb(id);
   };
 
   // CRUD Operations for Todos
@@ -379,27 +319,30 @@ export default function TractionDashboardPage() {
 
   const openEditTodo = (todo: Todo) => {
     setEditingTodo(todo);
-    setTodoForm({ description: todo.description, owner: todo.owner, dueDate: todo.dueDate, status: todo.status, createdDate: todo.createdDate });
+    setTodoForm({ description: todo.description, owner: todo.owner, ownerId: todo.ownerId, dueDate: todo.dueDate, status: todo.status, createdDate: todo.createdDate });
     setShowTodoForm(true);
   };
 
-  const saveTodo = () => {
+  const saveTodo = async () => {
     if (!todoForm.description || !todoForm.owner) return;
     if (editingTodo) {
-      setTodos(todos.map(t => t.id === editingTodo.id ? { ...editingTodo, ...todoForm } : t));
+      await updateTodoInDb(editingTodo.id, { ...todoForm, ownerId: todoForm.ownerId || "" });
     } else {
-      setTodos([...todos, { id: `todo-${Date.now()}`, ...todoForm }]);
+      await addTodoToDb({ ...todoForm, ownerId: todoForm.ownerId || "" });
     }
     setShowTodoForm(false);
     setTodoForm(emptyTodo);
   };
 
-  const toggleTodoComplete = (id: string) => {
-    setTodos(todos.map(t => t.id === id ? { ...t, status: t.status === "complete" ? "not-started" : "complete" } : t));
+  const toggleTodoComplete = async (id: string) => {
+    const todo = todos.find(t => t.id === id);
+    if (todo) {
+      await updateTodoInDb(id, { status: todo.status === "complete" ? "not-started" : "complete" });
+    }
   };
 
-  const deleteTodo = (id: string) => {
-    setTodos(todos.filter(t => t.id !== id));
+  const deleteTodo = async (id: string) => {
+    await deleteTodoFromDb(id);
   };
 
   // CRUD Operations for Meetings
@@ -415,19 +358,19 @@ export default function TractionDashboardPage() {
     setShowMeetingForm(true);
   };
 
-  const saveMeeting = () => {
+  const saveMeeting = async () => {
     if (!meetingForm.date) return;
     if (editingMeeting) {
-      setMeetings(meetings.map(m => m.id === editingMeeting.id ? { ...editingMeeting, ...meetingForm } : m));
+      await updateMeetingInDb(editingMeeting.id, meetingForm);
     } else {
-      setMeetings([{ id: `meeting-${Date.now()}`, ...meetingForm }, ...meetings]);
+      await addMeetingToDb(meetingForm);
     }
     setShowMeetingForm(false);
     setMeetingForm(emptyMeeting);
   };
 
-  const deleteMeeting = (id: string) => {
-    setMeetings(meetings.filter(m => m.id !== id));
+  const deleteMeeting = async (id: string) => {
+    await deleteMeetingFromDb(id);
   };
 
   // CRUD Operations for Team Members
@@ -439,23 +382,23 @@ export default function TractionDashboardPage() {
 
   const openEditTeamMember = (member: TeamMember) => {
     setEditingTeamMember(member);
-    setTeamMemberForm({ name: member.name, role: member.role, getsIt: member.getsIt, wantsIt: member.wantsIt, capacityToDoIt: member.capacityToDoIt, rightSeat: member.rightSeat });
+    setTeamMemberForm({ name: member.name, role: member.role, category: member.category, getsIt: member.getsIt, wantsIt: member.wantsIt, capacityToDoIt: member.capacityToDoIt, rightSeat: member.rightSeat });
     setShowTeamMemberForm(true);
   };
 
-  const saveTeamMember = () => {
+  const saveTeamMember = async () => {
     if (!teamMemberForm.name || !teamMemberForm.role) return;
     if (editingTeamMember) {
-      setTeam(team.map(t => t.id === editingTeamMember.id ? { ...editingTeamMember, ...teamMemberForm } : t));
+      await updateTeamMemberInDb(editingTeamMember.id, teamMemberForm);
     } else {
-      setTeam([...team, { id: `tm-${Date.now()}`, ...teamMemberForm }]);
+      await addTeamMemberToDb(teamMemberForm);
     }
     setShowTeamMemberForm(false);
     setTeamMemberForm(emptyTeamMember);
   };
 
-  const deleteTeamMember = (id: string) => {
-    setTeam(team.filter(t => t.id !== id));
+  const deleteTeamMember = async (id: string) => {
+    await deleteTeamMemberFromDb(id);
   };
 
   // Delete confirmation
@@ -464,15 +407,15 @@ export default function TractionDashboardPage() {
     setShowDeleteConfirm(true);
   };
 
-  const executeDelete = () => {
+  const executeDelete = async () => {
     if (!deleteTarget) return;
     switch (deleteTarget.type) {
-      case "rock": deleteRock(deleteTarget.id); break;
-      case "metric": deleteMetric(deleteTarget.id); break;
-      case "issue": deleteIssue(deleteTarget.id); break;
-      case "todo": deleteTodo(deleteTarget.id); break;
-      case "meeting": deleteMeeting(deleteTarget.id); break;
-      case "team": deleteTeamMember(deleteTarget.id); break;
+      case "rock": await deleteRock(deleteTarget.id); break;
+      case "metric": await deleteMetric(deleteTarget.id); break;
+      case "issue": await deleteIssue(deleteTarget.id); break;
+      case "todo": await deleteTodo(deleteTarget.id); break;
+      case "meeting": await deleteMeeting(deleteTarget.id); break;
+      case "team": await deleteTeamMember(deleteTarget.id); break;
     }
     setShowDeleteConfirm(false);
     setDeleteTarget(null);
@@ -549,6 +492,55 @@ export default function TractionDashboardPage() {
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chatMessages]);
 
   const overallHealth = calculateOverallHealth();
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-purple-600" />
+          <p className="text-muted-foreground">Loading Traction data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error/setup state if Firebase not configured
+  if (!isFirebaseConfigured || error) {
+    return (
+      <div className="h-[calc(100vh-4rem)] flex items-center justify-center p-6">
+        <Card className="max-w-lg w-full">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-amber-100">
+                <AlertTriangle className="h-6 w-6 text-amber-600" />
+              </div>
+              <div>
+                <CardTitle>Database Not Connected</CardTitle>
+                <CardDescription>Configure Firebase to enable data persistence</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              {error || "The Traction Dashboard requires Firebase to store your EOS data. Please configure your Firebase credentials in Settings to get started."}
+            </p>
+            <div className="bg-muted rounded-lg p-4 space-y-2">
+              <p className="text-sm font-medium">To connect Firebase:</p>
+              <ol className="text-sm text-muted-foreground list-decimal list-inside space-y-1">
+                <li>Go to Settings → Integrations</li>
+                <li>Add your Firebase project credentials</li>
+                <li>Refresh this page</li>
+              </ol>
+            </div>
+            <Button variant="outline" className="w-full" onClick={() => window.location.href = "/portal/settings"}>
+              <Database className="h-4 w-4 mr-2" />Go to Settings
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="h-[calc(100vh-4rem)] flex">
@@ -717,7 +709,7 @@ export default function TractionDashboardPage() {
             <ScrollArea className="h-full">
               <div className="p-6 space-y-6">
                 <div className="flex justify-between items-center"><div><h2 className="text-lg font-semibold">People Analyzer (GWC)</h2><p className="text-sm text-muted-foreground">Right people in the right seats</p></div><Button onClick={openAddTeamMember}><Plus className="h-4 w-4 mr-2" />Add Team Member</Button></div>
-                <Card><CardContent className="pt-6"><Table><TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Role</TableHead><TableHead className="text-center">Gets It</TableHead><TableHead className="text-center">Wants It</TableHead><TableHead className="text-center">Capacity</TableHead><TableHead className="text-center">Right Seat</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader><TableBody>{team.map(member => (<TableRow key={member.id}><TableCell className="font-medium">{member.name}</TableCell><TableCell>{member.role}</TableCell><TableCell className="text-center">{member.getsIt === true ? <CheckCircle className="h-5 w-5 text-green-600 mx-auto" /> : member.getsIt === false ? <XCircle className="h-5 w-5 text-red-600 mx-auto" /> : <Minus className="h-5 w-5 text-gray-400 mx-auto" />}</TableCell><TableCell className="text-center">{member.wantsIt === true ? <CheckCircle className="h-5 w-5 text-green-600 mx-auto" /> : member.wantsIt === false ? <XCircle className="h-5 w-5 text-red-600 mx-auto" /> : <Minus className="h-5 w-5 text-gray-400 mx-auto" />}</TableCell><TableCell className="text-center">{member.capacityToDoIt === true ? <CheckCircle className="h-5 w-5 text-green-600 mx-auto" /> : member.capacityToDoIt === false ? <XCircle className="h-5 w-5 text-red-600 mx-auto" /> : <Minus className="h-5 w-5 text-gray-400 mx-auto" />}</TableCell><TableCell className="text-center">{member.rightSeat === true ? <CheckCircle className="h-5 w-5 text-green-600 mx-auto" /> : member.rightSeat === false ? <XCircle className="h-5 w-5 text-red-600 mx-auto" /> : <Minus className="h-5 w-5 text-gray-400 mx-auto" />}</TableCell><TableCell className="text-right"><Button variant="ghost" size="icon" onClick={() => openEditTeamMember(member)}><Edit className="h-4 w-4" /></Button><Button variant="ghost" size="icon" onClick={() => confirmDelete("team", member.id, member.name)}><Trash2 className="h-4 w-4 text-red-500" /></Button></TableCell></TableRow>))}</TableBody></Table></CardContent></Card>
+                <Card><CardContent className="pt-6"><Table><TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Role</TableHead><TableHead>Category</TableHead><TableHead className="text-center">Gets It</TableHead><TableHead className="text-center">Wants It</TableHead><TableHead className="text-center">Capacity</TableHead><TableHead className="text-center">Right Seat</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader><TableBody>{team.map(member => (<TableRow key={member.id}><TableCell className="font-medium">{member.name}</TableCell><TableCell>{member.role}</TableCell><TableCell><Badge variant={member.category === "team" ? "default" : "secondary"} className="capitalize">{member.category}</Badge></TableCell><TableCell className="text-center">{member.getsIt === true ? <CheckCircle className="h-5 w-5 text-green-600 mx-auto" /> : member.getsIt === false ? <XCircle className="h-5 w-5 text-red-600 mx-auto" /> : <Minus className="h-5 w-5 text-gray-400 mx-auto" />}</TableCell><TableCell className="text-center">{member.wantsIt === true ? <CheckCircle className="h-5 w-5 text-green-600 mx-auto" /> : member.wantsIt === false ? <XCircle className="h-5 w-5 text-red-600 mx-auto" /> : <Minus className="h-5 w-5 text-gray-400 mx-auto" />}</TableCell><TableCell className="text-center">{member.capacityToDoIt === true ? <CheckCircle className="h-5 w-5 text-green-600 mx-auto" /> : member.capacityToDoIt === false ? <XCircle className="h-5 w-5 text-red-600 mx-auto" /> : <Minus className="h-5 w-5 text-gray-400 mx-auto" />}</TableCell><TableCell className="text-center">{member.rightSeat === true ? <CheckCircle className="h-5 w-5 text-green-600 mx-auto" /> : member.rightSeat === false ? <XCircle className="h-5 w-5 text-red-600 mx-auto" /> : <Minus className="h-5 w-5 text-gray-400 mx-auto" />}</TableCell><TableCell className="text-right"><Button variant="ghost" size="icon" onClick={() => openEditTeamMember(member)}><Edit className="h-4 w-4" /></Button><Button variant="ghost" size="icon" onClick={() => confirmDelete("team", member.id, member.name)}><Trash2 className="h-4 w-4 text-red-500" /></Button></TableCell></TableRow>))}</TableBody></Table></CardContent></Card>
               </div>
             </ScrollArea>
           </TabsContent>
@@ -1051,6 +1043,18 @@ export default function TractionDashboardPage() {
                 <Label htmlFor="member-role">Role *</Label>
                 <Input id="member-role" placeholder="e.g., VP Sales" value={teamMemberForm.role} onChange={(e) => setTeamMemberForm({ ...teamMemberForm, role: e.target.value })} />
               </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="member-category">Category</Label>
+              <Select value={teamMemberForm.category} onValueChange={(v: TeamMember["category"]) => setTeamMemberForm({ ...teamMemberForm, category: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="team">Team (appears in owner dropdowns)</SelectItem>
+                  <SelectItem value="contractor">Contractor</SelectItem>
+                  <SelectItem value="advisor">Advisor</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="border rounded-lg p-4 space-y-4">
               <h4 className="font-medium">GWC Assessment</h4>
