@@ -145,17 +145,22 @@ export default function LinkedInContentPage() {
     };
     
     // Generate content based on selected length
-    const generateLongContent = () => {
+    const generateContentByLength = (length: string) => {
       const topic = articleTopic.toLowerCase();
       const topicTitle = articleTopic;
       
-      return `In today's rapidly evolving business landscape, ${topic} has emerged as one of the most critical factors determining organizational success. As we navigate through unprecedented changes in technology, market dynamics, and customer expectations, understanding and mastering ${topic} has never been more important.
+      // Base sections that can be combined based on length
+      const intro = `In today's rapidly evolving business landscape, ${topic} has emerged as one of the most critical factors determining organizational success. As we navigate through unprecedented changes in technology, market dynamics, and customer expectations, understanding and mastering ${topic} has never been more important.`;
+
+      const currentState = `
 
 ## The Current State of ${topicTitle}
 
 Over the past decade, we've witnessed a fundamental shift in how businesses approach ${topic}. What was once considered a peripheral concern has now moved to the center of strategic planning for organizations of all sizes. This transformation hasn't happened overnight—it's been driven by a confluence of factors including technological advancement, changing consumer behavior, and increased global competition.
 
-The statistics are compelling. Recent industry research indicates that companies who prioritize ${topic} see an average of 23% higher revenue growth compared to their peers. Moreover, organizations that have fully integrated ${topic} into their operations report significantly higher employee satisfaction and customer retention rates.
+The statistics are compelling. Recent industry research indicates that companies who prioritize ${topic} see an average of 23% higher revenue growth compared to their peers. Moreover, organizations that have fully integrated ${topic} into their operations report significantly higher employee satisfaction and customer retention rates.`;
+
+      const whyItMatters = `
 
 ## Why ${topicTitle} Matters Now More Than Ever
 
@@ -171,7 +176,9 @@ Today's customers are more informed, more demanding, and have more choices than 
 
 **3. Talent Acquisition and Retention**
 
-The best employees want to work for companies that are leaders in their field. Organizations that demonstrate excellence in ${topic} have a significant advantage in attracting and retaining top talent. This creates a virtuous cycle where great people drive even better results.
+The best employees want to work for companies that are leaders in their field. Organizations that demonstrate excellence in ${topic} have a significant advantage in attracting and retaining top talent. This creates a virtuous cycle where great people drive even better results.`;
+
+      const strategies = `
 
 ## Key Strategies for Success in ${topicTitle}
 
@@ -195,7 +202,9 @@ You can't improve what you don't measure. Successful organizations establish cle
 
 ### Strategy 5: Build Strong Partnerships
 
-No organization can excel at everything. The most successful companies build ecosystems of partners who complement their strengths and help them deliver better outcomes. This collaborative approach is especially important in ${topic}, where the landscape is constantly evolving.
+No organization can excel at everything. The most successful companies build ecosystems of partners who complement their strengths and help them deliver better outcomes. This collaborative approach is especially important in ${topic}, where the landscape is constantly evolving.`;
+
+      const pitfalls = `
 
 ## Common Pitfalls to Avoid
 
@@ -207,7 +216,9 @@ While there are many paths to success, there are also common mistakes that can d
 
 - **Failing to communicate effectively**: Change requires buy-in from all stakeholders. Organizations that don't invest in communication often face resistance and slow adoption.
 
-- **Underestimating resource requirements**: Successful implementation of ${topic} initiatives requires adequate investment in time, money, and people.
+- **Underestimating resource requirements**: Successful implementation of ${topic} initiatives requires adequate investment in time, money, and people.`;
+
+      const future = `
 
 ## Looking Ahead: The Future of ${topicTitle}
 
@@ -217,7 +228,63 @@ The integration of artificial intelligence and machine learning will continue to
 
 Sustainability and social responsibility will become increasingly important considerations. Stakeholders—including customers, employees, and investors—are demanding that companies demonstrate commitment to broader societal goals.
 
-The boundaries between industries will continue to blur, creating both challenges and opportunities. Companies that can adapt to this new reality and find innovative ways to apply ${topic} across different contexts will thrive.
+The boundaries between industries will continue to blur, creating both challenges and opportunities. Companies that can adapt to this new reality and find innovative ways to apply ${topic} across different contexts will thrive.`;
+
+      const caseStudies = `
+
+## Real-World Case Studies
+
+Let me share some examples of organizations that have excelled in ${topic}:
+
+### Case Study 1: A Manufacturing Company's Transformation
+
+A mid-sized manufacturing company was struggling with declining market share and increasing competition from overseas. By reimagining their approach to ${topic}, they were able to reduce costs by 30% while simultaneously improving quality. The key was investing in employee training and implementing lean principles throughout their operations.
+
+### Case Study 2: A Service Company's Digital Journey
+
+A professional services firm recognized that their traditional approach to ${topic} was no longer sustainable. They embarked on a digital transformation journey that included implementing new technologies, redesigning processes, and upskilling their workforce. Within two years, they had doubled their client satisfaction scores and increased revenue by 45%.
+
+### Case Study 3: A Startup's Innovative Approach
+
+A technology startup took a completely different approach to ${topic}. Rather than following conventional wisdom, they experimented with new methodologies and weren't afraid to fail fast. This culture of innovation allowed them to disrupt their industry and achieve rapid growth.`;
+
+      const implementation = `
+
+## Implementation Roadmap
+
+For organizations looking to improve their approach to ${topic}, here's a practical roadmap:
+
+### Phase 1: Assessment (Weeks 1-4)
+- Conduct a thorough assessment of current capabilities
+- Identify gaps and opportunities for improvement
+- Benchmark against industry best practices
+- Gather input from key stakeholders
+
+### Phase 2: Planning (Weeks 5-8)
+- Develop a comprehensive strategy aligned with business objectives
+- Create detailed implementation plans with clear milestones
+- Allocate resources and assign responsibilities
+- Establish metrics and KPIs for measuring success
+
+### Phase 3: Pilot (Weeks 9-16)
+- Launch pilot initiatives in selected areas
+- Monitor progress and gather feedback
+- Make adjustments based on learnings
+- Document best practices and lessons learned
+
+### Phase 4: Scale (Weeks 17-24)
+- Roll out successful initiatives across the organization
+- Provide training and support to all affected teams
+- Continue monitoring and optimizing
+- Celebrate successes and recognize contributors
+
+### Phase 5: Sustain (Ongoing)
+- Embed new practices into organizational culture
+- Continuously monitor and improve
+- Stay current with industry trends and innovations
+- Share knowledge and best practices`;
+
+      const conclusion = `
 
 ## Conclusion
 
@@ -228,12 +295,26 @@ The journey toward excellence in ${topic} is ongoing. It requires commitment, in
 I'd love to hear your thoughts and experiences with ${topic}. What strategies have worked for your organization? What challenges have you faced? Let's continue this conversation in the comments.
 
 #${topicTitle.replace(/\s+/g, "")} #BusinessStrategy #Leadership #ProfessionalDevelopment #Innovation #DigitalTransformation #BusinessGrowth #ThoughtLeadership`;
+
+      // Build content based on selected length
+      switch (length) {
+        case "short":
+          return intro + whyItMatters + conclusion;
+        case "medium":
+          return intro + currentState + whyItMatters + strategies + conclusion;
+        case "long":
+          return intro + currentState + whyItMatters + strategies + pitfalls + future + conclusion;
+        case "extended":
+          return intro + currentState + whyItMatters + strategies + pitfalls + future + caseStudies + implementation + conclusion;
+        default:
+          return intro + currentState + whyItMatters + strategies + pitfalls + future + conclusion;
+      }
     };
 
     // Generate mock content based on topic
     const generated: GeneratedContent = {
       title: `${articleTopic}: Key Insights for Industry Leaders`,
-      content: generateLongContent(),
+      content: generateContentByLength(articleLength),
       hashtags: [
         articleTopic.replace(/\s+/g, ""),
         "BusinessStrategy",
