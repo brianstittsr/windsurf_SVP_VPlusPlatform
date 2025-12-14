@@ -606,6 +606,13 @@ export interface PlatformSettingsDoc {
   };
   // Webhook Events
   webhookEvents?: Record<string, boolean>;
+  // Notification Settings
+  notificationSettings?: {
+    syncWithMattermost: boolean;
+    inAppEnabled: boolean;
+    browserEnabled: boolean;
+    soundEnabled: boolean;
+  };
   updatedAt: Timestamp;
   updatedBy?: string;
 }
