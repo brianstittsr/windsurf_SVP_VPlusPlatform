@@ -46,6 +46,7 @@ import {
   Clock,
   Save,
   Wand2,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -98,6 +99,27 @@ export default function LinkedInContentPage() {
   // Drafts state
   const [drafts, setDrafts] = useState<ArticleDraft[]>([]);
   const [showPreview, setShowPreview] = useState(false);
+  const [showWordCount, setShowWordCount] = useState(false);
+
+  // Calculate word count statistics
+  const getWordCountStats = () => {
+    const fullText = `${editedTitle} ${editedContent}`;
+    const words = fullText.trim().split(/\s+/).filter(w => w.length > 0).length;
+    const charactersNoSpaces = fullText.replace(/\s/g, "").length;
+    const charactersWithSpaces = fullText.length;
+    const paragraphs = editedContent.split(/\n\s*\n/).filter(p => p.trim().length > 0).length;
+    const lines = editedContent.split(/\n/).filter(l => l.trim().length > 0).length;
+    const sentences = editedContent.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+    
+    return {
+      words,
+      charactersNoSpaces,
+      charactersWithSpaces,
+      paragraphs,
+      lines,
+      sentences,
+    };
+  };
 
   // Generate article content using AI
   const generateArticle = async () => {
@@ -506,6 +528,10 @@ What's your take on ${articleTopic.toLowerCase()}? I'd love to start a conversat
                             <Eye className="h-4 w-4 mr-1" />
                             Preview
                           </Button>
+                          <Button variant="outline" size="sm" onClick={() => setShowWordCount(true)}>
+                            <BarChart3 className="h-4 w-4 mr-1" />
+                            Word Count
+                          </Button>
                         </div>
                       </div>
                     </CardHeader>
@@ -836,6 +862,52 @@ What's your take on ${articleTopic.toLowerCase()}? I'd love to start a conversat
             <Button className="bg-blue-600 hover:bg-blue-700">
               <Send className="h-4 w-4 mr-2" />
               Publish
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Word Count Dialog */}
+      <Dialog open={showWordCount} onOpenChange={setShowWordCount}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" />
+              Word Count
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-muted-foreground mb-3">Statistics:</p>
+            <div className="space-y-2">
+              <div className="flex justify-between py-1 border-b">
+                <span className="text-sm">Words</span>
+                <span className="text-sm font-semibold">{getWordCountStats().words.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b">
+                <span className="text-sm">Characters (no spaces)</span>
+                <span className="text-sm font-semibold">{getWordCountStats().charactersNoSpaces.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b">
+                <span className="text-sm">Characters (with spaces)</span>
+                <span className="text-sm font-semibold">{getWordCountStats().charactersWithSpaces.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b">
+                <span className="text-sm">Paragraphs</span>
+                <span className="text-sm font-semibold">{getWordCountStats().paragraphs.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b">
+                <span className="text-sm">Lines</span>
+                <span className="text-sm font-semibold">{getWordCountStats().lines.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between py-1">
+                <span className="text-sm">Sentences</span>
+                <span className="text-sm font-semibold">{getWordCountStats().sentences.toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowWordCount(false)} className="w-full">
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
