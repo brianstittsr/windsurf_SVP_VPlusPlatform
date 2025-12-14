@@ -831,14 +831,16 @@ export default function TBMNCSupplierReadinessPage() {
 
       {/* Registration Wizard Dialog */}
       <Dialog open={isWizardOpen} onOpenChange={setIsWizardOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+        <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>TBMNC Supplier Registration Wizard</DialogTitle>
             <DialogDescription>
               Step {wizardStep} of 5 - Complete all steps to register as a potential supplier
             </DialogDescription>
           </DialogHeader>
 
+          {/* Scrollable content area */}
+          <div className="flex-1 overflow-y-auto min-h-0">
           {/* Progress Steps */}
           <div className="flex items-center justify-between mb-6">
             {[
@@ -1121,8 +1123,9 @@ export default function TBMNCSupplierReadinessPage() {
               </div>
             )}
           </div>
+          </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex-shrink-0 border-t pt-4 mt-4">
             <Button
               variant="outline"
               onClick={() => (wizardStep === 1 ? setIsWizardOpen(false) : setWizardStep(wizardStep - 1))}
