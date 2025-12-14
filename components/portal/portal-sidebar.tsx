@@ -92,6 +92,12 @@ const workItems = [
     badge: "AI",
   },
   {
+    title: "Supplier Search",
+    href: "/portal/supplier-search",
+    icon: Factory,
+    badge: "AI",
+  },
+  {
     title: "Documents",
     href: "/portal/documents",
     icon: FileText,
