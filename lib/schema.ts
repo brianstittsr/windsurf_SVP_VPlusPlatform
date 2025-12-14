@@ -849,6 +849,63 @@ export interface CalendarEventDoc {
 }
 
 // ============================================================================
+// DocuSeal Integration Types
+// ============================================================================
+
+/** DocuSeal Template (cached locally) */
+export interface DocuSealTemplateDoc {
+  id: string;
+  docusealId: number;
+  name: string;
+  slug: string;
+  description?: string;
+  category: 'nda' | 'engagement' | 'supplier_qualification' | 'msa' | 'sow' | 'other';
+  fields: Array<{
+    name: string;
+    type: string;
+    required?: boolean;
+  }>;
+  submitterRoles: string[];
+  isActive: boolean;
+  lastSyncedAt: Timestamp;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+/** DocuSeal Submission tracking */
+export interface DocuSealSubmissionDoc {
+  id: string;
+  docusealSubmissionId: number;
+  templateId: string;
+  templateName: string;
+  status: 'pending' | 'sent' | 'viewed' | 'completed' | 'declined' | 'expired';
+  // Related entities
+  organizationId?: string;
+  organizationName?: string;
+  opportunityId?: string;
+  projectId?: string;
+  // Submitters
+  submitters: Array<{
+    email: string;
+    name: string;
+    role: string;
+    status: 'pending' | 'sent' | 'opened' | 'completed' | 'declined';
+    completedAt?: Timestamp;
+    signedDocumentUrl?: string;
+  }>;
+  // Document URLs
+  combinedDocumentUrl?: string;
+  auditLogUrl?: string;
+  // Metadata
+  sentAt?: Timestamp;
+  completedAt?: Timestamp;
+  expiresAt?: Timestamp;
+  createdBy: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+// ============================================================================
 // Collection Names
 // ============================================================================
 
@@ -905,6 +962,9 @@ export const COLLECTIONS = {
   GHL_IMPORTED_WORKFLOWS: "ghlImportedWorkflows",
   // Calendar Events (built-in calendar)
   CALENDAR_EVENTS: "calendarEvents",
+  // DocuSeal Integration Collections
+  DOCUSEAL_TEMPLATES: "docusealTemplates",
+  DOCUSEAL_SUBMISSIONS: "docusealSubmissions",
 } as const;
 
 // ============================================================================
