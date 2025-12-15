@@ -537,6 +537,7 @@ export interface StrategicPartnerDoc {
 /** Team Member document in Firestore */
 export interface TeamMemberDoc {
   id: string;
+  firebaseUid?: string; // Links to Firebase Auth user UID
   firstName: string;
   lastName: string;
   emailPrimary: string;

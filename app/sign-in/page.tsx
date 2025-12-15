@@ -11,6 +11,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { auth } from "@/lib/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { findAndLinkTeamMember } from "@/lib/auth-team-member-link";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -47,21 +50,60 @@ export default function SignInPage() {
         localStorage.removeItem("svp_remember_me");
       }
 
-      // Simulate authentication delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // For demo purposes, accept any credentials
-      // In production, this would call your authentication API
-      if (email && password) {
-        // Store session info
-        sessionStorage.setItem("svp_authenticated", "true");
-        sessionStorage.setItem("svp_user_email", email);
-        
-        // Redirect to portal
-        router.push("/portal");
-      } else {
+      if (!email || !password) {
         setError("Please enter both email and password");
+        setIsLoading(false);
+        return;
       }
+
+      let firebaseUid: string | null = null;
+      let userName: string | null = null;
+
+      // Try Firebase Auth sign-in if available
+      if (auth) {
+        try {
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          firebaseUid = userCredential.user.uid;
+          userName = userCredential.user.displayName;
+
+          // Check if this email matches an existing Team Member and link them
+          // This handles the case where a Team Member exists but hasn't been linked yet
+          const teamMember = await findAndLinkTeamMember(email, firebaseUid);
+          if (teamMember) {
+            console.log(`Linked to Team Member: ${teamMember.firstName} ${teamMember.lastName}`);
+            sessionStorage.setItem("svp_team_member_id", teamMember.id);
+            sessionStorage.setItem("svp_user_role", teamMember.role);
+            sessionStorage.setItem("svp_user_name", `${teamMember.firstName} ${teamMember.lastName}`);
+          }
+        } catch (authError: any) {
+          // Handle specific Firebase Auth errors
+          if (authError.code === "auth/user-not-found") {
+            setError("No account found with this email. Please sign up first.");
+            setIsLoading(false);
+            return;
+          }
+          if (authError.code === "auth/wrong-password" || authError.code === "auth/invalid-credential") {
+            setError("Invalid email or password. Please try again.");
+            setIsLoading(false);
+            return;
+          }
+          console.error("Firebase Auth error:", authError);
+          // Fall through to session-based auth for demo
+        }
+      }
+
+      // Store session info
+      sessionStorage.setItem("svp_authenticated", "true");
+      sessionStorage.setItem("svp_user_email", email);
+      if (firebaseUid) {
+        sessionStorage.setItem("svp_firebase_uid", firebaseUid);
+      }
+      if (userName) {
+        sessionStorage.setItem("svp_user_name", userName);
+      }
+      
+      // Redirect to portal
+      router.push("/portal");
     } catch (err) {
       setError("An error occurred during sign in. Please try again.");
     } finally {

@@ -11,7 +11,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Loader2, Eye, EyeOff, AlertCircle, Users, Building2, CheckCircle, Factory } from "lucide-react";
+import { Loader2, Eye, EyeOff, AlertCircle, Users, Building2, CheckCircle, Factory, UserCheck } from "lucide-react";
+import { auth } from "@/lib/firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { findAndLinkTeamMember } from "@/lib/auth-team-member-link";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -30,6 +33,7 @@ export default function SignUpPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [linkedTeamMember, setLinkedTeamMember] = useState<string | null>(null);
 
   const validateStep1 = () => {
     if (!accountType) {
@@ -77,6 +81,7 @@ export default function SignUpPage() {
     if (!validateStep2()) return;
     
     setIsLoading(true);
+    setLinkedTeamMember(null);
 
     try {
       // Save remember me preference
@@ -85,8 +90,40 @@ export default function SignUpPage() {
         localStorage.setItem("svp_remember_me", "true");
       }
 
-      // Simulate registration delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      let firebaseUid: string | null = null;
+
+      // Create Firebase Auth account if auth is available
+      if (auth) {
+        try {
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          firebaseUid = userCredential.user.uid;
+          
+          // Update the user's display name
+          await updateProfile(userCredential.user, {
+            displayName: `${firstName} ${lastName}`,
+          });
+
+          // Check if this email matches an existing Team Member and link them
+          const teamMember = await findAndLinkTeamMember(email, firebaseUid);
+          if (teamMember) {
+            setLinkedTeamMember(`${teamMember.firstName} ${teamMember.lastName}`);
+            console.log(`Linked to existing Team Member: ${teamMember.firstName} ${teamMember.lastName}`);
+            
+            // Store team member info in session
+            sessionStorage.setItem("svp_team_member_id", teamMember.id);
+            sessionStorage.setItem("svp_user_role", teamMember.role);
+          }
+        } catch (authError: any) {
+          // Handle specific Firebase Auth errors
+          if (authError.code === "auth/email-already-in-use") {
+            setError("An account with this email already exists. Please sign in instead.");
+            setIsLoading(false);
+            return;
+          }
+          console.error("Firebase Auth error:", authError);
+          // Continue with session-based auth as fallback
+        }
+      }
 
       // Store session info
       sessionStorage.setItem("svp_authenticated", "true");
@@ -95,6 +132,9 @@ export default function SignUpPage() {
       sessionStorage.setItem("svp_user_name", `${firstName} ${lastName}`);
       sessionStorage.setItem("svp_user_company", company);
       sessionStorage.setItem("svp_user_phone", phone);
+      if (firebaseUid) {
+        sessionStorage.setItem("svp_firebase_uid", firebaseUid);
+      }
 
       // Redirect based on account type
       if (accountType === "client") {
