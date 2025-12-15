@@ -62,6 +62,13 @@ import {
   Link as LinkIcon,
   GraduationCap,
   Star,
+  Search,
+  Truck,
+  Brain,
+  Bot,
+  Zap,
+  Bug,
+  Lock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUserProfile } from "@/contexts/user-profile-context";
@@ -100,14 +107,30 @@ const industries = [
   "Defense",
 ];
 
-// SVP Tools list
-const svpTools = [
-  { id: "intelledge", name: "IntellEDGE AI", description: "AI-powered business intelligence", connected: true },
-  { id: "twinedge", name: "TwinEDGE", description: "Digital twin simulation platform", connected: false },
-  { id: "gohighlevel", name: "GoHighLevel CRM", description: "Customer relationship management", connected: true },
-  { id: "docuseal", name: "DocuSeal", description: "Document signing and management", connected: false },
-  { id: "mattermost", name: "Mattermost", description: "Team communication platform", connected: true },
-  { id: "zoom", name: "Zoom", description: "Video conferencing", connected: true },
+// SVP Tools list with role-based access
+interface SVPTool {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  href: string;
+  teamAccess: boolean;
+  affiliateAccess: boolean;
+}
+
+const svpTools: SVPTool[] = [
+  { id: "apollo", name: "Apollo Search", description: "Lead generation and prospecting", icon: "search", href: "/portal/apollo", teamAccess: true, affiliateAccess: false },
+  { id: "supplier", name: "Supplier Search", description: "Find and evaluate suppliers", icon: "truck", href: "/portal/suppliers", teamAccess: true, affiliateAccess: true },
+  { id: "deals", name: "Deals", description: "Track and manage deals", icon: "handshake", href: "/portal/deals", teamAccess: true, affiliateAccess: true },
+  { id: "calendar", name: "Calendar", description: "Schedule and manage meetings", icon: "calendar", href: "/portal/calendar", teamAccess: true, affiliateAccess: true },
+  { id: "proposal", name: "Proposal Creator", description: "Create professional proposals", icon: "file-text", href: "/portal/proposals", teamAccess: true, affiliateAccess: false },
+  { id: "intelliedge", name: "Ask IntelliEdge", description: "AI-powered business intelligence", icon: "brain", href: "/portal/intelliedge", teamAccess: true, affiliateAccess: false },
+  { id: "linkedin", name: "LinkedIn Content", description: "Create and schedule LinkedIn posts", icon: "linkedin", href: "/portal/linkedin", teamAccess: true, affiliateAccess: false },
+  { id: "docuseal", name: "DocuSeal", description: "Document signing and management", icon: "file-signature", href: "/portal/docuseal", teamAccess: true, affiliateAccess: false },
+  { id: "aiworkforce", name: "AI Workforce", description: "AI agents and automation", icon: "bot", href: "/portal/ai-workforce", teamAccess: true, affiliateAccess: false },
+  { id: "gohighlevel", name: "GoHighLevel", description: "CRM and marketing automation", icon: "zap", href: "/portal/gohighlevel", teamAccess: true, affiliateAccess: false },
+  { id: "bugtracker", name: "Bug Tracker", description: "Report and track issues", icon: "bug", href: "/portal/bugs", teamAccess: true, affiliateAccess: false },
+  { id: "availability", name: "Availability", description: "Set your availability schedule", icon: "clock", href: "/portal/availability", teamAccess: true, affiliateAccess: false },
 ];
 
 // Mock meeting recordings
@@ -869,51 +892,119 @@ export default function ProfilePage() {
         <TabsContent value="tools" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Connected SVP Tools</CardTitle>
-              <CardDescription>Manage your connections to Strategic Value+ platform tools</CardDescription>
+              <CardTitle>SVP Tools</CardTitle>
+              <CardDescription>
+                Access Strategic Value+ platform tools based on your role
+                {(profile.role === "team_member" || profile.role === "admin") && (
+                  <Badge variant="secondary" className="ml-2">Team Access</Badge>
+                )}
+                {profile.role === "affiliate" && (
+                  <Badge variant="outline" className="ml-2">Affiliate Access</Badge>
+                )}
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {svpTools.map((tool) => (
-                  <div
-                    key={tool.id}
-                    className="flex items-center justify-between p-4 border rounded-lg"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={cn(
-                        "p-2 rounded-lg",
-                        tool.connected ? "bg-green-100" : "bg-muted"
-                      )}>
-                        <Wrench className={cn(
-                          "h-5 w-5",
-                          tool.connected ? "text-green-600" : "text-muted-foreground"
-                        )} />
+              <div className="grid gap-4 md:grid-cols-2">
+                {svpTools.map((tool) => {
+                  const isTeamOrAdmin = profile.role === "team_member" || profile.role === "admin";
+                  const hasAccess = isTeamOrAdmin ? tool.teamAccess : tool.affiliateAccess;
+                  const isGrayedOut = !hasAccess;
+
+                  // Get the appropriate icon
+                  const getToolIcon = () => {
+                    switch (tool.icon) {
+                      case "search": return <Search className="h-5 w-5" />;
+                      case "truck": return <Truck className="h-5 w-5" />;
+                      case "handshake": return <Handshake className="h-5 w-5" />;
+                      case "calendar": return <Calendar className="h-5 w-5" />;
+                      case "file-text": return <FileText className="h-5 w-5" />;
+                      case "brain": return <Brain className="h-5 w-5" />;
+                      case "linkedin": return <Linkedin className="h-5 w-5" />;
+                      case "file-signature": return <FileText className="h-5 w-5" />;
+                      case "bot": return <Bot className="h-5 w-5" />;
+                      case "zap": return <Zap className="h-5 w-5" />;
+                      case "bug": return <Bug className="h-5 w-5" />;
+                      case "clock": return <Clock className="h-5 w-5" />;
+                      default: return <Wrench className="h-5 w-5" />;
+                    }
+                  };
+
+                  return (
+                    <div
+                      key={tool.id}
+                      className={cn(
+                        "flex items-center justify-between p-4 border rounded-lg transition-all",
+                        isGrayedOut 
+                          ? "opacity-50 bg-muted/30 cursor-not-allowed" 
+                          : "hover:bg-muted/50 hover:shadow-sm cursor-pointer"
+                      )}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={cn(
+                          "p-2 rounded-lg",
+                          isGrayedOut ? "bg-muted" : "bg-primary/10"
+                        )}>
+                          <div className={cn(
+                            isGrayedOut ? "text-muted-foreground" : "text-primary"
+                          )}>
+                            {getToolIcon()}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className={cn(
+                              "font-medium",
+                              isGrayedOut && "text-muted-foreground"
+                            )}>
+                              {tool.name}
+                            </p>
+                            {isGrayedOut && (
+                              <Lock className="h-3 w-3 text-muted-foreground" />
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground">{tool.description}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium">{tool.name}</p>
-                        <p className="text-sm text-muted-foreground">{tool.description}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={tool.connected ? "default" : "secondary"}>
-                        {tool.connected ? "Connected" : "Not Connected"}
-                      </Badge>
-                      <Button variant="outline" size="sm">
-                        {tool.connected ? (
-                          <>
-                            <Settings className="mr-2 h-4 w-4" />
-                            Configure
-                          </>
+                      <div className="flex items-center gap-2">
+                        {isGrayedOut ? (
+                          <Badge variant="outline" className="text-muted-foreground">
+                            Team Only
+                          </Badge>
                         ) : (
-                          <>
-                            <LinkIcon className="mr-2 h-4 w-4" />
-                            Connect
-                          </>
+                          <Button variant="outline" size="sm" asChild>
+                            <a href={tool.href}>
+                              Open
+                              <ExternalLink className="ml-2 h-3 w-3" />
+                            </a>
+                          </Button>
                         )}
-                      </Button>
+                      </div>
                     </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Access Legend */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">Access Legend</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded bg-primary/10">
+                    <Wrench className="h-4 w-4 text-primary" />
                   </div>
-                ))}
+                  <span>Full Access</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded bg-muted">
+                    <Lock className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <span className="text-muted-foreground">Team Only (Upgrade Required)</span>
+                </div>
               </div>
             </CardContent>
           </Card>
