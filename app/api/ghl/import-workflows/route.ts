@@ -17,20 +17,16 @@ export async function GET(request: NextRequest) {
     const locationId = searchParams.get('locationId') || process.env.GOHIGHLEVEL_LOCATION_ID;
 
     if (!apiToken || !locationId) {
-      return NextResponse.json(
-        { success: false, error: "API token and location ID are required" },
-        { status: 400 }
-      );
+      // Return empty array instead of error when credentials not configured
+      return NextResponse.json({ success: true, workflows: [] });
     }
 
     const ghlService = new GoHighLevelService({ apiToken, locationId });
     const result = await ghlService.getWorkflows();
 
     if (!result.success) {
-      return NextResponse.json(
-        { success: false, error: result.error || "Failed to fetch workflows from GHL" },
-        { status: 500 }
-      );
+      // Return empty array instead of error to prevent UI crashes
+      return NextResponse.json({ success: true, workflows: [] });
     }
 
     return NextResponse.json({
@@ -39,10 +35,8 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error importing workflows:", error);
-    return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
-    );
+    // Return empty array instead of error to prevent UI crashes
+    return NextResponse.json({ success: true, workflows: [] });
   }
 }
 

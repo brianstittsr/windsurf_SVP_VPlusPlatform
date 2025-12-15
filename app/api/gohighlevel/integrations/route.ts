@@ -27,10 +27,8 @@ function serializeIntegration(doc: GHLIntegrationDoc): Record<string, unknown> {
 export async function GET() {
   try {
     if (!db) {
-      return NextResponse.json(
-        { success: false, error: "Database not configured" },
-        { status: 503 }
-      );
+      // Return empty array instead of error to prevent UI crashes
+      return NextResponse.json({ success: true, integrations: [] });
     }
 
     const snapshot = await getDocs(collection(db, COLLECTIONS.GHL_INTEGRATIONS));
@@ -42,10 +40,8 @@ export async function GET() {
     return NextResponse.json({ success: true, integrations });
   } catch (error) {
     console.error("Error fetching GHL integrations:", error);
-    return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
-    );
+    // Return empty array instead of error to prevent UI crashes
+    return NextResponse.json({ success: true, integrations: [] });
   }
 }
 

@@ -54,7 +54,7 @@ const opportunities = [
     value: 85000,
     probability: 60,
     expectedClose: "2025-01-15",
-    owner: { name: "John Doe", avatar: "/avatars/john.jpg", initials: "JD" },
+    owner: { name: "John Doe", initials: "JD" },
     services: ["ISO Certification", "Lean Manufacturing"],
     lastActivity: "3 days ago",
   },
@@ -66,7 +66,7 @@ const opportunities = [
     value: 120000,
     probability: 30,
     expectedClose: "2025-02-28",
-    owner: { name: "Sarah Williams", avatar: "/avatars/sarah.jpg", initials: "SW" },
+    owner: { name: "Sarah Williams", initials: "SW" },
     services: ["Digital Transformation", "Automation"],
     lastActivity: "Today",
   },
@@ -78,7 +78,7 @@ const opportunities = [
     value: 45000,
     probability: 90,
     expectedClose: "2025-01-10",
-    owner: { name: "Mike Roberts", avatar: "/avatars/mike.jpg", initials: "MR" },
+    owner: { name: "Mike Roberts", initials: "MR" },
     services: ["ISO 9001"],
     lastActivity: "1 day ago",
   },
@@ -90,7 +90,7 @@ const opportunities = [
     value: 95000,
     probability: 75,
     expectedClose: "2025-01-20",
-    owner: { name: "John Doe", avatar: "/avatars/john.jpg", initials: "JD" },
+    owner: { name: "John Doe", initials: "JD" },
     services: ["Supplier Readiness", "Quality Systems"],
     lastActivity: "5 days ago",
   },
@@ -102,7 +102,7 @@ const opportunities = [
     value: 150000,
     probability: 10,
     expectedClose: "2025-03-31",
-    owner: { name: "Sarah Williams", avatar: "/avatars/sarah.jpg", initials: "SW" },
+    owner: { name: "Sarah Williams", initials: "SW" },
     services: ["TwinEDGE", "Process Simulation"],
     lastActivity: "1 week ago",
   },
@@ -283,7 +283,6 @@ export default function OpportunitiesPage() {
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Avatar className="h-6 w-6">
-                        <AvatarImage src={opp.owner.avatar} />
                         <AvatarFallback className="text-xs">{opp.owner.initials}</AvatarFallback>
                       </Avatar>
                       <span className="text-sm">{opp.owner.name}</span>

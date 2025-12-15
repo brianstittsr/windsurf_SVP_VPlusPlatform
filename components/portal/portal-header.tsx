@@ -157,7 +157,6 @@ export function PortalHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar className="h-8 w-8">
-                <AvatarImage src="/avatars/user.svg" />
                 <AvatarFallback className="bg-primary/20 text-primary">JD</AvatarFallback>
               </Avatar>
             </Button>

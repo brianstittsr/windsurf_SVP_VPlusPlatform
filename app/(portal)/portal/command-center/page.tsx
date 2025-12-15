@@ -53,7 +53,7 @@ const opportunities = [
     stage: "Proposal",
     value: 85000,
     daysAgo: 3,
-    owner: { name: "John D.", avatar: "/avatars/john.jpg" },
+    owner: { name: "John D.", initials: "JD" },
   },
   {
     id: "2",
@@ -61,7 +61,7 @@ const opportunities = [
     stage: "Discovery",
     value: 120000,
     daysAgo: 0,
-    owner: { name: "Sarah W.", avatar: "/avatars/sarah.jpg" },
+    owner: { name: "Sarah W.", initials: "SW" },
   },
   {
     id: "3",
@@ -69,7 +69,7 @@ const opportunities = [
     stage: "Contract",
     value: 45000,
     daysAgo: 1,
-    owner: { name: "Mike R.", avatar: "/avatars/mike.jpg" },
+    owner: { name: "Mike R.", initials: "MR" },
   },
   {
     id: "4",
@@ -77,7 +77,7 @@ const opportunities = [
     stage: "Negotiation",
     value: 95000,
     daysAgo: 5,
-    owner: { name: "John D.", avatar: "/avatars/john.jpg" },
+    owner: { name: "John D.", initials: "JD" },
   },
 ];
 
@@ -312,9 +312,8 @@ export default function CommandCenterPage() {
                 >
                   <div className="flex items-center gap-4">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={opp.owner.avatar} />
                       <AvatarFallback className="bg-primary/20 text-primary">
-                        {opp.owner.name.split(" ").map((n) => n[0]).join("")}
+                        {opp.owner.initials}
                       </AvatarFallback>
                     </Avatar>
                     <div>

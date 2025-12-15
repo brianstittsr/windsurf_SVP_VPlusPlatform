@@ -15,7 +15,7 @@ const testimonials = [
     company: "Precision Components Inc.",
     industry: "Automotive",
     employees: "85 employees",
-    avatar: "/avatars/michael.jpg",
+    initials: "MJ",
   },
   {
     quote:
@@ -25,7 +25,7 @@ const testimonials = [
     company: "Advanced Manufacturing Solutions",
     industry: "Aerospace",
     employees: "150 employees",
-    avatar: "/avatars/sarah.jpg",
+    initials: "SW",
   },
   {
     quote:
@@ -35,7 +35,7 @@ const testimonials = [
     company: "Martinez Metal Works",
     industry: "Industrial Equipment",
     employees: "45 employees",
-    avatar: "/avatars/robert.jpg",
+    initials: "RM",
   },
   {
     quote:
@@ -45,7 +45,7 @@ const testimonials = [
     company: "TechForm Industries",
     industry: "Electronics",
     employees: "200 employees",
-    avatar: "/avatars/jennifer.jpg",
+    initials: "JP",
   },
 ];
 
@@ -85,12 +85,8 @@ export function Testimonials() {
 
               <div className="flex items-center gap-4">
                 <Avatar className="h-14 w-14">
-                  <AvatarImage src={testimonials[currentIndex].avatar} />
                   <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                    {testimonials[currentIndex].author
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
+                    {testimonials[currentIndex].initials}
                   </AvatarFallback>
                 </Avatar>
                 <div>

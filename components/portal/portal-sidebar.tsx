@@ -452,7 +452,6 @@ export function PortalSidebar() {
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton className="w-full">
                   <Avatar className="h-6 w-6">
-                    <AvatarImage src="/avatars/user.svg" />
                     <AvatarFallback className="bg-primary/20 text-primary text-xs">
                       JD
                     </AvatarFallback>
