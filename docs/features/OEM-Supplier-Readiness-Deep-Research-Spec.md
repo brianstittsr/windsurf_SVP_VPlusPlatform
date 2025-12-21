@@ -694,6 +694,58 @@ interface VersionHistory {
 
 ## 7. Presentation Step (Step 8)
 
+### 7.0 McKinsey Slide Framework Integration
+
+The presentation generation system uses the **MOVIE Framework** (McKinsey-style) to transform deep research output into professional slides:
+
+#### MOVIE Framework Steps:
+1. **M - Message**: Each slide has a clear, actionable title stating the key insight
+2. **O - Organize**: Supporting data categorized into 2-3 logical groups
+3. **V - Visualize**: Charts, tables, and visuals that explain data better than text
+4. **I - Insight**: Direct statements of what the audience should know, with highlights
+5. **E - Extras**: Alignment, formatting, and professional polish
+
+#### Deep Research → Slide Mapping
+
+The system automatically transforms deep research sections into McKinsey-style slides:
+
+| Deep Research Section | Slide Type | Message Format |
+|----------------------|------------|----------------|
+| Executive Summary | Title + Key Points | "[Company] is positioned for [Opportunity] with [Value]" |
+| Company Profile | Two-Column | "[Company] brings [X] years experience across [Y] facilities" |
+| Capabilities Assessment | Chart + Bullets | "[Company] excels in [Top 3 Capabilities]" |
+| Certification Analysis | Matrix Table | "[X] certifications required; [Y] gaps identified" |
+| Gap Analysis | Visual Matrix | "Critical gaps in [Areas] require [Timeline] to close" |
+| Opportunity Matrix | Value Chart | "$[X-Y]M annual opportunity across [N] service categories" |
+| Implementation Roadmap | Timeline Visual | "[N]-phase approach delivers results in [Timeline]" |
+| Investment & ROI | Financial Chart | "[X]% ROI with [Y]-month payback period" |
+| Risk Mitigation | Risk Matrix | "[N] risks identified with mitigation strategies" |
+
+#### Slide Generation API
+
+```typescript
+// POST /api/presentation/generate-from-research
+interface GeneratePresentationRequest {
+  projectId: string;
+  deepResearchData: DeepResearchResult;
+  executiveBrief: DocumentSections;
+  style: 'mckinsey' | 'minimal' | 'detailed';
+  branding: PresentationBranding;
+}
+
+// The system uses the deep research output as the primary data source
+// Each slide is generated following the MOVIE framework:
+const generateSlideFromSection = (section: ResearchSection): PresentationSlide => {
+  return {
+    title: extractInsightAsTitle(section), // M - Message (insight as title)
+    content: organizeIntoGroups(section.data), // O - Organize (2-3 groups)
+    visualizations: selectBestVisualization(section), // V - Visualize
+    highlights: identifyKeyInsights(section), // I - Insight callouts
+    formatting: applyProfessionalPolish(section), // E - Extras
+  };
+};
+```
+
 ### 7.1 Web Presentation Builder
 
 Interactive presentation with AI enhancement capabilities:
@@ -802,7 +854,166 @@ Interactive presentation with AI enhancement capabilities:
 </Card>
 ```
 
-### 7.2 Presentation Data Model
+### 7.2 Complete Slide Generation from Deep Research
+
+The presentation generator takes the deep research output and creates a complete McKinsey-style slide deck:
+
+```typescript
+// Slide generation function that uses deep research as input
+async function generatePresentationFromDeepResearch(
+  deepResearch: DeepResearchResult,
+  executiveBrief: DocumentSections,
+  branding: PresentationBranding
+): Promise<Presentation> {
+  const slides: PresentationSlide[] = [];
+  
+  // Slide 1: Title Slide
+  slides.push({
+    id: 'title',
+    type: 'title',
+    title: `${deepResearch.companyProfile.name} - OEM Supplier Readiness`,
+    content: {
+      text: `Strategic Assessment for ${deepResearch.targetOEM}`,
+      bullets: [`Prepared by Strategic Value+ Solutions`, `${new Date().toLocaleDateString()}`]
+    }
+  });
+  
+  // Slide 2: Executive Summary (from deep research)
+  slides.push({
+    id: 'exec-summary',
+    type: 'content',
+    title: `${deepResearch.companyProfile.name} is positioned for $${formatRange(deepResearch.opportunities.totalEstimatedValue)}M opportunity`,
+    content: {
+      bullets: [
+        `**The Opportunity:** ${executiveBrief.executiveSummary.keyOpportunity}`,
+        `**Strategic Advantage:** ${executiveBrief.executiveSummary.strategicAdvantage}`,
+        `**Readiness Score:** ${deepResearch.opportunities.readinessScore}%`
+      ]
+    }
+  });
+  
+  // Slide 3: Company Profile (from deep research companyProfile)
+  slides.push({
+    id: 'company-profile',
+    type: 'two-column',
+    title: `${deepResearch.companyProfile.name} brings ${deepResearch.companyProfile.employees} employees across ${deepResearch.companyProfile.locations.length} facilities`,
+    content: {
+      columns: {
+        left: formatCompanyOverview(deepResearch.companyProfile),
+        right: formatKeyMetrics(deepResearch.companyProfile)
+      }
+    }
+  });
+  
+  // Slide 4: Capabilities Assessment (from deep research capabilities)
+  slides.push({
+    id: 'capabilities',
+    type: 'chart',
+    title: `${deepResearch.companyProfile.name} excels in ${deepResearch.capabilities.primaryCapabilities.slice(0, 3).map(c => c.name).join(', ')}`,
+    content: {
+      chart: {
+        type: 'radar',
+        data: deepResearch.capabilities.primaryCapabilities.map(c => ({
+          label: c.name,
+          value: c.relevanceScore
+        }))
+      },
+      bullets: deepResearch.capabilities.primaryCapabilities.map(c => c.description)
+    }
+  });
+  
+  // Slide 5: Certification Gap Analysis (from deep research certifications)
+  slides.push({
+    id: 'cert-gaps',
+    type: 'table',
+    title: `${deepResearch.certifications.required.length} certifications required; ${deepResearch.certifications.gaps.length} gaps identified`,
+    content: {
+      table: {
+        headers: ['Certification', 'Status', 'Gap', 'Priority', 'Timeline'],
+        rows: deepResearch.certifications.gaps.map(g => [
+          g.certification,
+          g.currentStatus,
+          g.requiredStatus,
+          g.priority,
+          g.estimatedTimeline
+        ])
+      }
+    }
+  });
+  
+  // Slide 6: Opportunity Matrix (from deep research opportunities)
+  slides.push({
+    id: 'opportunities',
+    type: 'chart',
+    title: `$${formatRange(deepResearch.opportunities.totalEstimatedValue)}M annual opportunity across ${deepResearch.opportunities.opportunities.length} service categories`,
+    content: {
+      chart: {
+        type: 'bar',
+        data: deepResearch.opportunities.opportunities.map(o => ({
+          label: o.name,
+          value: (o.estimatedAnnualValue.low + o.estimatedAnnualValue.high) / 2
+        }))
+      }
+    }
+  });
+  
+  // Slide 7: Implementation Roadmap (from deep research)
+  slides.push({
+    id: 'roadmap',
+    type: 'content',
+    title: `4-phase approach delivers results in 12 months`,
+    content: {
+      bullets: [
+        '**Phase 0:** Discovery & Scoping (Weeks 1-2)',
+        '**Phase 1:** Foundation - ISO 9001, Hazmat, ESG (Months 1-6)',
+        '**Phase 2:** Automotive Qualification - IATF 16949 (Months 4-12)',
+        '**Phase 3:** Toyota Qualification & Onboarding (Months 6-12)'
+      ]
+    }
+  });
+  
+  // Slide 8: Investment & ROI (from deep research)
+  slides.push({
+    id: 'investment',
+    type: 'chart',
+    title: `${calculateROI(deepResearch)}% ROI with ${calculatePayback(deepResearch)}-month payback period`,
+    content: {
+      chart: {
+        type: 'waterfall',
+        data: [
+          { label: 'Investment', value: -deepResearch.investment.total },
+          { label: 'Year 1 Revenue', value: deepResearch.projections.year1 },
+          { label: 'Year 2 Revenue', value: deepResearch.projections.year2 },
+          { label: 'Year 3 Revenue', value: deepResearch.projections.year3 }
+        ]
+      }
+    }
+  });
+  
+  // Slide 9: Next Steps
+  slides.push({
+    id: 'next-steps',
+    type: 'content',
+    title: 'Recommended Next Steps',
+    content: {
+      bullets: deepResearch.recommendations.slice(0, 5)
+    }
+  });
+  
+  return {
+    id: generateId(),
+    title: `${deepResearch.companyProfile.name} - OEM Supplier Readiness`,
+    subtitle: `Strategic Assessment for ${deepResearch.targetOEM}`,
+    branding,
+    slides,
+    transitions: { defaultTransition: 'fade', duration: 300, autoAdvance: false, autoAdvanceDelay: 0 },
+    navigation: { showProgress: true, showSlideNumbers: true, showThumbnails: true, keyboardNavigation: true, swipeNavigation: true },
+    metadata: { createdAt: new Date().toISOString(), sourceProjectId: deepResearch.projectId }
+  };
+}
+```
+
+### 7.3 Presentation Data Model
 
 ```typescript
 interface Presentation {
