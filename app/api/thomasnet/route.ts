@@ -518,6 +518,12 @@ export async function POST(request: NextRequest) {
         const query = searchParams?.query || "";
         const region = searchParams?.region || "";
         
+        // Get ThomasNet credentials from environment or request
+        const thomasnetCredentials = searchParams?.thomasnetCredentials || {
+          email: process.env.THOMASNET_EMAIL || "",
+          password: process.env.THOMASNET_PASSWORD || "",
+        };
+        
         if (!query.trim()) {
           return NextResponse.json({
             success: true,
@@ -533,8 +539,11 @@ export async function POST(request: NextRequest) {
           });
         }
         
-        // Try to scrape real data from ThomasNet first
-        const { suppliers: liveSuppliers, totalResults, error: scrapeError } = await scrapeThomasNetSearch(query);
+        // Try to scrape real data from ThomasNet first (with optional authentication)
+        const { suppliers: liveSuppliers, totalResults, error: scrapeError, isAuthenticated } = await scrapeThomasNetSearch(
+          query,
+          thomasnetCredentials.email && thomasnetCredentials.password ? thomasnetCredentials : undefined
+        );
         
         let results: SupplierResult[];
         let total: number;
@@ -589,10 +598,12 @@ export async function POST(request: NextRequest) {
           results,
           total,
           isLiveData: true,
+          isAuthenticated,
           dataSource,
           refinementSuggestions: [
             total > 25 ? `Showing 25 of ${total.toLocaleString()} results - add filters to narrow` : null,
             results.length === 0 ? "Try broader search terms" : null,
+            !isAuthenticated ? "Add ThomasNet credentials for better results" : null,
             "Filter by certification (ISO, AS9100, etc.)",
             "Specify employee count or company size",
           ].filter(Boolean),

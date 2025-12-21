@@ -22,9 +22,16 @@ interface ScrapeResult {
   totalResults: number;
   isLiveData: boolean;
   error?: string;
+  isAuthenticated?: boolean;
+}
+
+interface ThomasNetCredentials {
+  email: string;
+  password: string;
 }
 
 let browserInstance: Browser | null = null;
+let isLoggedIn = false;
 
 async function getBrowser(): Promise<Browser> {
   if (browserInstance) {
@@ -43,11 +50,29 @@ async function getBrowser(): Promise<Browser> {
     });
   } else {
     // For local development, use local Chrome
-    const executablePath = process.platform === "win32"
-      ? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+    // Try multiple possible Chrome paths
+    const possiblePaths = process.platform === "win32"
+      ? [
+          "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+          "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+          process.env.LOCALAPPDATA + "\\Google\\Chrome\\Application\\chrome.exe",
+        ]
       : process.platform === "darwin"
-      ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-      : "/usr/bin/google-chrome";
+      ? ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"]
+      : ["/usr/bin/google-chrome", "/usr/bin/chromium-browser", "/usr/bin/chromium"];
+
+    let executablePath = possiblePaths[0];
+    
+    // Try to find an existing Chrome installation
+    const fs = await import("fs");
+    for (const path of possiblePaths) {
+      if (fs.existsSync(path)) {
+        executablePath = path;
+        break;
+      }
+    }
+
+    console.log("Using Chrome at:", executablePath);
 
     browserInstance = await puppeteer.launch({
       headless: true,
@@ -66,7 +91,115 @@ async function getBrowser(): Promise<Browser> {
   return browserInstance;
 }
 
-export async function scrapeThomasNetSearch(query: string): Promise<ScrapeResult> {
+// Login to ThomasNet
+async function loginToThomasNet(page: Page, credentials: ThomasNetCredentials): Promise<boolean> {
+  try {
+    console.log("Attempting to login to ThomasNet...");
+    
+    // Navigate to login page
+    await page.goto("https://www.thomasnet.com/login", {
+      waitUntil: "networkidle2",
+      timeout: 30000,
+    });
+
+    // Wait for login form
+    await page.waitForSelector('input[type="email"], input[name="email"], #email', { timeout: 10000 });
+    
+    // Fill in email
+    const emailSelector = await page.$('input[type="email"]') || 
+                          await page.$('input[name="email"]') || 
+                          await page.$('#email');
+    if (emailSelector) {
+      await emailSelector.type(credentials.email, { delay: 50 });
+    }
+
+    // Fill in password
+    const passwordSelector = await page.$('input[type="password"]') || 
+                             await page.$('input[name="password"]') || 
+                             await page.$('#password');
+    if (passwordSelector) {
+      await passwordSelector.type(credentials.password, { delay: 50 });
+    }
+
+    // Click login button
+    const loginButton = await page.$('button[type="submit"]') || 
+                        await page.$('input[type="submit"]') ||
+                        await page.$('[class*="login-button"]') ||
+                        await page.$('[class*="submit"]');
+    if (loginButton) {
+      await loginButton.click();
+    }
+
+    // Wait for navigation after login
+    await page.waitForNavigation({ waitUntil: "networkidle2", timeout: 15000 }).catch(() => {});
+
+    // Check if login was successful by looking for account indicators
+    const isLoggedInNow = await page.evaluate(() => {
+      // Check for common logged-in indicators
+      const accountLink = document.querySelector('a[href*="/account"]');
+      const logoutLink = document.querySelector('a[href*="logout"]');
+      const userMenu = document.querySelector('[class*="user-menu"], [class*="account-menu"]');
+      const dashboardText = document.body.innerText.toLowerCase();
+      
+      return !!(accountLink || logoutLink || userMenu || 
+                dashboardText.includes("my account") || 
+                dashboardText.includes("dashboard") ||
+                dashboardText.includes("welcome"));
+    });
+
+    if (isLoggedInNow) {
+      console.log("Successfully logged in to ThomasNet");
+      isLoggedIn = true;
+      return true;
+    } else {
+      console.log("Login may have failed - checking for error messages");
+      const errorMessage = await page.evaluate(() => {
+        const errorEl = document.querySelector('[class*="error"], [class*="alert"], .error-message');
+        return errorEl?.textContent?.trim() || null;
+      });
+      if (errorMessage) {
+        console.log("Login error:", errorMessage);
+      }
+      return false;
+    }
+  } catch (error) {
+    console.error("Login error:", error);
+    return false;
+  }
+}
+
+// Check if already logged in
+async function checkLoginStatus(page: Page): Promise<boolean> {
+  try {
+    await page.goto("https://www.thomasnet.com/account", {
+      waitUntil: "networkidle2",
+      timeout: 15000,
+    });
+
+    const isLoggedInNow = await page.evaluate(() => {
+      const url = window.location.href;
+      // If redirected to login page, not logged in
+      if (url.includes("/login")) return false;
+      
+      // Check for account page content
+      const bodyText = document.body.innerText.toLowerCase();
+      return bodyText.includes("my account") || 
+             bodyText.includes("dashboard") ||
+             bodyText.includes("saved suppliers") ||
+             bodyText.includes("account settings");
+    });
+
+    return isLoggedInNow;
+  } catch {
+    return false;
+  }
+}
+
+// Main search function with optional authentication
+export async function scrapeThomasNetSearch(
+  query: string, 
+  credentials?: ThomasNetCredentials
+): Promise<ScrapeResult> {
   let page: Page | null = null;
   
   try {
@@ -81,9 +214,23 @@ export async function scrapeThomasNetSearch(query: string): Promise<ScrapeResult
     // Set viewport
     await page.setViewport({ width: 1920, height: 1080 });
 
+    // If credentials provided, attempt login first
+    let authenticated = false;
+    if (credentials?.email && credentials?.password) {
+      // Check if already logged in
+      const alreadyLoggedIn = await checkLoginStatus(page);
+      if (alreadyLoggedIn) {
+        console.log("Already logged in to ThomasNet");
+        authenticated = true;
+      } else {
+        // Attempt login
+        authenticated = await loginToThomasNet(page, credentials);
+      }
+    }
+
     // Navigate to ThomasNet search
     const searchUrl = `https://www.thomasnet.com/suppliers/search?searchterm=${encodeURIComponent(query)}&search_type=search-suppliers&ref=search`;
-    console.log("Navigating to ThomasNet:", searchUrl);
+    console.log("Navigating to ThomasNet:", searchUrl, authenticated ? "(authenticated)" : "(anonymous)");
     
     await page.goto(searchUrl, {
       waitUntil: "networkidle2",
@@ -187,6 +334,7 @@ export async function scrapeThomasNetSearch(query: string): Promise<ScrapeResult
       suppliers: result.suppliers,
       totalResults: result.totalResults || result.suppliers.length,
       isLiveData: result.suppliers.length > 0,
+      isAuthenticated: authenticated,
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
