@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OEM Supplier Readiness - Deep Research Feature | Strategic Value Plus</title>
+    <style>
+        @page {
+            size: 16in 9in landscape;
+            margin: 0;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        :root {
+            --primary: #1a365d;
+            --primary-light: #2c5282;
+            --accent: #c8a951;
+            --accent-light: #d4b86a;
+            --success: #38a169;
+            --warning: #ed8936;
+            --danger: #e53e3e;
+            --gray-50: #f7fafc;
+            --gray-100: #edf2f7;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e0;
+            --gray-500: #718096;
+            --gray-600: #4a5568;
+            --gray-700: #2d3748;
+            --gray-800: #1a202c;
+        }
+        
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000;
+            color: var(--gray-800);
+            line-height: 1.4;
+        }
+        
+        /* Slide Container */
+        .presentation {
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .slide {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: white;
+            position: relative;
+            padding: 60px 80px;
+            margin-bottom: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            page-break-after: always;
+            overflow: hidden;
+        }
+        
+        /* Header Bar */
+        .slide-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+        }
+        
+        /* Footer */
+        .slide-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 80px;
+            right: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+        
+        .slide-footer .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .slide-footer .logo-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        /* Slide Number */
+        .slide-number {
+            position: absolute;
+            bottom: 20px;
+            right: 80px;
+            font-size: 14px;
+            color: var(--gray-400);
+            font-weight: 500;
+        }
+        
+        /* Title Slide */
+        .slide.title-slide {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+        
+        .slide.title-slide .slide-header {
+            background: var(--accent);
+            height: 6px;
+        }
+        
+        .title-slide .main-title {
+            font-size: 56px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+        
+        .title-slide .subtitle {
+            font-size: 28px;
+            font-weight: 400;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+        
+        .title-slide .meta {
+            font-size: 18px;
+            opacity: 0.7;
+        }
+        
+        .title-slide .accent-bar {
+            width: 120px;
+            height: 4px;
+            background: var(--accent);
+            margin: 30px auto;
+        }
+        
+        /* Section Divider */
+        .slide.section-slide {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: var(--gray-50);
+        }
+        
+        .section-slide .section-number {
+            font-size: 120px;
+            font-weight: 800;
+            color: var(--gray-200);
+            line-height: 1;
+            margin-bottom: 20px;
+        }
+        
+        .section-slide .section-title {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        /* Content Slide */
+        .slide-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--accent);
+            line-height: 1.2;
+        }
+        
+        /* McKinsey Insight Title - The key message */
+        .insight-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 30px;
+            line-height: 1.3;
+        }
+        
+        .insight-title .highlight {
+            color: var(--primary);
+            font-weight: 700;
+        }
+        
+        .insight-title .number {
+            color: var(--accent);
+            font-weight: 700;
+        }
+        
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            height: calc(100% - 140px);
+        }
+        
+        .content-grid.three-col {
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 40px;
+        }
+        
+        /* Content Boxes */
+        .content-box {
+            background: var(--gray-50);
+            border-radius: 12px;
+            padding: 30px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .content-box.accent {
+            border-left-color: var(--accent);
+        }
+        
+        .content-box.success {
+            border-left-color: var(--success);
+            background: #f0fff4;
+        }
+        
+        .content-box.warning {
+            border-left-color: var(--warning);
+            background: #fffaf0;
+        }
+        
+        .content-box h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .content-box h3 .icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+        
+        /* Bullet Points */
+        .bullets {
+            list-style: none;
+        }
+        
+        .bullets li {
+            padding: 12px 0;
+            padding-left: 28px;
+            position: relative;
+            font-size: 18px;
+            color: var(--gray-700);
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .bullets li:last-child {
+            border-bottom: none;
+        }
+        
+        .bullets li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+        
+        .bullets li strong {
+            color: var(--primary);
+        }
+        
+        /* Callout Box */
+        .callout {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+        
+        .callout h4 {
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        
+        .callout p {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 30px 20px;
+            background: var(--gray-50);
+            border-radius: 12px;
+            border-top: 4px solid var(--accent);
+        }
+        
+        .stat-card .value {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+        
+        .stat-card .label {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Table Styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 16px;
+        }
+        
+        .data-table th {
+            background: var(--primary);
+            color: white;
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .data-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .data-table tr:nth-child(even) {
+            background: var(--gray-50);
+        }
+        
+        .data-table .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .data-table .status.has {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .data-table .status.gap {
+            background: #fed7d7;
+            color: #822727;
+        }
+        
+        .data-table .status.partial {
+            background: #feebc8;
+            color: #744210;
+        }
+        
+        .data-table .priority {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .data-table .priority.critical {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .data-table .priority.high {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .data-table .priority.medium {
+            background: #4299e1;
+            color: white;
+        }
+        
+        /* Timeline */
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            position: relative;
+        }
+        
+        .timeline::before {
+            content: "";
+            position: absolute;
+            top: 40px;
+            left: 60px;
+            right: 60px;
+            height: 4px;
+            background: var(--gray-200);
+        }
+        
+        .timeline-item {
+            text-align: center;
+            position: relative;
+            flex: 1;
+        }
+        
+        .timeline-item .phase {
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .timeline-item .phase .number {
+            font-size: 24px;
+        }
+        
+        .timeline-item .phase .label {
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+        
+        .timeline-item h4 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        
+        .timeline-item p {
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+        
+        .timeline-item .duration {
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        
+        /* Chart Placeholder */
+        .chart-container {
+            background: var(--gray-50);
+            border-radius: 12px;
+            padding: 30px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chart-container h4 {
+            font-size: 16px;
+            color: var(--gray-600);
+            margin-bottom: 20px;
+        }
+        
+        /* Bar Chart */
+        .bar-chart {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+        }
+        
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .bar-item .label {
+            width: 180px;
+            font-size: 14px;
+            color: var(--gray-700);
+            text-align: right;
+        }
+        
+        .bar-item .bar-wrapper {
+            flex: 1;
+            height: 32px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .bar-item .bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        
+        /* Opportunity Cards */
+        .opportunity-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+        
+        .opportunity-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid var(--gray-200);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .opportunity-card.ready {
+            border-color: var(--success);
+        }
+        
+        .opportunity-card.needs-cert {
+            border-color: var(--warning);
+        }
+        
+        .opportunity-card.needs-dev {
+            border-color: var(--danger);
+        }
+        
+        .opportunity-card .status-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+        
+        .opportunity-card.ready .status-bar {
+            background: var(--success);
+        }
+        
+        .opportunity-card.needs-cert .status-bar {
+            background: var(--warning);
+        }
+        
+        .opportunity-card.needs-dev .status-bar {
+            background: var(--danger);
+        }
+        
+        .opportunity-card h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 10px;
+        }
+        
+        .opportunity-card .value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        
+        .opportunity-card .value-label {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+        
+        .opportunity-card .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .opportunity-card.ready .status-badge {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .opportunity-card.needs-cert .status-badge {
+            background: #feebc8;
+            color: #744210;
+        }
+        
+        .opportunity-card.needs-dev .status-badge {
+            background: #fed7d7;
+            color: #822727;
+        }
+        
+        /* ROI Visual */
+        .roi-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .roi-box {
+            text-align: center;
+            padding: 40px;
+            background: var(--gray-50);
+            border-radius: 16px;
+            min-width: 200px;
+        }
+        
+        .roi-box.highlight {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+        
+        .roi-box .value {
+            font-size: 56px;
+            font-weight: 800;
+            line-height: 1;
+        }
+        
+        .roi-box.highlight .value {
+            color: var(--accent);
+        }
+        
+        .roi-box .label {
+            font-size: 14px;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+        
+        .roi-arrow {
+            font-size: 48px;
+            color: var(--accent);
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .slide {
+                margin: 0;
+                box-shadow: none;
+                page-break-after: always;
+                page-break-inside: avoid;
+            }
+            
+            .no-print {
+                display: none;
+            }
+        }
+        
+        /* Navigation (screen only) */
+        .nav-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 15px 25px;
+            border-radius: 50px;
+            z-index: 1000;
+        }
+        
+        .nav-controls button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .nav-controls button:hover {
+            background: var(--accent);
+        }
+        
+        @media print {
+            .nav-controls {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        
+        <!-- Slide 1: Title Slide -->
+        <div class="slide title-slide">
+            <div class="slide-header"></div>
+            <div class="main-title">OEM Supplier Readiness</div>
+            <div class="accent-bar"></div>
+            <div class="subtitle">Deep Research Feature Specification</div>
+            <div class="meta">Strategic Value Plus Solutions, LLC | December 2025</div>
+            <div class="slide-footer" style="color: rgba(255,255,255,0.6);">
+                <div class="logo" style="color: white;">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+            </div>
+            <div class="slide-number" style="color: rgba(255,255,255,0.5);">1</div>
+        </div>
+        
+        <!-- Slide 2: Executive Summary -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="insight-title">
+                Deep Research transforms <span class="highlight">raw company data</span> into 
+                <span class="number">$2-10M</span> supplier opportunities with <span class="highlight">AI-powered analysis</span>
+            </div>
+            
+            <div class="content-grid">
+                <div>
+                    <div class="content-box">
+                        <h3><span class="icon">🎯</span> The Opportunity</h3>
+                        <ul class="bullets">
+                            <li><strong>Automate</strong> 40+ hours of manual research per engagement</li>
+                            <li><strong>Generate</strong> professional deliverables in minutes, not days</li>
+                            <li><strong>Identify</strong> certification gaps and revenue opportunities</li>
+                            <li><strong>Enable</strong> data-driven supplier readiness assessments</li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <div class="content-box accent">
+                        <h3><span class="icon">⚡</span> Key Deliverables</h3>
+                        <ul class="bullets">
+                            <li><strong>Company Dossier</strong> - Complete research compilation</li>
+                            <li><strong>Executive Brief</strong> - Strategic analysis document</li>
+                            <li><strong>Presentation</strong> - SVP-branded McKinsey-style deck</li>
+                            <li><strong>Value Optimizer</strong> - Interactive scenario modeling</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="callout">
+                <h4>Strategic Impact</h4>
+                <p>Reduce proposal creation time by 80% while increasing win rates through data-driven insights</p>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>OEM Supplier Readiness - Deep Research</span>
+            </div>
+            <div class="slide-number">2</div>
+        </div>
+        
+        <!-- Slide 3: Key Metrics -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="insight-title">
+                The Deep Research feature delivers <span class="number">6 key artifacts</span> from 
+                <span class="highlight">automated AI analysis</span>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="value">6</div>
+                    <div class="label">Deliverables Generated</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">80%</div>
+                    <div class="label">Time Reduction</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">50+</div>
+                    <div class="label">Pages Crawled</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">RAG</div>
+                    <div class="label">AI-Powered Search</div>
+                </div>
+            </div>
+            
+            <div class="content-grid" style="margin-top: 40px;">
+                <div class="content-box success">
+                    <h3>🔍 Research Automation</h3>
+                    <ul class="bullets">
+                        <li>Website crawling with AI extraction</li>
+                        <li>Document analysis (PDF, Word, Excel)</li>
+                        <li>PGVector semantic search</li>
+                    </ul>
+                </div>
+                <div class="content-box warning">
+                    <h3>📊 Analysis Engine</h3>
+                    <ul class="bullets">
+                        <li>Capability assessment scoring</li>
+                        <li>Certification gap analysis</li>
+                        <li>Opportunity matrix generation</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>OEM Supplier Readiness - Deep Research</span>
+            </div>
+            <div class="slide-number">3</div>
+        </div>
+        
+        <!-- Slide 4: Workflow Overview -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="insight-title">
+                <span class="number">10-step wizard</span> guides users from 
+                <span class="highlight">raw data to professional deliverables</span>
+            </div>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="phase">
+                        <span class="number">1</span>
+                    </div>
+                    <h4>Basic Info</h4>
+                    <p>Document upload & details</p>
+                    <div class="duration">Day 1</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="phase" style="background: var(--accent);">
+                        <span class="number">2</span>
+                    </div>
+                    <h4>Deep Research</h4>
+                    <p>AI-powered analysis</p>
+                    <div class="duration">Day 1-2</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="phase">
+                        <span class="number">3-5</span>
+                    </div>
+                    <h4>Analysis</h4>
+                    <p>Certs, Gaps, Opportunities</p>
+                    <div class="duration">Day 2-3</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="phase">
+                        <span class="number">6-8</span>
+                    </div>
+                    <h4>Documents</h4>
+                    <p>Generate deliverables</p>
+                    <div class="duration">Day 3-4</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="phase" style="background: var(--success);">
+                        <span class="number">9-10</span>
+                    </div>
+                    <h4>Export</h4>
+                    <p>Download & deliver</p>
+                    <div class="duration">Day 4-5</div>
+                </div>
+            </div>
+            
+            <div class="callout" style="margin-top: 60px;">
+                <h4>Conditional Activation</h4>
+                <p>Deep Research steps only appear when Document Type = "OEM Supplier Readiness"</p>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>OEM Supplier Readiness - Deep Research</span>
+            </div>
+            <div class="slide-number">4</div>
+        </div>
+        
+        <!-- Slide 5: Deep Research Components -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="insight-title">
+                Deep Research combines <span class="number">3 data sources</span> into a 
+                <span class="highlight">unified knowledge base</span>
+            </div>
+            
+            <div class="content-grid three-col">
+                <div class="content-box">
+                    <h3><span class="icon">🌐</span> Website Crawler</h3>
+                    <ul class="bullets">
+                        <li><strong>Multi-page</strong> crawling (50+ pages)</li>
+                        <li><strong>AI extraction</strong> of capabilities</li>
+                        <li><strong>Contact</strong> identification</li>
+                        <li><strong>Certification</strong> detection</li>
+                    </ul>
+                </div>
+                <div class="content-box accent">
+                    <h3><span class="icon">📄</span> Document Analysis</h3>
+                    <ul class="bullets">
+                        <li><strong>PDF, Word, Excel</strong> support</li>
+                        <li><strong>Meeting notes</strong> extraction</li>
+                        <li><strong>RFP/RFI</strong> parsing</li>
+                        <li><strong>Financial</strong> data capture</li>
+                    </ul>
+                </div>
+                <div class="content-box" style="border-left-color: var(--success);">
+                    <h3><span class="icon">🧠</span> PGVector Store</h3>
+                    <ul class="bullets">
+                        <li><strong>Semantic</strong> search</li>
+                        <li><strong>RAG</strong> generation</li>
+                        <li><strong>Conversational</strong> chat</li>
+                        <li><strong>Exportable</strong> knowledge base</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>OEM Supplier Readiness - Deep Research</span>
+            </div>
+            <div class="slide-number">5</div>
+        </div>
+        
+        <!-- Slide 6: Certification Gap Analysis -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="insight-title">
+                Certification analysis identifies <span class="number">critical gaps</span> and 
+                <span class="highlight">remediation timelines</span>
+            </div>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Certification</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Timeline</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>ISO 9001:2015</strong></td>
+                        <td>Quality Management System</td>
+                        <td><span class="status has">Certified</span></td>
+                        <td><span class="priority medium">Medium</span></td>
+                        <td>Maintained</td>
+                    </tr>
+                    <tr>
+                        <td><strong>IATF 16949</strong></td>
+                        <td>Automotive Quality Management</td>
+                        <td><span class="status gap">Gap</span></td>
+                        <td><span class="priority critical">Critical</span></td>
+                        <td>6-12 months</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ISO 14001</strong></td>
+                        <td>Environmental Management</td>
+                        <td><span class="status partial">Partial</span></td>
+                        <td><span class="priority high">High</span></td>
+                        <td>3-6 months</td>
+                    </tr>
+                    <tr>
+                        <td><strong>OSHA VPP</strong></td>
+                        <td>Safety & Health Program</td>
+                        <td><span class="status has">Certified</span></td>
+                        <td><span class="priority medium">Medium</span></td>
+                        <td>Maintained</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hazmat Handling</strong></td>
+                        <td>Hazardous Materials Certification</td>
+                        <td><span class="status gap">Gap</span></td>
+                        <td><span class="priority high">High</span></td>
+                        <td>2-4 months</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="callout" style="margin-top: 30px;">
+                <h4>Key Finding</h4>
+                <p>IATF 16949 certification is the critical path item - required for Toyota supplier qualification</p>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>OEM Supplier Readiness - Deep Research</span>
+            </div>
+            <div class="slide-number">6</div>
+        </div>
+        
+        <!-- Slide 7: Opportunity Matrix -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="insight-title">
+                <span class="number">$2.5-10M</span> annual opportunity across 
+                <span class="highlight">6 service categories</span>
+            </div>
+            
+            <div class="opportunity-grid">
+                <div class="opportunity-card ready">
+                    <div class="status-bar"></div>
+                    <h4>Packaging Services</h4>
+                    <div class="value">$1.2-2.5M</div>
+                    <div class="value-label">Annual Value</div>
+                    <div class="status-badge">Ready Now</div>
+                </div>
+                <div class="opportunity-card needs-cert">
+                    <div class="status-bar"></div>
+                    <h4>Battery Module Assembly</h4>
+                    <div class="value">$800K-1.5M</div>
+                    <div class="value-label">Annual Value</div>
+                    <div class="status-badge">Needs IATF 16949</div>
+                </div>
+                <div class="opportunity-card needs-cert">
+                    <div class="status-bar"></div>
+                    <h4>Hazmat Logistics</h4>
+                    <div class="value">$500K-1M</div>
+                    <div class="value-label">Annual Value</div>
+                    <div class="status-badge">Needs Hazmat Cert</div>
+                </div>
+                <div class="opportunity-card ready">
+                    <div class="status-bar"></div>
+                    <h4>Warehousing</h4>
+                    <div class="value">$400-800K</div>
+                    <div class="value-label">Annual Value</div>
+                    <div class="status-badge">Ready Now</div>
+                </div>
+                <div class="opportunity-card needs-dev">
+                    <div class="status-bar"></div>
+                    <h4>Quality Inspection</h4>
+                    <div class="value">$300-600K</div>
+                    <div class="value-label">Annual Value</div>
+                    <div class="status-badge">Needs Development</div>
+                </div>
+                <div class="opportunity-card needs-cert">
+                    <div class="status-bar"></div>
+                    <h4>Kitting Services</h4>
+                    <div class="value">$200-400K</div>
+                    <div class="value-label">Annual Value</div>
+                    <div class="status-badge">Needs ISO 14001</div>
+                </div>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>OEM Supplier Readiness - Deep Research</span>
+            </div>
+            <div class="slide-number">7</div>
+        </div>
+        
+        <!-- Slide 8: Implementation Roadmap -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="insight-title">
+                <span class="number">4-phase approach</span> delivers 
+                <span class="highlight">full OEM qualification in 12 months</span>
+            </div>
+            
+            <div class="content-grid">
+                <div>
+                    <div class="chart-container">
+                        <h4>Implementation Timeline</h4>
+                        <div class="bar-chart">
+                            <div class="bar-item">
+                                <span class="label">Phase 0: Discovery</span>
+                                <div class="bar-wrapper">
+                                    <div class="bar" style="width: 8%;">2 wks</div>
+                                </div>
+                            </div>
+                            <div class="bar-item">
+                                <span class="label">Phase 1: Foundation</span>
+                                <div class="bar-wrapper">
+                                    <div class="bar" style="width: 50%;">6 mo</div>
+                                </div>
+                            </div>
+                            <div class="bar-item">
+                                <span class="label">Phase 2: Automotive</span>
+                                <div class="bar-wrapper">
+                                    <div class="bar" style="width: 67%;">8 mo</div>
+                                </div>
+                            </div>
+                            <div class="bar-item">
+                                <span class="label">Phase 3: Qualification</span>
+                                <div class="bar-wrapper">
+                                    <div class="bar" style="width: 50%;">6 mo</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="content-box">
+                        <h3>Phase Deliverables</h3>
+                        <ul class="bullets">
+                            <li><strong>Phase 0:</strong> Gap assessment, project plan, resource allocation</li>
+                            <li><strong>Phase 1:</strong> ISO 9001 update, Hazmat cert, ESG framework</li>
+                            <li><strong>Phase 2:</strong> IATF 16949 certification, quality systems</li>
+                            <li><strong>Phase 3:</strong> Toyota audit, supplier onboarding, first PO</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>OEM Supplier Readiness - Deep Research</span>
+            </div>
+            <div class="slide-number">8</div>
+        </div>
+        
+        <!-- Slide 9: Investment & ROI -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="insight-title">
+                <span class="number">285% ROI</span> with 
+                <span class="highlight">8-month payback period</span>
+            </div>
+            
+            <div class="roi-visual">
+                <div class="roi-box">
+                    <div class="value" style="color: var(--danger);">$450K</div>
+                    <div class="label">Total Investment</div>
+                </div>
+                <div class="roi-arrow">→</div>
+                <div class="roi-box">
+                    <div class="value" style="color: var(--warning);">$1.2M</div>
+                    <div class="label">Year 1 Revenue</div>
+                </div>
+                <div class="roi-arrow">→</div>
+                <div class="roi-box">
+                    <div class="value" style="color: var(--success);">$2.8M</div>
+                    <div class="label">Year 2 Revenue</div>
+                </div>
+                <div class="roi-arrow">→</div>
+                <div class="roi-box highlight">
+                    <div class="value">$5.2M</div>
+                    <div class="label">Year 3 Revenue</div>
+                </div>
+            </div>
+            
+            <div class="stats-grid" style="margin-top: 50px;">
+                <div class="stat-card">
+                    <div class="value">285%</div>
+                    <div class="label">3-Year ROI</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">8</div>
+                    <div class="label">Month Payback</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">$9.2M</div>
+                    <div class="label">3-Year Revenue</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">$8.75M</div>
+                    <div class="label">Net Value Created</div>
+                </div>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>OEM Supplier Readiness - Deep Research</span>
+            </div>
+            <div class="slide-number">9</div>
+        </div>
+        
+        <!-- Slide 10: Next Steps -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="insight-title">
+                <span class="number">5 recommended actions</span> to 
+                <span class="highlight">accelerate OEM qualification</span>
+            </div>
+            
+            <div class="content-grid">
+                <div>
+                    <div class="content-box success">
+                        <h3><span class="icon">✓</span> Immediate Actions (Week 1-2)</h3>
+                        <ul class="bullets">
+                            <li><strong>Schedule</strong> discovery workshop with leadership team</li>
+                            <li><strong>Compile</strong> existing certification documentation</li>
+                            <li><strong>Identify</strong> internal project champion</li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <div class="content-box warning">
+                        <h3><span class="icon">→</span> Short-Term (Month 1-3)</h3>
+                        <ul class="bullets">
+                            <li><strong>Engage</strong> IATF 16949 certification body</li>
+                            <li><strong>Begin</strong> Hazmat certification process</li>
+                            <li><strong>Develop</strong> Toyota-specific quality procedures</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="callout" style="margin-top: 40px;">
+                <h4>Ready to Begin?</h4>
+                <p>Contact Strategic Value Plus to schedule your Deep Research assessment and unlock your OEM supplier potential</p>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>OEM Supplier Readiness - Deep Research</span>
+            </div>
+            <div class="slide-number">10</div>
+        </div>
+        
+        <!-- Slide 11: Thank You -->
+        <div class="slide title-slide">
+            <div class="slide-header"></div>
+            <div class="main-title">Thank You</div>
+            <div class="accent-bar"></div>
+            <div class="subtitle">Ready to Transform Your OEM Supplier Readiness?</div>
+            <div class="meta" style="margin-top: 40px;">
+                <p>Strategic Value Plus Solutions, LLC</p>
+                <p style="margin-top: 10px; opacity: 0.7;">www.strategicvalueplus.com | info@strategicvalueplus.com</p>
+            </div>
+            <div class="slide-footer" style="color: rgba(255,255,255,0.6);">
+                <div class="logo" style="color: white;">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+            </div>
+            <div class="slide-number" style="color: rgba(255,255,255,0.5);">11</div>
+        </div>
+        
+    </div>
+    
+    <!-- Navigation Controls -->
+    <div class="nav-controls no-print">
+        <button onclick="window.print()">🖨️ Print / Save PDF</button>
+    </div>
+    
+</body>
+</html>
