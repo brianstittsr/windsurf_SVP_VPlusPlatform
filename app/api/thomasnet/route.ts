@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { scrapeThomasNetSearch } from "@/lib/thomasnet-scraper";
+import { searchAllSources, getSourceSummary } from "@/lib/supplier-aggregator";
 
 // State name to abbreviation mapping
 const STATE_MAP: Record<string, string> = {
@@ -514,14 +515,21 @@ export async function POST(request: NextRequest) {
       }
 
       case "ai_search": {
-        // AI-powered natural language search
+        // AI-powered natural language search with multi-source aggregation
         const query = searchParams?.query || "";
         const region = searchParams?.region || "";
+        const useMultiSource = searchParams?.multiSource !== false; // Default to true
         
-        // Get ThomasNet credentials from environment or request
-        const thomasnetCredentials = searchParams?.thomasnetCredentials || {
-          email: process.env.THOMASNET_EMAIL || "",
-          password: process.env.THOMASNET_PASSWORD || "",
+        // Get credentials from environment or request
+        const credentials = {
+          thomasnet: searchParams?.thomasnetCredentials || {
+            email: process.env.THOMASNET_EMAIL || "",
+            password: process.env.THOMASNET_PASSWORD || "",
+          },
+          connex: searchParams?.connexCredentials || {
+            email: process.env.CONNEX_EMAIL || "",
+            password: process.env.CONNEX_PASSWORD || "",
+          },
         };
         
         if (!query.trim()) {
@@ -539,36 +547,62 @@ export async function POST(request: NextRequest) {
           });
         }
         
-        // Try to scrape real data from ThomasNet first (with optional authentication)
-        const { suppliers: liveSuppliers, totalResults, error: scrapeError, isAuthenticated } = await scrapeThomasNetSearch(
-          query,
-          thomasnetCredentials.email && thomasnetCredentials.password ? thomasnetCredentials : undefined
-        );
-        
         let results: SupplierResult[];
         let total: number;
-        let dataSource: "live" | "mock" | "error" = "live";
+        let dataSource: "live" | "aggregated" | "error" = "live";
         let errorMessage: string | undefined;
+        let sourceSummary: string | undefined;
+        let isAuthenticated = false;
         
-        if (liveSuppliers.length > 0) {
-          // Use live data from ThomasNet
+        if (useMultiSource) {
+          // Use multi-source aggregator (ThomasNet + CONNEX)
+          const aggregatedResult = await searchAllSources(query, {
+            thomasnet: credentials.thomasnet.email && credentials.thomasnet.password ? credentials.thomasnet : undefined,
+            connex: credentials.connex.email && credentials.connex.password ? credentials.connex : undefined,
+          });
+          
+          results = aggregatedResult.suppliers;
+          total = aggregatedResult.totalResults;
+          sourceSummary = getSourceSummary(aggregatedResult);
+          isAuthenticated = aggregatedResult.sources.thomasnet.authenticated || aggregatedResult.sources.connex.authenticated || false;
+          
+          if (aggregatedResult.isLiveData) {
+            dataSource = "aggregated";
+            console.log(`Using ${results.length} suppliers from multiple sources (${total} total)`);
+          } else {
+            // Both sources failed
+            const errors = [
+              aggregatedResult.sources.thomasnet.error,
+              aggregatedResult.sources.connex.error,
+            ].filter(Boolean);
+            
+            if (errors.length > 0) {
+              dataSource = "error";
+              errorMessage = errors.join("; ");
+            }
+          }
+        } else {
+          // Single source (ThomasNet only) - legacy behavior
+          const { suppliers: liveSuppliers, totalResults, error: scrapeError, isAuthenticated: authStatus } = await scrapeThomasNetSearch(
+            query,
+            credentials.thomasnet.email && credentials.thomasnet.password ? credentials.thomasnet : undefined
+          );
+          
           results = liveSuppliers;
           total = totalResults;
-          dataSource = "live";
-          console.log(`Using ${results.length} live suppliers from ThomasNet (${total} total available)`);
-        } else if (scrapeError) {
-          // Scraping failed - show error to user, don't silently fall back
-          results = [];
-          total = 0;
-          dataSource = "error";
-          errorMessage = scrapeError;
-          console.error("ThomasNet scraping failed:", scrapeError);
-        } else {
-          // No results found (not an error, just no matches)
-          results = [];
-          total = 0;
-          dataSource = "live";
-          console.log("No suppliers found on ThomasNet for query:", query);
+          isAuthenticated = authStatus || false;
+          
+          if (liveSuppliers.length > 0) {
+            dataSource = "live";
+            console.log(`Using ${results.length} live suppliers from ThomasNet (${total} total available)`);
+          } else if (scrapeError) {
+            dataSource = "error";
+            errorMessage = scrapeError;
+            console.error("ThomasNet scraping failed:", scrapeError);
+          } else {
+            dataSource = "live";
+            console.log("No suppliers found on ThomasNet for query:", query);
+          }
         }
         
         // Generate AI response
@@ -579,15 +613,17 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({
             success: false,
             error: errorMessage,
-            interpretation: `Failed to search ThomasNet for ${query}${regionLabel}.`,
+            interpretation: `Failed to search suppliers for ${query}${regionLabel}.`,
             results: [],
             total: 0,
             isLiveData: false,
             dataSource: "error",
+            sourceSummary,
             troubleshooting: [
-              "ThomasNet may be blocking automated requests",
+              "Supplier databases may be blocking automated requests",
               "Check if Chrome/Chromium is installed on the server",
               "Try again in a few moments",
+              "Add ThomasNet or CONNEX credentials for better access",
               "Contact support if the issue persists",
             ],
           });
@@ -600,10 +636,11 @@ export async function POST(request: NextRequest) {
           isLiveData: true,
           isAuthenticated,
           dataSource,
+          sourceSummary,
           refinementSuggestions: [
-            total > 25 ? `Showing 25 of ${total.toLocaleString()} results - add filters to narrow` : null,
+            total > 25 ? `Showing ${results.length} of ${total.toLocaleString()} results - add filters to narrow` : null,
             results.length === 0 ? "Try broader search terms" : null,
-            !isAuthenticated ? "Add ThomasNet credentials for better results" : null,
+            !isAuthenticated ? "Add ThomasNet or CONNEX credentials for better results" : null,
             "Filter by certification (ISO, AS9100, etc.)",
             "Specify employee count or company size",
           ].filter(Boolean),
