@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BelPak - Toyota Battery Manufacturing NC Supplier Qualification | Strategic Value Plus</title>
+    <style>
+        @page {
+            size: 16in 9in landscape;
+            margin: 0;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        :root {
+            --primary: #1a365d;
+            --primary-light: #2c5282;
+            --accent: #c8a951;
+            --accent-light: #d4b86a;
+            --success: #38a169;
+            --warning: #ed8936;
+            --danger: #e53e3e;
+            --toyota-red: #eb0a1e;
+            --gray-50: #f7fafc;
+            --gray-100: #edf2f7;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e0;
+            --gray-500: #718096;
+            --gray-600: #4a5568;
+            --gray-700: #2d3748;
+            --gray-800: #1a202c;
+        }
+        
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000;
+            color: var(--gray-800);
+            line-height: 1.4;
+        }
+        
+        .presentation {
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .slide {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: white;
+            position: relative;
+            padding: 60px 80px;
+            margin-bottom: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            page-break-after: always;
+            overflow: hidden;
+        }
+        
+        .slide-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+        }
+        
+        .slide-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 80px;
+            right: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+        
+        .slide-footer .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .slide-footer .logo-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        .slide-number {
+            position: absolute;
+            bottom: 20px;
+            right: 80px;
+            font-size: 14px;
+            color: var(--gray-400);
+            font-weight: 500;
+        }
+        
+        /* Title Slide */
+        .slide.title-slide {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+        
+        .slide.title-slide .slide-header {
+            background: var(--accent);
+            height: 6px;
+        }
+        
+        .title-slide .company-badge {
+            background: rgba(255,255,255,0.15);
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+        
+        .title-slide .main-title {
+            font-size: 52px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+        
+        .title-slide .subtitle {
+            font-size: 28px;
+            font-weight: 400;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+        
+        .title-slide .meta {
+            font-size: 18px;
+            opacity: 0.7;
+        }
+        
+        .title-slide .accent-bar {
+            width: 120px;
+            height: 4px;
+            background: var(--accent);
+            margin: 30px auto;
+        }
+        
+        .title-slide .toyota-badge {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 40px;
+            padding: 15px 30px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        
+        .title-slide .toyota-badge .toyota-logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--toyota-red);
+            background: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+        
+        /* Insight Title */
+        .insight-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 30px;
+            line-height: 1.3;
+        }
+        
+        .insight-title .highlight {
+            color: var(--primary);
+            font-weight: 700;
+        }
+        
+        .insight-title .number {
+            color: var(--accent);
+            font-weight: 700;
+        }
+        
+        .insight-title .toyota {
+            color: var(--toyota-red);
+            font-weight: 700;
+        }
+        
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            height: calc(100% - 140px);
+        }
+        
+        .content-grid.three-col {
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 40px;
+        }
+        
+        /* Content Boxes */
+        .content-box {
+            background: var(--gray-50);
+            border-radius: 12px;
+            padding: 30px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .content-box.accent {
+            border-left-color: var(--accent);
+        }
+        
+        .content-box.success {
+            border-left-color: var(--success);
+            background: #f0fff4;
+        }
+        
+        .content-box.warning {
+            border-left-color: var(--warning);
+            background: #fffaf0;
+        }
+        
+        .content-box.danger {
+            border-left-color: var(--danger);
+            background: #fff5f5;
+        }
+        
+        .content-box.toyota {
+            border-left-color: var(--toyota-red);
+            background: #fff5f5;
+        }
+        
+        .content-box h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .content-box h3 .icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+        
+        /* Bullet Points */
+        .bullets {
+            list-style: none;
+        }
+        
+        .bullets li {
+            padding: 12px 0;
+            padding-left: 28px;
+            position: relative;
+            font-size: 18px;
+            color: var(--gray-700);
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .bullets li:last-child {
+            border-bottom: none;
+        }
+        
+        .bullets li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+        
+        .bullets li strong {
+            color: var(--primary);
+        }
+        
+        .bullets.check li::before {
+            content: "✓";
+            color: var(--success);
+        }
+        
+        .bullets.question li::before {
+            content: "?";
+            color: var(--warning);
+        }
+        
+        .bullets.risk li::before {
+            content: "⚠";
+            color: var(--danger);
+        }
+        
+        /* Callout Box */
+        .callout {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+        
+        .callout.toyota {
+            background: linear-gradient(135deg, var(--toyota-red) 0%, #c00818 100%);
+        }
+        
+        .callout.warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #dd6b20 100%);
+        }
+        
+        .callout h4 {
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        
+        .callout p {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 30px 20px;
+            background: var(--gray-50);
+            border-radius: 12px;
+            border-top: 4px solid var(--accent);
+        }
+        
+        .stat-card .value {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+        
+        .stat-card .label {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Table Styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 16px;
+        }
+        
+        .data-table th {
+            background: var(--primary);
+            color: white;
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .data-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .data-table tr:nth-child(even) {
+            background: var(--gray-50);
+        }
+        
+        .data-table .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .data-table .status.has {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .data-table .status.gap {
+            background: #fed7d7;
+            color: #822727;
+        }
+        
+        .data-table .status.partial {
+            background: #feebc8;
+            color: #744210;
+        }
+        
+        .data-table .status.unknown {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .data-table .priority {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .data-table .priority.critical {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .data-table .priority.high {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .data-table .priority.medium {
+            background: #4299e1;
+            color: white;
+        }
+        
+        /* Timeline */
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            position: relative;
+        }
+        
+        .timeline::before {
+            content: "";
+            position: absolute;
+            top: 40px;
+            left: 60px;
+            right: 60px;
+            height: 4px;
+            background: var(--gray-200);
+        }
+        
+        .timeline-item {
+            text-align: center;
+            position: relative;
+            flex: 1;
+        }
+        
+        .timeline-item .phase {
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .timeline-item .phase .number {
+            font-size: 24px;
+        }
+        
+        .timeline-item h4 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        
+        .timeline-item p {
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+        
+        .timeline-item .duration {
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        
+        /* Comparison Table */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        
+        .comparison-card {
+            background: var(--gray-50);
+            border-radius: 12px;
+            padding: 30px;
+        }
+        
+        .comparison-card h4 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .comparison-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .comparison-item:last-child {
+            border-bottom: none;
+        }
+        
+        .comparison-item .label {
+            color: var(--gray-600);
+        }
+        
+        .comparison-item .value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .slide {
+                margin: 0;
+                box-shadow: none;
+                page-break-after: always;
+                page-break-inside: avoid;
+            }
+            
+            .no-print {
+                display: none;
+            }
+        }
+        
+        /* Navigation */
+        .nav-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 15px 25px;
+            border-radius: 50px;
+            z-index: 1000;
+        }
+        
+        .nav-controls button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .nav-controls button:hover {
+            background: var(--accent);
+        }
+        
+        @media print {
+            .nav-controls {
+                display: none;
+            }
+        }
+        
+        /* Version Badge */
+        .version-badge {
+            position: absolute;
+            top: 20px;
+            right: 80px;
+            background: var(--accent);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        
+        <!-- Slide 1: Title Slide -->
+        <div class="slide title-slide">
+            <div class="slide-header"></div>
+            <div class="company-badge">BELPAK</div>
+            <div class="main-title">Toyota Battery Manufacturing NC</div>
+            <div class="accent-bar"></div>
+            <div class="subtitle">Supplier Qualification Discovery</div>
+            <div class="toyota-badge">
+                <span class="toyota-logo">TOYOTA</span>
+                <span>Battery Manufacturing North Carolina</span>
+            </div>
+            <div class="meta" style="margin-top: 30px;">Prepared by Strategic Value+ Solutions | December 2025</div>
+            <div class="slide-footer" style="color: rgba(255,255,255,0.6);">
+                <div class="logo" style="color: white;">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+            </div>
+            <div class="slide-number" style="color: rgba(255,255,255,0.5);">1</div>
+        </div>
+        
+        <!-- Slide 2: Executive Summary -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="version-badge">V2 - REVISED</div>
+            <div class="insight-title">
+                BelPak's <span class="highlight">embedded operations model</span> positions them as a potential 
+                <span class="toyota">Toyota Battery NC</span> packaging & logistics partner
+            </div>
+            
+            <div class="content-grid">
+                <div>
+                    <div class="content-box toyota">
+                        <h3><span class="icon">🎯</span> The Opportunity</h3>
+                        <ul class="bullets">
+                            <li><strong>Contract packaging</strong> and logistics services</li>
+                            <li><strong>Embedded operations</strong> model proven with Subaru</li>
+                            <li><strong>MBE certification</strong> supports Toyota diversity goals</li>
+                            <li><strong>25+ facilities</strong> with national coverage</li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <div class="content-box warning">
+                        <h3><span class="icon">⚠️</span> Key Gaps to Address</h3>
+                        <ul class="bullets risk">
+                            <li><strong>No hazmat experience</strong> - critical for battery handling</li>
+                            <li><strong>ISO 9001/IATF 16949</strong> certifications required</li>
+                            <li><strong>Battery packaging expertise</strong> needs development</li>
+                            <li><strong>Toyota interest</strong> in outsourcing not yet confirmed</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="callout warning">
+                <h4>Critical Question</h4>
+                <p>Does Toyota intend to outsource packaging & logistics? This must be validated before proceeding.</p>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>BelPak - Toyota Battery NC Supplier Qualification</span>
+            </div>
+            <div class="slide-number">2</div>
+        </div>
+        
+        <!-- Slide 3: BelPak At A Glance -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="insight-title">
+                BelPak brings <span class="highlight">25+ facilities</span>, <span class="number">1,000 employees</span>, 
+                and <span class="highlight">proven OEM experience</span> with Subaru
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="value">25+</div>
+                    <div class="label">Facilities</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">1,000</div>
+                    <div class="label">Employees</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">99.6%</div>
+                    <div class="label">OTIF Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">45</div>
+                    <div class="label">Day Standup</div>
+                </div>
+            </div>
+            
+            <div class="comparison-grid" style="margin-top: 40px;">
+                <div class="comparison-card">
+                    <h4>🏢 Corporate Profile</h4>
+                    <div class="comparison-item">
+                        <span class="label">Parent Company</span>
+                        <span class="value">Red Arts Capital (Chicago)</span>
+                    </div>
+                    <div class="comparison-item">
+                        <span class="label">Formation</span>
+                        <span class="value">2024 (3-company merger)</span>
+                    </div>
+                    <div class="comparison-item">
+                        <span class="label">MBE Certification</span>
+                        <span class="value" style="color: var(--warning);">TBD - Verify entity & ownership</span>
+                    </div>
+                    <div class="comparison-item">
+                        <span class="label">Coverage</span>
+                        <span class="value">US & Canada</span>
+                    </div>
+                </div>
+                <div class="comparison-card">
+                    <h4>🏭 Legacy Companies</h4>
+                    <div class="comparison-item">
+                        <span class="label">Coregistics (Atlanta)</span>
+                        <span class="value" style="color: var(--success);">Best fit - closest to NC</span>
+                    </div>
+                    <div class="comparison-item">
+                        <span class="label">Proven Partners (IL)</span>
+                        <span class="value">Food manufacturing focus</span>
+                    </div>
+                    <div class="comparison-item">
+                        <span class="label">Belvika (Toronto)</span>
+                        <span class="value">Food products focus</span>
+                    </div>
+                    <div class="comparison-item">
+                        <span class="label">Subaru Relationship</span>
+                        <span class="value" style="color: var(--warning);">Which entity? Location?</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>BelPak - Toyota Battery NC Supplier Qualification</span>
+            </div>
+            <div class="slide-number">3</div>
+        </div>
+        
+        <!-- Slide 4: The Subaru Model -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="insight-title">
+                BelPak's <span class="highlight">Subaru embedded operations</span> may provide a model for Toyota - 
+                <span class="toyota">but key differences exist</span>
+            </div>
+            
+            <div class="content-grid">
+                <div>
+                    <div class="content-box success">
+                        <h3><span class="icon">🚗</span> Current Subaru Operations</h3>
+                        <ul class="bullets check">
+                            <li><strong>Portland, OR & Indianapolis, IN</strong> locations</li>
+                            <li><strong>On-site presence</strong> within Subaru facilities</li>
+                            <li><strong>Parts packaging</strong> - windshields, brakes, headrests</li>
+                            <li><strong>Facilities maintenance</strong> for 29 locations</li>
+                            <li><strong>Flex staffing</strong> scales with volume</li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <div class="content-box danger">
+                        <h3><span class="icon">⚠️</span> Key Differences for Toyota</h3>
+                        <ul class="bullets risk">
+                            <li><strong>Hazmat handling</strong> - no current experience</li>
+                            <li><strong>Battery packaging</strong> - specialized expertise needed</li>
+                            <li><strong>Temperature control</strong> - different requirements</li>
+                            <li><strong>DOT compliance</strong> - new regulatory burden</li>
+                            <li><strong>RFID tracking</strong> - may need new systems</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="callout warning">
+                <h4>Key Question for BelPak</h4>
+                <p>Which legacy company serves Subaru? This may be the best candidate for Toyota certification.</p>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>BelPak - Toyota Battery NC Supplier Qualification</span>
+            </div>
+            <div class="slide-number">4</div>
+        </div>
+        
+        <!-- Slide 5: Service Opportunities -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="insight-title">
+                Potential service categories for Toyota Battery - 
+                <span class="highlight">all require hazmat capability development</span>
+            </div>
+            
+            <div class="content-grid three-col" style="margin-top: 20px;">
+                <div class="content-box">
+                    <h3>📦 Packaging Services</h3>
+                    <ul class="bullets">
+                        <li><strong>Protective packaging</strong> for battery modules</li>
+                        <li><strong>Temperature-controlled</strong> solutions</li>
+                        <li><strong>Shock-absorbing</strong> materials</li>
+                    </ul>
+                    <p style="margin-top: 15px; padding: 10px; background: #fff5f5; border-radius: 6px; font-size: 14px; color: var(--danger);">
+                        <strong>Note:</strong> Service only - NOT production of containers
+                    </p>
+                </div>
+                <div class="content-box accent">
+                    <h3>🏭 Embedded Logistics</h3>
+                    <ul class="bullets">
+                        <li><strong>On-site</strong> facility management</li>
+                        <li><strong>Receiving</strong> and inventory</li>
+                        <li><strong>Internal</strong> logistics coordination</li>
+                    </ul>
+                    <p style="margin-top: 15px; padding: 10px; background: #f0fff4; border-radius: 6px; font-size: 14px; color: var(--success);">
+                        <strong>Strength:</strong> Proven model with Subaru
+                    </p>
+                </div>
+                <div class="content-box warning">
+                    <h3>⚠️ Hazmat Services</h3>
+                    <ul class="bullets">
+                        <li><strong>DOT-compliant</strong> packaging</li>
+                        <li><strong>Hazardous materials</strong> labeling</li>
+                        <li><strong>Regulatory</strong> documentation</li>
+                    </ul>
+                    <p style="margin-top: 15px; padding: 10px; background: #fff5f5; border-radius: 6px; font-size: 14px; color: var(--danger);">
+                        <strong>Gap:</strong> No current hazmat experience
+                    </p>
+                </div>
+            </div>
+            
+            <div class="callout">
+                <h4>Strategic Question</h4>
+                <p>Does BelPak want to enter the hazmat business? This is a significant capability investment.</p>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>BelPak - Toyota Battery NC Supplier Qualification</span>
+            </div>
+            <div class="slide-number">5</div>
+        </div>
+        
+        <!-- Slide 6: Certification Requirements -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="insight-title">
+                Certification requirements - <span class="number">9-12 month</span> timeline for 
+                <span class="highlight">ISO 9001 + IATF 16949</span> (done in parallel)
+            </div>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Certification</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Timeline</th>
+                        <th>Est. Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>ISO 9001:2015</strong></td>
+                        <td>Quality Management System</td>
+                        <td><span class="status partial">Systems may exist</span></td>
+                        <td>9 months minimum</td>
+                        <td>$15-30K/facility</td>
+                    </tr>
+                    <tr>
+                        <td><strong>IATF 16949</strong></td>
+                        <td>Automotive Quality (if required)</td>
+                        <td><span class="status gap">Gap</span></td>
+                        <td>12 months minimum</td>
+                        <td>$50-100K/facility</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hazmat Compliance</strong></td>
+                        <td>DOT Battery Handling</td>
+                        <td><span class="status gap">Gap</span></td>
+                        <td>TBD - need expert input</td>
+                        <td>TBD - site-specific</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ESG Documentation</strong></td>
+                        <td>Environmental/Safety/Governance</td>
+                        <td><span class="status unknown">Unknown</span></td>
+                        <td>Overlay with QMS</td>
+                        <td>TBD</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="content-grid" style="margin-top: 30px;">
+                <div class="content-box success">
+                    <h3>✓ Key Points</h3>
+                    <ul class="bullets check">
+                        <li><strong>ISO 9001 & IATF</strong> must be done in parallel - same system</li>
+                        <li><strong>Hazmat training</strong> only for staff handling materials</li>
+                        <li><strong>Process FMEA (PFMEA)</strong> relevant - not PPAP/APQP</li>
+                    </ul>
+                </div>
+                <div class="content-box warning">
+                    <h3>⚠️ Considerations</h3>
+                    <ul class="bullets question">
+                        <li><strong>How many facilities?</strong> Strategic decision for BelPak</li>
+                        <li><strong>Proximity to Toyota</strong> is key factor</li>
+                        <li><strong>6 months</strong> just to schedule Stage 1 audit</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>BelPak - Toyota Battery NC Supplier Qualification</span>
+            </div>
+            <div class="slide-number">6</div>
+        </div>
+        
+        <!-- Slide 7: Implementation Approach -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="insight-title">
+                Recommended approach: <span class="highlight">Discovery first</span>, then 
+                <span class="number">parallel certification</span> of selected facility(ies)
+            </div>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="phase">
+                        <span class="number">0</span>
+                    </div>
+                    <h4>Discovery</h4>
+                    <p>Gap analysis, facility selection, Toyota validation</p>
+                    <div class="duration">Weeks 1-4</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="phase" style="background: var(--accent);">
+                        <span class="number">1</span>
+                    </div>
+                    <h4>QMS Development</h4>
+                    <p>ISO 9001 + IATF 16949 in parallel</p>
+                    <div class="duration">Months 1-9</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="phase">
+                        <span class="number">2</span>
+                    </div>
+                    <h4>Certification Audits</h4>
+                    <p>Stage 1 & Stage 2 audits</p>
+                    <div class="duration">Months 9-12</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="phase" style="background: var(--toyota-red);">
+                        <span class="number">3</span>
+                    </div>
+                    <h4>Toyota Registration</h4>
+                    <p>Submit after certs received</p>
+                    <div class="duration">Month 12+</div>
+                </div>
+            </div>
+            
+            <div class="content-grid" style="margin-top: 50px;">
+                <div class="content-box">
+                    <h3>Phase 0 Deliverables</h3>
+                    <ul class="bullets">
+                        <li><strong>Detailed gap analysis</strong> of target facility</li>
+                        <li><strong>Hazmat capabilities</strong> assessment</li>
+                        <li><strong>Existing documentation</strong> review</li>
+                        <li><strong>Toyota interest</strong> validation</li>
+                    </ul>
+                </div>
+                <div class="content-box accent">
+                    <h3>Key Decisions for BelPak</h3>
+                    <ul class="bullets question">
+                        <li><strong>Which facility?</strong> Proximity to Toyota plant</li>
+                        <li><strong>How many sites?</strong> Start with 1, expand later?</li>
+                        <li><strong>Hazmat investment?</strong> Do they want this capability?</li>
+                        <li><strong>Subaru synergy?</strong> Same site that serves Subaru?</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>BelPak - Toyota Battery NC Supplier Qualification</span>
+            </div>
+            <div class="slide-number">7</div>
+        </div>
+        
+        <!-- Slide 8: Investment Estimate -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="insight-title">
+                Preliminary investment estimate: <span class="number">$275K - $490K</span> for 
+                <span class="highlight">focused scope</span> (1 facility, core certifications)
+            </div>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Low Estimate</th>
+                        <th>High Estimate</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>ISO 9001 (1 facility)</strong></td>
+                        <td>$15,000</td>
+                        <td>$30,000</td>
+                        <td>9-month timeline</td>
+                    </tr>
+                    <tr>
+                        <td><strong>IATF 16949 (1 facility)</strong></td>
+                        <td>$50,000</td>
+                        <td>$100,000</td>
+                        <td>If required - 12-month timeline</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hazmat Compliance</strong></td>
+                        <td>$30,000</td>
+                        <td>$60,000</td>
+                        <td>Site-specific, handlers only</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ESG/Safety Documentation</strong></td>
+                        <td>$10,000</td>
+                        <td>$20,000</td>
+                        <td>Overlay with QMS</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SVP Consulting & Support</strong></td>
+                        <td>$170,000</td>
+                        <td>$280,000</td>
+                        <td>Gap analysis, implementation, audit prep</td>
+                    </tr>
+                    <tr style="background: var(--gray-100); font-weight: bold;">
+                        <td><strong>TOTAL</strong></td>
+                        <td><strong>$275,000</strong></td>
+                        <td><strong>$490,000</strong></td>
+                        <td>12-month project</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="callout" style="margin-top: 30px;">
+                <h4>Important Notes</h4>
+                <p>Final pricing requires Phase 0 discovery. Additional facilities would add incremental cost.</p>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>BelPak - Toyota Battery NC Supplier Qualification</span>
+            </div>
+            <div class="slide-number">8</div>
+        </div>
+        
+        <!-- Slide 9: Key Risks -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="insight-title">
+                <span class="toyota">Critical risks</span> must be addressed before significant investment
+            </div>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Risk</th>
+                        <th>Impact</th>
+                        <th>Mitigation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong style="color: var(--danger);">Toyota may not outsource</strong></td>
+                        <td><span class="priority critical">Critical</span></td>
+                        <td>Validate Toyota's outsourcing intentions before investing</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--danger);">No hazmat experience</strong></td>
+                        <td><span class="priority critical">Critical</span></td>
+                        <td>Engage hazmat expert; assess if this is right for BelPak</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--warning);">Battery packaging complexity</strong></td>
+                        <td><span class="priority high">High</span></td>
+                        <td>Bring in packaging expertise; this may be the real opportunity</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Certification timeline</strong></td>
+                        <td><span class="priority high">High</span></td>
+                        <td>Start immediately; 6 months just to schedule audits</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Competitive landscape</strong></td>
+                        <td><span class="priority medium">Medium</span></td>
+                        <td>First-mover advantage; leverage Subaru relationship</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="callout warning" style="margin-top: 30px;">
+                <h4>Biggest Risk</h4>
+                <p>Toyota may not be interested in outsourcing. Even if they are, BelPak's lack of hazmat experience is a significant barrier.</p>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>BelPak - Toyota Battery NC Supplier Qualification</span>
+            </div>
+            <div class="slide-number">9</div>
+        </div>
+        
+        <!-- Slide 10: Discovery Questions -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="insight-title">
+                <span class="number">Key questions</span> to answer before proceeding
+            </div>
+            
+            <div class="content-grid">
+                <div>
+                    <div class="content-box">
+                        <h3><span class="icon">❓</span> Questions for BelPak</h3>
+                        <ul class="bullets question">
+                            <li><strong>Which facility</strong> would serve Toyota? Proximity matters.</li>
+                            <li><strong>Which entity</strong> serves Subaru? Same site for Toyota?</li>
+                            <li><strong>MBE certification</strong> - which entity holds it? Ownership %?</li>
+                            <li><strong>Hazmat interest?</strong> Do they want this capability?</li>
+                            <li><strong>How many sites</strong> to certify? Strategic decision.</li>
+                            <li><strong>Existing certifications?</strong> Any ISO certs today?</li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <div class="content-box toyota">
+                        <h3><span class="icon">🔋</span> Questions About Toyota</h3>
+                        <ul class="bullets question">
+                            <li><strong>Outsourcing plans?</strong> Will they outsource packaging?</li>
+                            <li><strong>Timeline?</strong> When do they need suppliers?</li>
+                            <li><strong>Requirements?</strong> Specific certifications needed?</li>
+                            <li><strong>Packaging specs?</strong> What do they actually need?</li>
+                            <li><strong>Hazmat requirements?</strong> What level of compliance?</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="callout">
+                <h4>Recommended Next Step</h4>
+                <p>Phase 0 Discovery engagement to answer these questions before committing to full certification project</p>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>BelPak - Toyota Battery NC Supplier Qualification</span>
+            </div>
+            <div class="slide-number">10</div>
+        </div>
+        
+        <!-- Slide 11: Team & Next Steps -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="insight-title">
+                <span class="highlight">Strategic Value+ Team</span> and 
+                <span class="number">immediate next steps</span>
+            </div>
+            
+            <div class="content-grid">
+                <div>
+                    <div class="content-box">
+                        <h3><span class="icon">👥</span> SV+ Team</h3>
+                        <ul class="bullets">
+                            <li><strong>Nelinia Varenas</strong> - CEO</li>
+                            <li><strong>Roy Dickan</strong> - CRO, North Carolina Lead</li>
+                            <li><strong>Dave</strong> - Quality & Certification Expert</li>
+                            <li><strong>Nate Hallums</strong> - ESG Expert</li>
+                            <li><strong>Brian Stitt</strong> - CTO / Technical Lead</li>
+                            <li><strong>Icy Williams</strong> - Client Liaison</li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <div class="content-box success">
+                        <h3><span class="icon">✓</span> Immediate Next Steps</h3>
+                        <ul class="bullets check">
+                            <li><strong>Schedule</strong> discovery meeting with Henry & Anthony</li>
+                            <li><strong>Clarify</strong> which facility/entity serves Subaru</li>
+                            <li><strong>Validate</strong> MBE certification details</li>
+                            <li><strong>Assess</strong> Toyota's outsourcing intentions</li>
+                            <li><strong>Engage</strong> hazmat expert for capability assessment</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="comparison-card" style="margin-top: 30px;">
+                <h4>🤝 BelPak Leadership</h4>
+                <div style="display: flex; gap: 40px;">
+                    <div class="comparison-item" style="flex: 1; border: none;">
+                        <span class="label">Henry Hicks III</span>
+                        <span class="value">Revenue Growth</span>
+                    </div>
+                    <div class="comparison-item" style="flex: 1; border: none;">
+                        <span class="label">Anthony [Last Name]</span>
+                        <span class="value">Operating Partner (Red Arts)</span>
+                    </div>
+                    <div class="comparison-item" style="flex: 1; border: none;">
+                        <span class="label">Dawn Statsney</span>
+                        <span class="value">Chief HR Officer</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slide-footer">
+                <div class="logo">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+                <span>BelPak - Toyota Battery NC Supplier Qualification</span>
+            </div>
+            <div class="slide-number">11</div>
+        </div>
+        
+        <!-- Slide 12: Thank You -->
+        <div class="slide title-slide">
+            <div class="slide-header"></div>
+            <div class="company-badge">BELPAK × TOYOTA</div>
+            <div class="main-title">Thank You</div>
+            <div class="accent-bar"></div>
+            <div class="subtitle">Ready to Begin Discovery?</div>
+            <div class="meta" style="margin-top: 40px;">
+                <p>Strategic Value+ Solutions</p>
+                <p style="margin-top: 10px; opacity: 0.7;">Nelinia Varenas, CEO | Roy Dickan, CRO</p>
+            </div>
+            <div class="slide-footer" style="color: rgba(255,255,255,0.6);">
+                <div class="logo" style="color: white;">
+                    <div class="logo-icon">SVP</div>
+                    Strategic Value Plus
+                </div>
+            </div>
+            <div class="slide-number" style="color: rgba(255,255,255,0.5);">12</div>
+        </div>
+        
+    </div>
+    
+    <!-- Navigation Controls -->
+    <div class="nav-controls no-print">
+        <button onclick="window.print()">🖨️ Print / Save PDF</button>
+    </div>
+    
+</body>
+</html>
