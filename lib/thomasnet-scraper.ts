@@ -21,6 +21,7 @@ interface ScrapeResult {
   suppliers: ScrapedSupplier[];
   totalResults: number;
   isLiveData: boolean;
+  error?: string;
 }
 
 let browserInstance: Browser | null = null;
@@ -188,11 +189,13 @@ export async function scrapeThomasNetSearch(query: string): Promise<ScrapeResult
       isLiveData: result.suppliers.length > 0,
     };
   } catch (error) {
-    console.error("Puppeteer scraping error:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Puppeteer scraping error:", errorMessage);
     return {
       suppliers: [],
       totalResults: 0,
       isLiveData: false,
+      error: `ThomasNet scraping failed: ${errorMessage}`,
     };
   } finally {
     if (page) {

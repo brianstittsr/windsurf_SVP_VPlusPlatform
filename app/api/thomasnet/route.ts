@@ -534,36 +534,62 @@ export async function POST(request: NextRequest) {
         }
         
         // Try to scrape real data from ThomasNet first
-        const { suppliers: liveSuppliers, totalResults } = await scrapeThomasNetSearch(query);
+        const { suppliers: liveSuppliers, totalResults, error: scrapeError } = await scrapeThomasNetSearch(query);
         
         let results: SupplierResult[];
         let total: number;
+        let dataSource: "live" | "mock" | "error" = "live";
+        let errorMessage: string | undefined;
         
         if (liveSuppliers.length > 0) {
           // Use live data from ThomasNet
           results = liveSuppliers;
           total = totalResults;
+          dataSource = "live";
           console.log(`Using ${results.length} live suppliers from ThomasNet (${total} total available)`);
+        } else if (scrapeError) {
+          // Scraping failed - show error to user, don't silently fall back
+          results = [];
+          total = 0;
+          dataSource = "error";
+          errorMessage = scrapeError;
+          console.error("ThomasNet scraping failed:", scrapeError);
         } else {
-          // Fall back to mock data if scraping fails
-          const parsed = parseSearchQuery(query);
-          results = searchSuppliers(parsed);
-          total = results.length;
-          console.log(`Falling back to ${results.length} mock suppliers`);
-        }
-        
-        // Apply region filter if specified (only works with mock data that has state info)
-        if (region && region !== "all" && liveSuppliers.length === 0) {
-          results = filterByRegion(results, region);
+          // No results found (not an error, just no matches)
+          results = [];
+          total = 0;
+          dataSource = "live";
+          console.log("No suppliers found on ThomasNet for query:", query);
         }
         
         // Generate AI response
         const regionLabel = region && region !== "all" ? ` in ${region}` : "";
+        
+        // If there was an error, return error response
+        if (dataSource === "error") {
+          return NextResponse.json({
+            success: false,
+            error: errorMessage,
+            interpretation: `Failed to search ThomasNet for ${query}${regionLabel}.`,
+            results: [],
+            total: 0,
+            isLiveData: false,
+            dataSource: "error",
+            troubleshooting: [
+              "ThomasNet may be blocking automated requests",
+              "Check if Chrome/Chromium is installed on the server",
+              "Try again in a few moments",
+              "Contact support if the issue persists",
+            ],
+          });
+        }
+        
         const aiResponse = {
           interpretation: `Searching for ${query}${regionLabel}.`,
           results,
           total,
-          isLiveData: liveSuppliers.length > 0,
+          isLiveData: true,
+          dataSource,
           refinementSuggestions: [
             total > 25 ? `Showing 25 of ${total.toLocaleString()} results - add filters to narrow` : null,
             results.length === 0 ? "Try broader search terms" : null,

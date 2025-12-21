@@ -170,7 +170,7 @@ export default function SupplierSearchPage() {
   const generateMessageId = () => `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
   // Search suppliers via API
-  const searchSuppliers = async (query: string, region?: string): Promise<{ results: SupplierResult[]; message: string; total: number; isLiveData?: boolean }> => {
+  const searchSuppliers = async (query: string, region?: string): Promise<{ results: SupplierResult[]; message: string; total: number; isLiveData?: boolean; error?: string; troubleshooting?: string[] }> => {
     try {
       const response = await fetch("/api/thomasnet", {
         method: "POST",
@@ -194,10 +194,23 @@ export default function SupplierSearchPage() {
           isLiveData: data.isLiveData,
         };
       }
-      return { results: [], message: "Search failed. Please try again.", total: 0 };
+      
+      // Return error details from API
+      return { 
+        results: [], 
+        message: data.error || "Search failed. Please try again.", 
+        total: 0,
+        error: data.error,
+        troubleshooting: data.troubleshooting,
+      };
     } catch (error) {
       console.error("Search error:", error);
-      return { results: [], message: "Search failed. Please try again.", total: 0 };
+      return { 
+        results: [], 
+        message: `Search failed: ${error instanceof Error ? error.message : "Unknown error"}`, 
+        total: 0,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   };
 
@@ -278,7 +291,24 @@ export default function SupplierSearchPage() {
     setIsLoading(true);
 
     try {
-      const { results, message, total, isLiveData } = await searchSuppliers(query, regionFilter);
+      const { results, message, total, isLiveData, error, troubleshooting } = await searchSuppliers(query, regionFilter);
+
+      // Check if there was an error from the API
+      if (error) {
+        const troubleshootingText = troubleshooting?.length 
+          ? `\n\n**Troubleshooting:**\n${troubleshooting.map(t => `• ${t}`).join("\n")}`
+          : "";
+        
+        const errorResponseMessage: ChatMessage = {
+          id: generateMessageId(),
+          role: "assistant",
+          content: `❌ **Search Failed**\n\n${message}${troubleshootingText}`,
+          timestamp: new Date(),
+          suggestions: searchSuggestions,
+        };
+        setMessages((prev) => [...prev, errorResponseMessage]);
+        return;
+      }
 
       const liveDataNote = isLiveData ? "\n\n*Data sourced from ThomasNet.com*" : "";
       const totalNote = total > results.length ? `\n\nShowing ${results.length} of ${total.toLocaleString()} total results.` : "";
@@ -288,7 +318,7 @@ export default function SupplierSearchPage() {
         role: "assistant",
         content: results.length > 0
           ? `✅ ${message}\n\nI found **${total.toLocaleString()} suppliers** matching your criteria. You can save them to a list or click on any supplier to view details.${totalNote}${liveDataNote}`
-          : `🔍 ${message}\n\nTry adjusting your search terms or browse by category.`,
+          : `🔍 ${message}\n\nNo suppliers found. Try adjusting your search terms or browse by category.`,
         timestamp: new Date(),
         results: results.length > 0 ? results : undefined,
         suggestions: results.length === 0 ? searchSuggestions : undefined,
@@ -310,7 +340,7 @@ export default function SupplierSearchPage() {
       const errorMessage: ChatMessage = {
         id: generateMessageId(),
         role: "assistant",
-        content: "❌ **Something went wrong**. Please try again.",
+        content: `❌ **Something went wrong**\n\n${error instanceof Error ? error.message : "Unknown error"}. Please try again.`,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
