@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supplier Search SOP - Strategic Value Plus</title>
+    <style>
+        @page {
+            size: letter;
+            margin: 0.75in;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #333;
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: 0.5in;
+            background: white;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #1a365d;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .company-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1a365d;
+        }
+        
+        .doc-type {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .header-right {
+            text-align: right;
+            font-size: 10pt;
+            color: #666;
+        }
+        
+        /* Title */
+        h1 {
+            color: #1a365d;
+            font-size: 24pt;
+            margin: 20px 0 10px 0;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            color: #2c5282;
+            font-size: 16pt;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            border-left: 4px solid #3182ce;
+            padding-left: 12px;
+            page-break-after: avoid;
+        }
+        
+        h3 {
+            color: #2d3748;
+            font-size: 13pt;
+            margin-top: 18px;
+            margin-bottom: 8px;
+            page-break-after: avoid;
+        }
+        
+        h4 {
+            color: #4a5568;
+            font-size: 11pt;
+            margin-top: 12px;
+            margin-bottom: 6px;
+        }
+        
+        /* Overview box */
+        .overview {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+        
+        .overview p {
+            margin: 0;
+        }
+        
+        /* Table of Contents */
+        .toc {
+            background: #edf2f7;
+            border-radius: 8px;
+            padding: 15px 25px;
+            margin: 20px 0;
+        }
+        
+        .toc h3 {
+            margin-top: 0;
+            color: #1a365d;
+            border-bottom: 1px solid #cbd5e0;
+            padding-bottom: 8px;
+        }
+        
+        .toc ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .toc li {
+            margin: 6px 0;
+        }
+        
+        .toc a {
+            color: #2c5282;
+            text-decoration: none;
+        }
+        
+        /* Lists */
+        ul, ol {
+            margin: 8px 0;
+            padding-left: 25px;
+        }
+        
+        li {
+            margin: 4px 0;
+        }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 10pt;
+        }
+        
+        th {
+            background: #2c5282;
+            color: white;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        tr:nth-child(even) {
+            background: #f7fafc;
+        }
+        
+        tr:hover {
+            background: #edf2f7;
+        }
+        
+        /* Code */
+        code {
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 10pt;
+            color: #c53030;
+        }
+        
+        /* Callouts */
+        .warning {
+            background: #fffaf0;
+            border-left: 4px solid #ed8936;
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .warning-icon {
+            color: #ed8936;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .info {
+            background: #ebf8ff;
+            border-left: 4px solid #3182ce;
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .success {
+            background: #f0fff4;
+            border-left: 4px solid #38a169;
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        /* Divider */
+        hr {
+            border: none;
+            border-top: 1px solid #e2e8f0;
+            margin: 25px 0;
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            padding-top: 15px;
+            border-top: 2px solid #1a365d;
+            font-size: 9pt;
+            color: #666;
+            text-align: center;
+        }
+        
+        /* Document info table */
+        .doc-info {
+            margin-top: 30px;
+        }
+        
+        .doc-info table {
+            width: auto;
+            min-width: 300px;
+        }
+        
+        .doc-info th {
+            background: #4a5568;
+            width: 150px;
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                padding: 0;
+            }
+            
+            .no-print {
+                display: none;
+            }
+            
+            h2, h3 {
+                page-break-after: avoid;
+            }
+            
+            table, .overview, .toc, .warning, .info {
+                page-break-inside: avoid;
+            }
+        }
+        
+        /* Procedure steps */
+        .procedure-step {
+            display: flex;
+            align-items: flex-start;
+            margin: 10px 0;
+        }
+        
+        .step-number {
+            background: #3182ce;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        strong {
+            color: #2d3748;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo">SVP</div>
+            <div>
+                <div class="company-name">Strategic Value Plus</div>
+                <div class="doc-type">Standard Operating Procedure</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div><strong>Document:</strong> SOP-SS-001</div>
+            <div><strong>Version:</strong> 1.0</div>
+            <div><strong>Effective:</strong> December 21, 2024</div>
+        </div>
+    </div>
+
+    <!-- Title -->
+    <h1>Supplier Search Standard Operating Procedure</h1>
+
+    <!-- Overview -->
+    <div class="overview">
+        <p>This document outlines the standard operating procedure for using the Supplier Search feature in the Strategic Value Plus (SVP) Platform. The Supplier Search integrates with <strong>ThomasNet</strong> for supplier discovery and <strong>Apollo.io</strong> for contact enrichment.</p>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h3>Table of Contents</h3>
+        <ol>
+            <li><a href="#section1">Supplier Discovery (ThomasNet)</a></li>
+            <li><a href="#section2">Contact Enrichment (Apollo.io)</a></li>
+            <li><a href="#section3">Apollo.io Pricing & Credit Costs</a></li>
+            <li><a href="#section4">Best Practices</a></li>
+            <li><a href="#section5">Troubleshooting</a></li>
+            <li><a href="#appendix">Appendix: API Endpoints</a></li>
+        </ol>
+    </div>
+
+    <hr>
+
+    <!-- Section 1 -->
+    <h2 id="section1">1. Supplier Discovery (ThomasNet)</h2>
+
+    <h3>1.1 Accessing Supplier Search</h3>
+    <div class="procedure-step">
+        <div class="step-number">1</div>
+        <div class="step-content">Navigate to <strong>Portal → Supplier Search</strong> in the SVP Platform</div>
+    </div>
+    <div class="procedure-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+            You will see multiple search options:
+            <ul>
+                <li><strong>AI Chat</strong> - Natural language search</li>
+                <li><strong>All Suppliers</strong> - Keyword-based search with region filter</li>
+                <li><strong>By Name</strong> - Search by company name</li>
+                <li><strong>By Brand</strong> - Search by brand name</li>
+                <li><strong>Product Catalogs</strong> - Browse product catalogs</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>1.2 Performing a Search</h3>
+    <div class="procedure-step">
+        <div class="step-number">1</div>
+        <div class="step-content"><strong>Enter your search query</strong> (e.g., "CNC machining suppliers")</div>
+    </div>
+    <div class="procedure-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+            <strong>Select a region</strong> (optional):
+            <ul>
+                <li>All Regions</li>
+                <li>Northeast</li>
+                <li>Southeast</li>
+                <li>Midwest</li>
+                <li>Southwest</li>
+                <li>West</li>
+            </ul>
+        </div>
+    </div>
+    <div class="procedure-step">
+        <div class="step-number">3</div>
+        <div class="step-content">Click <strong>Search All Suppliers</strong></div>
+    </div>
+
+    <h3>1.3 Search Results</h3>
+    <ul>
+        <li>Results are sourced from <strong>ThomasNet.com</strong></li>
+        <li>Each result includes: Company name, Description, Location, Link to ThomasNet profile</li>
+        <li>Results can be saved to custom lists for later reference</li>
+    </ul>
+
+    <h3>1.4 Saving Suppliers to Lists</h3>
+    <div class="procedure-step">
+        <div class="step-number">1</div>
+        <div class="step-content">Click <strong>Save to List</strong> on any supplier card</div>
+    </div>
+    <div class="procedure-step">
+        <div class="step-number">2</div>
+        <div class="step-content">Select an existing list or create a new one</div>
+    </div>
+    <div class="procedure-step">
+        <div class="step-number">3</div>
+        <div class="step-content">Saved suppliers appear in the <strong>Saved Lists</strong> tab</div>
+    </div>
+
+    <hr>
+
+    <!-- Section 2 -->
+    <h2 id="section2">2. Contact Enrichment (Apollo.io)</h2>
+
+    <h3>2.1 Overview</h3>
+    <p>Apollo.io is used to find and reveal contact information (emails and phone numbers) for decision-makers at supplier companies.</p>
+
+    <h3>2.2 Searching for Contacts</h3>
+    <div class="procedure-step">
+        <div class="step-number">1</div>
+        <div class="step-content">Navigate to <strong>Portal → Apollo Search</strong></div>
+    </div>
+    <div class="procedure-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+            Enter search criteria:
+            <ul>
+                <li><strong>Keywords</strong> (e.g., "Purchasing Manager")</li>
+                <li><strong>Company name</strong></li>
+                <li><strong>Location</strong></li>
+                <li><strong>Industry</strong></li>
+            </ul>
+        </div>
+    </div>
+    <div class="procedure-step">
+        <div class="step-number">3</div>
+        <div class="step-content">Click <strong>Search</strong></div>
+    </div>
+
+    <h3>2.3 Revealing Contact Information</h3>
+    
+    <h4>Email Reveal</h4>
+    <div class="procedure-step">
+        <div class="step-number">1</div>
+        <div class="step-content">Find a contact in search results</div>
+    </div>
+    <div class="procedure-step">
+        <div class="step-number">2</div>
+        <div class="step-content">Click the <strong>Email</strong> button (envelope icon)</div>
+    </div>
+    <div class="procedure-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+            The system will:
+            <ul>
+                <li>First check Apollo's saved contacts (<span style="color: green; font-weight: bold;">FREE</span> - no credits used)</li>
+                <li>If not found, use <code>people/enrich</code> endpoint (<span style="color: orange; font-weight: bold;">USES CREDITS</span>)</li>
+            </ul>
+        </div>
+    </div>
+    <div class="procedure-step">
+        <div class="step-number">4</div>
+        <div class="step-content">Email is displayed and saved to your list</div>
+    </div>
+
+    <h4>Phone Reveal</h4>
+    <div class="procedure-step">
+        <div class="step-number">1</div>
+        <div class="step-content">Find a contact in search results</div>
+    </div>
+    <div class="procedure-step">
+        <div class="step-number">2</div>
+        <div class="step-content">Click the <strong>Phone</strong> button (phone icon)</div>
+    </div>
+    <div class="procedure-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+            The system will:
+            <ul>
+                <li>First check Apollo's saved contacts (<span style="color: green; font-weight: bold;">FREE</span> - no credits used)</li>
+                <li>If not found, use <code>people/enrich</code> endpoint (<span style="color: orange; font-weight: bold;">USES CREDITS</span>)</li>
+            </ul>
+        </div>
+    </div>
+    <div class="procedure-step">
+        <div class="step-number">4</div>
+        <div class="step-content">Phone number is displayed and saved to your list</div>
+    </div>
+
+    <h3>2.4 Credit-Saving Strategy</h3>
+    <div class="success">
+        <strong>The SVP Platform is optimized to minimize credit usage:</strong>
+        <ol>
+            <li><strong>Saved Contacts Check</strong> - Before spending credits, the system checks if the contact was previously enriched</li>
+            <li><strong>Firebase Caching</strong> - Revealed data is stored in Firebase, so re-accessing the same contact doesn't use additional credits</li>
+            <li><strong>Batch Operations</strong> - Plan your enrichment to avoid duplicate lookups</li>
+        </ol>
+    </div>
+
+    <hr>
+
+    <!-- Section 3 -->
+    <h2 id="section3">3. Apollo.io Pricing & Credit Costs</h2>
+
+    <h3>3.1 Subscription Plans</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Plan</th>
+                <th>Monthly (per user)</th>
+                <th>Annual (per user)</th>
+                <th>Mobile Credits/mo</th>
+                <th>Export Credits/mo</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Free</strong></td>
+                <td>$0</td>
+                <td>$0</td>
+                <td>5</td>
+                <td>10</td>
+            </tr>
+            <tr>
+                <td><strong>Basic</strong></td>
+                <td>$59</td>
+                <td>$49</td>
+                <td>75</td>
+                <td>1,000</td>
+            </tr>
+            <tr>
+                <td><strong>Professional</strong></td>
+                <td>$99</td>
+                <td>$79</td>
+                <td>100</td>
+                <td>2,000</td>
+            </tr>
+            <tr>
+                <td><strong>Organization</strong></td>
+                <td>$149</td>
+                <td>$119</td>
+                <td>200</td>
+                <td>4,000</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="info">
+        <strong>Note:</strong> Email credits are unlimited on all plans (subject to fair use policy)
+    </div>
+
+    <h3>3.2 Credit Costs Per Action</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Action</th>
+                <th>Credit Cost</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>View/Reveal Email</strong></td>
+                <td>1 email credit (unlimited on paid plans)</td>
+            </tr>
+            <tr>
+                <td><strong>Reveal Mobile Phone</strong></td>
+                <td>1 mobile credit</td>
+            </tr>
+            <tr>
+                <td><strong>Export to CRM/CSV</strong></td>
+                <td>1 export credit</td>
+            </tr>
+            <tr>
+                <td><strong>API Enrichment</strong></td>
+                <td>1 credit per field revealed</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>3.3 Additional Credit Purchases</h3>
+    <p>If you exceed your monthly allocation:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Credit Type</th>
+                <th>Cost</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Per Credit</strong></td>
+                <td>$0.20</td>
+            </tr>
+            <tr>
+                <td><strong>Minimum Purchase (Monthly)</strong></td>
+                <td>250 credits ($50)</td>
+            </tr>
+            <tr>
+                <td><strong>Minimum Purchase (Annual)</strong></td>
+                <td>2,500 credits ($500)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>3.4 Cost Examples</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Scenario</th>
+                <th>Credits Used</th>
+                <th>Estimated Cost</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Reveal 100 emails</td>
+                <td>0 (unlimited)</td>
+                <td>$0</td>
+            </tr>
+            <tr>
+                <td>Reveal 100 mobile phones</td>
+                <td>100 mobile credits</td>
+                <td>Included in plan or ~$20</td>
+            </tr>
+            <tr>
+                <td>Export 500 contacts to CRM</td>
+                <td>500 export credits</td>
+                <td>Included in plan</td>
+            </tr>
+            <tr>
+                <td>Reveal 1,000 mobiles (Basic plan)</td>
+                <td>1,000 - 75 = 925 extra</td>
+                <td>~$185</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>3.5 Fair Use Policy</h3>
+    <ul>
+        <li><strong>Free accounts (corporate email):</strong> 10,000 email credits/month</li>
+        <li><strong>Free accounts (personal email):</strong> 100 email credits/month</li>
+        <li><strong>Paid accounts:</strong> Lesser of ($ paid ÷ $0.025) or 1 million credits/year</li>
+    </ul>
+
+    <h3>3.6 Important Notes</h3>
+    <div class="warning">
+        <ul style="margin: 0; padding-left: 20px;">
+            <li><span class="warning-icon">⚠️</span><strong>Credits expire</strong> at the end of each billing cycle</li>
+            <li><span class="warning-icon">⚠️</span><strong>No refunds</strong> for unused credits</li>
+            <li><span class="warning-icon">⚠️</span><strong>Seat reductions</strong> not allowed mid-term</li>
+            <li><span class="warning-icon">⚠️</span><strong>Credits are charged</strong> even if data is incorrect or unavailable</li>
+        </ul>
+    </div>
+
+    <hr>
+
+    <!-- Section 4 -->
+    <h2 id="section4">4. Best Practices</h2>
+
+    <h3>4.1 Minimize Credit Usage</h3>
+    <ol>
+        <li><strong>Check saved contacts first</strong> - The system does this automatically</li>
+        <li><strong>Use saved lists</strong> - Avoid re-revealing the same contacts</li>
+        <li><strong>Batch your searches</strong> - Plan enrichment campaigns in advance</li>
+        <li><strong>Prioritize high-value contacts</strong> - Focus on decision-makers</li>
+    </ol>
+
+    <h3>4.2 Optimize Search Results</h3>
+    <ol>
+        <li><strong>Use specific keywords</strong> - "CNC machining" vs just "machining"</li>
+        <li><strong>Add location filters</strong> - Narrow results by region</li>
+        <li><strong>Include certifications</strong> - "ISO 9001", "AS9100", etc.</li>
+        <li><strong>Specify company size</strong> - Filter by employee count</li>
+    </ol>
+
+    <h3>4.3 Data Quality</h3>
+    <ol>
+        <li><strong>Verify contact info</strong> - Apollo data may be outdated</li>
+        <li><strong>Cross-reference</strong> - Check LinkedIn profiles</li>
+        <li><strong>Update regularly</strong> - Re-enrich contacts periodically</li>
+        <li><strong>Report errors</strong> - Flag incorrect data in Apollo</li>
+    </ol>
+
+    <hr>
+
+    <!-- Section 5 -->
+    <h2 id="section5">5. Troubleshooting</h2>
+
+    <h3>5.1 "Email/Phone Not Available"</h3>
+    <p><strong>Possible causes:</strong></p>
+    <ul>
+        <li>Contact not in Apollo's database</li>
+        <li>Data not yet enriched</li>
+        <li>API key restrictions (some endpoints require higher-tier plans)</li>
+    </ul>
+    <p><strong>Solutions:</strong></p>
+    <ol>
+        <li>Try searching by LinkedIn URL</li>
+        <li>Check if contact exists in Apollo directly</li>
+        <li>Verify API key permissions</li>
+    </ol>
+
+    <h3>5.2 "API Inaccessible"</h3>
+    <p><strong>Cause:</strong> The <code>people/enrich</code> endpoint requires a paid Apollo plan</p>
+    <p><strong>Solution:</strong></p>
+    <ul>
+        <li>Upgrade to a paid Apollo plan</li>
+        <li>Use the <code>contacts/search</code> endpoint for already-saved contacts (free)</li>
+    </ul>
+
+    <h3>5.3 Slow Search Results</h3>
+    <p><strong>Cause:</strong> ThomasNet scraping takes time</p>
+    <p><strong>Solution:</strong></p>
+    <ul>
+        <li>Wait for results to load (first search may take 5-10 seconds)</li>
+        <li>Use more specific search terms to reduce result set</li>
+    </ul>
+
+    <h3>5.4 Missing Supplier Data</h3>
+    <p><strong>Cause:</strong> ThomasNet may block automated requests</p>
+    <p><strong>Solution:</strong></p>
+    <ul>
+        <li>Retry the search</li>
+        <li>Use category-based search instead of keyword search</li>
+        <li>Check ThomasNet directly for comparison</li>
+    </ul>
+
+    <hr>
+
+    <!-- Appendix -->
+    <h2 id="appendix">Appendix: API Endpoints Used</h2>
+
+    <h3>ThomasNet</h3>
+    <ul>
+        <li><strong>Search URL:</strong> <code>https://www.thomasnet.com/suppliers/search?searchterm={query}</code></li>
+        <li><strong>Method:</strong> Puppeteer-based web scraping</li>
+    </ul>
+
+    <h3>Apollo.io</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th>Purpose</th>
+                <th>Credits</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>contacts/search</code></td>
+                <td>Search saved contacts</td>
+                <td style="color: green; font-weight: bold;">FREE</td>
+            </tr>
+            <tr>
+                <td><code>people/enrich</code></td>
+                <td>Reveal email/phone</td>
+                <td>1 credit</td>
+            </tr>
+            <tr>
+                <td><code>people/match</code></td>
+                <td>Match by name/company</td>
+                <td>1 credit</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- Document Information -->
+    <div class="doc-info">
+        <h3>Document Information</h3>
+        <table>
+            <tbody>
+                <tr>
+                    <th>Version</th>
+                    <td>1.0</td>
+                </tr>
+                <tr>
+                    <th>Document ID</th>
+                    <td>SOP-SS-001</td>
+                </tr>
+                <tr>
+                    <th>Created</th>
+                    <td>December 21, 2024</td>
+                </tr>
+                <tr>
+                    <th>Author</th>
+                    <td>SVP Platform Team</td>
+                </tr>
+                <tr>
+                    <th>Last Updated</th>
+                    <td>December 21, 2024</td>
+                </tr>
+                <tr>
+                    <th>Review Date</th>
+                    <td>June 21, 2025</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p><strong>Strategic Value Plus</strong> | Supplier Search SOP | Version 1.0</p>
+        <p>For questions or support, contact the SVP Platform administrator.</p>
+        <p style="font-size: 8pt; color: #999;">© 2024 Strategic Value Plus. All rights reserved. Confidential.</p>
+    </div>
+
+    <!-- Print Button (hidden when printing) -->
+    <div class="no-print" style="margin-top: 30px; text-align: center;">
+        <button onclick="window.print()" style="padding: 12px 30px; font-size: 14px; background: #3182ce; color: white; border: none; border-radius: 6px; cursor: pointer;">
+            Print / Save as PDF
+        </button>
+    </div>
+</body>
+</html>
