@@ -170,14 +170,17 @@ export default function SupplierSearchPage() {
   const generateMessageId = () => `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
   // Search suppliers via API
-  const searchSuppliers = async (query: string): Promise<{ results: SupplierResult[]; message: string }> => {
+  const searchSuppliers = async (query: string, region?: string): Promise<{ results: SupplierResult[]; message: string }> => {
     try {
       const response = await fetch("/api/thomasnet", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "ai_search",
-          searchParams: { query },
+          searchParams: { 
+            query,
+            region: region && region !== "all" ? region : undefined,
+          },
         }),
       });
 
@@ -273,7 +276,7 @@ export default function SupplierSearchPage() {
     setIsLoading(true);
 
     try {
-      const { results, message } = await searchSuppliers(query);
+      const { results, message } = await searchSuppliers(query, regionFilter);
 
       const responseMessage: ChatMessage = {
         id: generateMessageId(),

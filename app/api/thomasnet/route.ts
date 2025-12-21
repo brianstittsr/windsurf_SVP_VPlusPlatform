@@ -409,6 +409,30 @@ function searchSuppliers(searchParams: { keywords: string; location?: string }):
   return results;
 }
 
+// Region to states mapping
+const REGION_STATES: Record<string, string[]> = {
+  "northeast": ["ct", "de", "ma", "md", "me", "nh", "nj", "ny", "pa", "ri", "vt"],
+  "southeast": ["al", "ar", "fl", "ga", "ky", "la", "ms", "nc", "sc", "tn", "va", "wv"],
+  "midwest": ["ia", "il", "in", "ks", "mi", "mn", "mo", "nd", "ne", "oh", "sd", "wi"],
+  "southwest": ["az", "nm", "ok", "tx"],
+  "west": ["ak", "ca", "co", "hi", "id", "mt", "nv", "or", "ut", "wa", "wy"],
+};
+
+// Filter suppliers by region
+function filterByRegion(suppliers: SupplierResult[], region: string): SupplierResult[] {
+  const regionLower = region.toLowerCase();
+  const statesInRegion = REGION_STATES[regionLower];
+  
+  if (!statesInRegion) {
+    return suppliers; // Unknown region, return all
+  }
+  
+  return suppliers.filter(supplier => {
+    const supplierState = supplier.state?.toLowerCase() || "";
+    return statesInRegion.includes(supplierState);
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -491,6 +515,7 @@ export async function POST(request: NextRequest) {
       case "ai_search": {
         // AI-powered natural language search
         const query = searchParams?.query || "";
+        const region = searchParams?.region || "";
         
         if (!query.trim()) {
           return NextResponse.json({
@@ -509,11 +534,18 @@ export async function POST(request: NextRequest) {
         
         // Parse and search
         const parsed = parseSearchQuery(query);
-        const results = searchSuppliers(parsed);
+        
+        // Apply region filter if specified
+        let results = searchSuppliers(parsed);
+        
+        if (region && region !== "all") {
+          results = filterByRegion(results, region);
+        }
         
         // Generate AI response
+        const regionLabel = region && region !== "all" ? ` in ${region}` : "";
         const aiResponse = {
-          interpretation: `Searching for ${parsed.keywords || "suppliers"}${parsed.location ? ` in ${parsed.location}` : ""}.`,
+          interpretation: `Searching for ${parsed.keywords || "suppliers"}${parsed.location ? ` in ${parsed.location}` : ""}${regionLabel}.`,
           results,
           total: results.length,
           refinementSuggestions: [
