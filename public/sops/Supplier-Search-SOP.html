@@ -30,7 +30,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 3px solid #1a365d;
+            border-bottom: 3px solid #f5a623;
             padding-bottom: 15px;
             margin-bottom: 20px;
         }
@@ -42,16 +42,21 @@
         }
         
         .logo {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
-            border-radius: 8px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
+            gap: 8px;
+        }
+        
+        .vplus-icon {
+            font-size: 48px;
+            font-weight: 900;
+            color: #f5a623;
+            line-height: 1;
+        }
+        
+        .vplus-icon sup {
+            font-size: 24px;
+            color: #f5a623;
         }
         
         .company-name {
@@ -83,11 +88,11 @@
         }
         
         h2 {
-            color: #2c5282;
+            color: #1a365d;
             font-size: 16pt;
             margin-top: 25px;
             margin-bottom: 12px;
-            border-left: 4px solid #3182ce;
+            border-left: 4px solid #f5a623;
             padding-left: 12px;
             page-break-after: avoid;
         }
@@ -168,7 +173,7 @@
         }
         
         th {
-            background: #2c5282;
+            background: #1a365d;
             color: white;
             padding: 10px 12px;
             text-align: left;
@@ -240,7 +245,7 @@
         .footer {
             margin-top: 40px;
             padding-top: 15px;
-            border-top: 2px solid #1a365d;
+            border-top: 2px solid #f5a623;
             font-size: 9pt;
             color: #666;
             text-align: center;
@@ -288,8 +293,8 @@
         }
         
         .step-number {
-            background: #3182ce;
-            color: white;
+            background: #f5a623;
+            color: #1a365d;
             width: 24px;
             height: 24px;
             border-radius: 50%;
@@ -297,6 +302,7 @@
             align-items: center;
             justify-content: center;
             font-size: 12px;
+            font-weight: 700;
             font-weight: bold;
             margin-right: 12px;
             flex-shrink: 0;
@@ -315,9 +321,11 @@
     <!-- Header -->
     <div class="header">
         <div class="header-left">
-            <div class="logo">SVP</div>
+            <div class="logo">
+                <span class="vplus-icon">V<sup>+</sup></span>
+            </div>
             <div>
-                <div class="company-name">Strategic Value Plus</div>
+                <div class="company-name">Strategic Value+</div>
                 <div class="doc-type">Standard Operating Procedure</div>
             </div>
         </div>
