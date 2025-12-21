@@ -592,7 +592,14 @@ export default function ApolloSearchPage() {
         return (a.title || "").localeCompare(b.title || "");
       });
       
-      // Convert to SavedListContact format (filter out undefined values for Firebase)
+      // Helper to check if email is a placeholder
+      const isPlaceholderEmail = (email: string) => 
+        !email || 
+        email.includes("email_not_unlocked") || 
+        email.includes("@domain.com") ||
+        email === "email@domain.com";
+
+      // Convert to SavedListContact format (filter out undefined values and placeholder emails for Firebase)
       const contacts = sortedResults.map((result) => {
         const contact: Record<string, unknown> = {
           apolloId: result.id,
@@ -608,7 +615,8 @@ export default function ApolloSearchPage() {
         if (result.location) contact.location = result.location;
         if (result.industry) contact.industry = result.industry;
         if (result.companySize) contact.companySize = result.companySize;
-        if (result.email) contact.email = result.email;
+        // Only save email if it's not a placeholder
+        if (result.email && !isPlaceholderEmail(result.email)) contact.email = result.email;
         if (result.phone) contact.phone = result.phone;
         if (result.linkedIn) contact.linkedIn = result.linkedIn;
         return contact;
