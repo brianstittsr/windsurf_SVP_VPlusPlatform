@@ -274,7 +274,17 @@ export async function POST(request: NextRequest) {
             });
 
             const contactSearchData = await contactSearchResponse.json();
-            console.log("Apollo contacts/search response for email:", JSON.stringify(contactSearchData, null, 2));
+            console.log("Apollo contacts/search response for email - found", contactSearchData.contacts?.length || 0, "contacts");
+            
+            // Log all contacts found for debugging
+            if (contactSearchData.contacts?.length > 0) {
+              console.log("Contacts found:", contactSearchData.contacts.map((c: Record<string, unknown>) => ({
+                name: `${c.first_name} ${c.last_name}`,
+                company: c.organization_name,
+                email: c.email,
+                hasPhone: !!(c.phone_numbers as unknown[])?.length,
+              })));
+            }
 
             if (contactSearchResponse.ok && contactSearchData.contacts?.length > 0) {
               // Find the matching contact by name (relaxed matching - just check name match)
@@ -287,13 +297,14 @@ export async function POST(request: NextRequest) {
                 // Match if first and last name match
                 const nameMatch = contactFirstName === searchFirstName && contactLastName === searchLastName;
                 
-                // Optionally also check company if provided
-                if (company) {
+                // Optionally also check company if provided - but be lenient
+                if (company && nameMatch) {
                   const org = c.organization as Record<string, unknown> | undefined;
                   const contactCompany = ((c.organization_name || org?.name || "") as string).toLowerCase();
                   const searchCompany = company.toLowerCase();
-                  const companyMatch = contactCompany.includes(searchCompany) || searchCompany.includes(contactCompany) || !contactCompany;
-                  return nameMatch && companyMatch;
+                  // If company matches or contact has no company, accept the match
+                  const companyMatch = !contactCompany || contactCompany.includes(searchCompany) || searchCompany.includes(contactCompany);
+                  return companyMatch;
                 }
                 
                 return nameMatch;
@@ -478,7 +489,17 @@ export async function POST(request: NextRequest) {
             });
 
             const contactSearchData = await contactSearchResponse.json();
-            console.log("Apollo contacts/search for phone:", JSON.stringify(contactSearchData, null, 2));
+            console.log("Apollo contacts/search for phone - found", contactSearchData.contacts?.length || 0, "contacts");
+            
+            // Log all contacts found for debugging
+            if (contactSearchData.contacts?.length > 0) {
+              console.log("Contacts found for phone:", contactSearchData.contacts.map((c: Record<string, unknown>) => ({
+                name: `${c.first_name} ${c.last_name}`,
+                company: c.organization_name,
+                hasPhone: !!(c.phone_numbers as unknown[])?.length,
+                phoneNumbers: c.phone_numbers,
+              })));
+            }
 
             if (contactSearchResponse.ok && contactSearchData.contacts?.length > 0) {
               // Find the matching contact by name (relaxed matching)
@@ -491,13 +512,14 @@ export async function POST(request: NextRequest) {
                 // Match if first and last name match
                 const nameMatch = contactFirstName === searchFirstName && contactLastName === searchLastName;
                 
-                // Optionally also check company if provided
-                if (company) {
+                // Optionally also check company if provided - but be lenient
+                if (company && nameMatch) {
                   const org = c.organization as Record<string, unknown> | undefined;
                   const contactCompany = ((c.organization_name || org?.name || "") as string).toLowerCase();
                   const searchCompany = company.toLowerCase();
-                  const companyMatch = contactCompany.includes(searchCompany) || searchCompany.includes(contactCompany) || !contactCompany;
-                  return nameMatch && companyMatch;
+                  // If company matches or contact has no company, accept the match
+                  const companyMatch = !contactCompany || contactCompany.includes(searchCompany) || searchCompany.includes(contactCompany);
+                  return companyMatch;
                 }
                 
                 return nameMatch;
