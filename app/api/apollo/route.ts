@@ -269,35 +269,51 @@ export async function POST(request: NextRequest) {
               headers,
               body: JSON.stringify({
                 q_keywords: `${firstName} ${lastName}`,
-                per_page: 10,
+                per_page: 25,
               }),
             });
 
             const contactSearchData = await contactSearchResponse.json();
-            console.log("Apollo contacts/search response:", JSON.stringify(contactSearchData, null, 2));
+            console.log("Apollo contacts/search response for email:", JSON.stringify(contactSearchData, null, 2));
 
             if (contactSearchResponse.ok && contactSearchData.contacts?.length > 0) {
-              // Find the matching contact by name and company
+              // Find the matching contact by name (relaxed matching - just check name match)
               const matchingContact = contactSearchData.contacts.find((c: Record<string, unknown>) => {
-                const contactName = `${c.first_name || ""} ${c.last_name || ""}`.toLowerCase().trim();
-                const searchName = `${firstName} ${lastName}`.toLowerCase().trim();
-                const org = c.organization as Record<string, unknown> | undefined;
-                const contactCompany = ((c.organization_name || org?.name || "") as string).toLowerCase();
-                const searchCompany = (company || "").toLowerCase();
+                const contactFirstName = ((c.first_name || "") as string).toLowerCase().trim();
+                const contactLastName = ((c.last_name || "") as string).toLowerCase().trim();
+                const searchFirstName = (firstName || "").toLowerCase().trim();
+                const searchLastName = (lastName || "").toLowerCase().trim();
                 
-                return contactName === searchName && 
-                       (contactCompany.includes(searchCompany) || searchCompany.includes(contactCompany));
+                // Match if first and last name match
+                const nameMatch = contactFirstName === searchFirstName && contactLastName === searchLastName;
+                
+                // Optionally also check company if provided
+                if (company) {
+                  const org = c.organization as Record<string, unknown> | undefined;
+                  const contactCompany = ((c.organization_name || org?.name || "") as string).toLowerCase();
+                  const searchCompany = company.toLowerCase();
+                  const companyMatch = contactCompany.includes(searchCompany) || searchCompany.includes(contactCompany) || !contactCompany;
+                  return nameMatch && companyMatch;
+                }
+                
+                return nameMatch;
               });
 
               if (matchingContact) {
                 const email = extractEmail(matchingContact);
+                console.log("Found matching contact in Apollo saved contacts:", {
+                  name: `${matchingContact.first_name} ${matchingContact.last_name}`,
+                  email: email,
+                  hasEmail: !!email,
+                });
                 if (email) {
-                  console.log("Found email in saved contacts:", email);
+                  console.log("Returning email from saved contacts (no credits used):", email);
                   return NextResponse.json({
                     connected: true,
                     email,
                     person: matchingContact,
                     source: "saved_contacts",
+                    creditsUsed: false,
                   });
                 }
               }
@@ -457,7 +473,7 @@ export async function POST(request: NextRequest) {
               headers,
               body: JSON.stringify({
                 q_keywords: `${firstName} ${lastName}`,
-                per_page: 10,
+                per_page: 25,
               }),
             });
 
@@ -465,27 +481,43 @@ export async function POST(request: NextRequest) {
             console.log("Apollo contacts/search for phone:", JSON.stringify(contactSearchData, null, 2));
 
             if (contactSearchResponse.ok && contactSearchData.contacts?.length > 0) {
-              // Find the matching contact by name and company
+              // Find the matching contact by name (relaxed matching)
               const matchingContact = contactSearchData.contacts.find((c: Record<string, unknown>) => {
-                const contactName = `${c.first_name || ""} ${c.last_name || ""}`.toLowerCase().trim();
-                const searchName = `${firstName} ${lastName}`.toLowerCase().trim();
-                const org = c.organization as Record<string, unknown> | undefined;
-                const contactCompany = ((c.organization_name || org?.name || "") as string).toLowerCase();
-                const searchCompany = (company || "").toLowerCase();
+                const contactFirstName = ((c.first_name || "") as string).toLowerCase().trim();
+                const contactLastName = ((c.last_name || "") as string).toLowerCase().trim();
+                const searchFirstName = (firstName || "").toLowerCase().trim();
+                const searchLastName = (lastName || "").toLowerCase().trim();
                 
-                return contactName === searchName && 
-                       (contactCompany.includes(searchCompany) || searchCompany.includes(contactCompany));
+                // Match if first and last name match
+                const nameMatch = contactFirstName === searchFirstName && contactLastName === searchLastName;
+                
+                // Optionally also check company if provided
+                if (company) {
+                  const org = c.organization as Record<string, unknown> | undefined;
+                  const contactCompany = ((c.organization_name || org?.name || "") as string).toLowerCase();
+                  const searchCompany = company.toLowerCase();
+                  const companyMatch = contactCompany.includes(searchCompany) || searchCompany.includes(contactCompany) || !contactCompany;
+                  return nameMatch && companyMatch;
+                }
+                
+                return nameMatch;
               });
 
               if (matchingContact) {
                 const phone = extractPhone(matchingContact);
+                console.log("Found matching contact in Apollo saved contacts for phone:", {
+                  name: `${matchingContact.first_name} ${matchingContact.last_name}`,
+                  phone: phone,
+                  hasPhone: !!phone,
+                });
                 if (phone) {
-                  console.log("Found phone in saved contacts:", phone);
+                  console.log("Returning phone from saved contacts (no credits used):", phone);
                   return NextResponse.json({
                     connected: true,
                     phone,
                     person: matchingContact,
                     source: "saved_contacts",
+                    creditsUsed: false,
                   });
                 }
               }
