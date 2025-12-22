@@ -111,6 +111,20 @@
             font-weight: 500;
         }
         
+        /* Animated Wave Background */
+        @keyframes wave1 {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            50% { transform: translateX(-25px) translateY(10px); }
+        }
+        @keyframes wave2 {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            50% { transform: translateX(25px) translateY(-10px); }
+        }
+        @keyframes wave3 {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            50% { transform: translateX(-15px) translateY(15px); }
+        }
+        
         /* Title Slide */
         .slide.title-slide {
             display: flex;
@@ -118,32 +132,54 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            background: white;
-            color: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, #3d6098 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .slide.title-slide::before,
+        .slide.title-slide::after,
+        .slide.title-slide .wave-layer {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: radial-gradient(ellipse at center, rgba(255,255,255,0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .slide.title-slide::before {
+            animation: wave1 8s ease-in-out infinite;
+        }
+        
+        .slide.title-slide::after {
+            animation: wave2 10s ease-in-out infinite;
+            background: radial-gradient(ellipse at 30% 70%, rgba(255,255,255,0.1) 0%, transparent 60%);
+        }
+        
+        .slide.title-slide .wave-layer {
+            animation: wave3 12s ease-in-out infinite;
+            background: radial-gradient(ellipse at 70% 30%, rgba(255,255,255,0.12) 0%, transparent 65%);
         }
         
         .slide.title-slide .slide-header {
             background: var(--accent);
             height: 6px;
+            z-index: 10;
         }
         
         .title-slide .company-badge {
             margin-bottom: 30px;
+            position: relative;
+            z-index: 10;
         }
         
         .title-slide .company-badge img.belpak-logo {
-            height: 60px;
+            height: 80px;
             width: auto;
-        }
-        
-        .title-slide .company-badge .belpak-text {
-            background: var(--primary);
-            color: white;
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-size: 18px;
-            letter-spacing: 2px;
-            font-weight: 600;
         }
         
         .title-slide .main-title {
@@ -151,22 +187,28 @@
             font-weight: 700;
             margin-bottom: 20px;
             letter-spacing: -1px;
-            color: var(--primary);
+            color: white;
+            position: relative;
+            z-index: 10;
         }
         
         .title-slide .subtitle {
             font-size: 28px;
             font-weight: 400;
-            color: var(--gray-600);
+            color: rgba(255,255,255,0.9);
             margin-bottom: 40px;
+            position: relative;
+            z-index: 10;
         }
         
         .title-slide .meta {
             font-size: 18px;
-            color: var(--gray-500);
+            color: rgba(255,255,255,0.7);
             display: flex;
             align-items: center;
             gap: 10px;
+            position: relative;
+            z-index: 10;
         }
         
         .title-slide .meta .vplus-logo {
@@ -195,8 +237,19 @@
             gap: 15px;
             margin-top: 40px;
             padding: 15px 30px;
-            background: var(--gray-100);
+            background: rgba(255,255,255,0.15);
             border-radius: 10px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .title-slide .toyota-badge span {
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .title-slide .accent-bar {
+            position: relative;
+            z-index: 10;
         }
         
         .title-slide .toyota-badge .toyota-logo {
@@ -712,8 +765,9 @@
         
         <!-- Slide 1: Title Slide -->
         <div class="slide title-slide">
+            <div class="wave-layer"></div>
             <div class="slide-header"></div>
-            <div class="company-badge"><img class="belpak-logo" src="/images/belpak-logo.png" alt="BelPak" onerror="this.outerHTML='<span class=belpak-text>BELPAK</span>'"></div>
+            <div class="company-badge"><img class="belpak-logo" src="/icons/belpak-logo-white-2x-400x96.png" alt="BelPak"></div>
             <div class="main-title">Toyota Battery Manufacturing NC</div>
             <div class="accent-bar"></div>
             <div class="subtitle">Supplier Qualification & Opportunity Assessment</div>
@@ -722,13 +776,13 @@
                 <span>Battery Manufacturing North Carolina</span>
             </div>
             <div class="meta" style="margin-top: 30px;"><img class="vplus-logo" src="/VPlus_logo.webp" alt="V+" onerror="this.outerHTML='<span class=vplus-text>V<sup>+</sup></span>'"> Prepared by Strategic Value+ Solutions | December 2025</div>
-            <div class="slide-footer">
-                <div class="logo">
+            <div class="slide-footer" style="color: rgba(255,255,255,0.6);">
+                <div class="logo" style="color: white;">
                     <div class="logo-icon">SVP</div>
                     Strategic Value Plus
                 </div>
             </div>
-            <div class="slide-number">1</div>
+            <div class="slide-number" style="color: rgba(255,255,255,0.5);">1</div>
         </div>
         
         <!-- Slide 2: Executive Summary -->
