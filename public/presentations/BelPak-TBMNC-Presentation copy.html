@@ -347,6 +347,229 @@
             font-weight: 700;
         }
         
+        /* ===== METRICS DASHBOARD STYLES ===== */
+        .metrics-dashboard {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 280px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 149, 237, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            z-index: 20;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .dashboard-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .dashboard-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 9px;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: #00C853;
+            border-radius: 50%;
+            animation: statusPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 4px #00C853; }
+            50% { opacity: 0.6; box-shadow: 0 0 8px #00C853; }
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .metric-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 12px 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-card.full-width {
+            grid-column: span 2;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            border-radius: 3px 0 0 3px;
+        }
+        
+        .metric-card.green::before { background: #00C853; }
+        .metric-card.amber::before { background: #FFA726; }
+        .metric-card.blue::before { background: #2196F3; }
+        .metric-card.red::before { background: #E53935; }
+        
+        .metric-label {
+            font-size: 9px;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        
+        .metric-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        
+        .metric-value.large {
+            font-size: 28px;
+        }
+        
+        .metric-value.green { color: #00C853; }
+        .metric-value.amber { color: #FFA726; }
+        .metric-value.blue { color: #2196F3; }
+        
+        .metric-subtitle {
+            font-size: 8px;
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .metric-trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 9px;
+            padding: 2px 5px;
+            border-radius: 4px;
+            margin-top: 4px;
+        }
+        
+        .metric-trend.up {
+            background: rgba(0, 200, 83, 0.15);
+            color: #00C853;
+        }
+        
+        .metric-trend.down {
+            background: rgba(229, 57, 53, 0.15);
+            color: #E53935;
+        }
+        
+        .metric-trend.neutral {
+            background: rgba(255, 167, 38, 0.15);
+            color: #FFA726;
+        }
+        
+        /* Progress ring */
+        .progress-ring {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 36px;
+            height: 36px;
+        }
+        
+        .progress-ring circle {
+            fill: none;
+            stroke-width: 3;
+        }
+        
+        .progress-ring .bg {
+            stroke: rgba(255,255,255,0.1);
+        }
+        
+        .progress-ring .progress {
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: center;
+            transition: stroke-dashoffset 1s ease;
+        }
+        
+        .progress-ring .progress.green { stroke: #00C853; }
+        .progress-ring .progress.amber { stroke: #FFA726; }
+        .progress-ring .progress.blue { stroke: #2196F3; }
+        
+        /* Sparkline */
+        .sparkline {
+            height: 20px;
+            margin-top: 6px;
+        }
+        
+        .sparkline svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .sparkline path {
+            fill: none;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+        }
+        
+        .sparkline path.green { stroke: rgba(0, 200, 83, 0.6); }
+        .sparkline path.blue { stroke: rgba(33, 150, 243, 0.6); }
+        
+        /* Safety badge */
+        .safety-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .shield-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        /* Metric count animation */
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .metric-value {
+            animation: countUp 0.8s ease-out forwards;
+        }
+        
+        /* Glow effect on good metrics */
+        .metric-card.green {
+            box-shadow: 0 0 15px rgba(0, 200, 83, 0.1);
+        }
+        
         .slide.title-slide .slide-header {
             background: linear-gradient(90deg, #eb0a1e 0%, var(--accent) 50%, #6495ed 100%);
             height: 6px;
@@ -1130,6 +1353,85 @@
                     <rect width="20" height="14" rx="2" fill="rgba(235,10,30,0.8)" stroke="rgba(235,10,30,1)"/>
                 </svg>
             </div>
+            
+            <!-- Metrics Dashboard -->
+            <div class="metrics-dashboard">
+                <div class="dashboard-header">
+                    <span class="dashboard-title">Live Operations</span>
+                    <div class="dashboard-status">
+                        <span class="status-dot"></span>
+                        <span>Real-time</span>
+                    </div>
+                </div>
+                
+                <div class="metrics-grid">
+                    <!-- OEE Metric -->
+                    <div class="metric-card green full-width">
+                        <div class="metric-label">Overall Equipment Effectiveness</div>
+                        <div class="metric-value large green">87.3%</div>
+                        <div class="metric-subtitle">Target: 85% | Availability: 92% | Performance: 95%</div>
+                        <div class="sparkline">
+                            <svg viewBox="0 0 100 20">
+                                <path class="green" d="M0,15 L12,12 L25,14 L37,10 L50,8 L62,9 L75,6 L87,5 L100,3"/>
+                            </svg>
+                        </div>
+                        <span class="metric-trend up">↑ +1.8% vs yesterday</span>
+                    </div>
+                    
+                    <!-- Efficiency -->
+                    <div class="metric-card green">
+                        <div class="metric-label">Line Efficiency</div>
+                        <div class="metric-value green">94.2%</div>
+                        <div class="metric-subtitle">Cycle: 12.3s/unit</div>
+                        <span class="metric-trend up">↑ +2.1%</span>
+                        <svg class="progress-ring" viewBox="0 0 36 36">
+                            <circle class="bg" cx="18" cy="18" r="15"/>
+                            <circle class="progress green" cx="18" cy="18" r="15" stroke-dasharray="94.2, 100"/>
+                        </svg>
+                    </div>
+                    
+                    <!-- On-Time Delivery -->
+                    <div class="metric-card green">
+                        <div class="metric-label">On-Time Delivery</div>
+                        <div class="metric-value green">98.7%</div>
+                        <div class="metric-subtitle">1,847 / 1,871 units</div>
+                        <span class="metric-trend up">↑ +0.3%</span>
+                        <svg class="progress-ring" viewBox="0 0 36 36">
+                            <circle class="bg" cx="18" cy="18" r="15"/>
+                            <circle class="progress green" cx="18" cy="18" r="15" stroke-dasharray="98.7, 100"/>
+                        </svg>
+                    </div>
+                    
+                    <!-- Safety -->
+                    <div class="metric-card blue full-width">
+                        <div class="safety-badge">
+                            <div class="shield-icon">🛡️</div>
+                            <div>
+                                <div class="metric-label">Days Without Incident</div>
+                                <div class="metric-value blue">156</div>
+                            </div>
+                        </div>
+                        <div class="metric-subtitle" style="margin-top:6px;">Safety Score: 99.1% | Near Misses: 3 this week</div>
+                    </div>
+                    
+                    <!-- Throughput -->
+                    <div class="metric-card amber">
+                        <div class="metric-label">Today's Output</div>
+                        <div class="metric-value">8,420</div>
+                        <div class="metric-subtitle">Target: 8,500</div>
+                        <span class="metric-trend neutral">→ 99.1%</span>
+                    </div>
+                    
+                    <!-- Quality -->
+                    <div class="metric-card green">
+                        <div class="metric-label">First Pass Yield</div>
+                        <div class="metric-value green">99.4%</div>
+                        <div class="metric-subtitle">Defect: 0.6%</div>
+                        <span class="metric-trend up">↑ +0.2%</span>
+                    </div>
+                </div>
+            </div>
+            
             <div class="slide-header"></div>
             <div class="company-badge"><img class="belpak-logo" src="/icons/belpak-logo-white-2x-400x96.png" alt="BelPak"></div>
             <div class="main-title">Toyota Battery Manufacturing NC</div>
