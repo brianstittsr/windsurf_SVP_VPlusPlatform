@@ -4,55 +4,55 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Wrench, Cpu, Brain, CheckCircle } from "lucide-react";
+import { ArrowRight, Wrench, Factory, Users, CheckCircle } from "lucide-react";
 
 const services = [
   {
-    title: "V+ EDGE™",
-    tagline: "Start Smart. Build Fast.",
+    title: "Supplier Readiness",
+    tagline: "Close gaps. Get qualified.",
     description:
-      "Your entry point to transformation. Modular platform covering lean, automation, sustainability, quality, and workforce strategy.",
-    icon: Wrench,
+      "A structured program to move your company from capable to OEM-ready: assessment, roadmap, and stage-based execution toward qualification.",
+    icon: Factory,
     color: "text-primary",
     bgColor: "bg-primary/10",
-    href: "/v-edge",
+    href: "/contact",
     features: [
-      "Hands-on implementation with real-time KPIs",
-      "Modular design for immediate impact",
-      "Ideal for companies with 25–500 employees",
-      "No ERP overhaul required",
+      "Readiness assessment and gap analysis",
+      "Qualification roadmap with milestones",
+      "Quality/ISO pathway and audit preparation",
+      "Supplier development with targeted experts",
     ],
   },
   {
-    title: "TwinEDGE™",
-    tagline: "Simulate. Optimize. Reshore with Confidence.",
+    title: "V+ EDGE™",
+    tagline: "Execute the roadmap.",
     description:
-      "Digital twin technology for workflow modeling, scenario testing, and supply chain redesign before making costly changes.",
-    icon: Cpu,
+      "A modular execution platform that supports readiness work across quality systems, operations discipline, and capability upgrades.",
+    icon: Wrench,
     color: "text-secondary",
     bgColor: "bg-secondary/10",
-    href: "/twinedge",
+    href: "/v-edge",
     features: [
-      "Predictive simulations & ROI modeling",
-      "Smart reshoring and supply chain reengineering",
-      "Factory layout and flow optimization",
-      "Machine maintenance prediction",
+      "Modular implementation for rapid progress",
+      "KPIs and visibility for accountability",
+      "Works with existing systems",
+      "Scales as your readiness needs grow",
     ],
   },
   {
-    title: "IntellEDGE™",
-    tagline: "Decide Smarter. Lead Stronger.",
+    title: "Affiliate Network",
+    tagline: "Bring the right expertise.",
     description:
-      "Executive-grade decision-making tools with predictive analytics and AI-powered insights for leadership teams.",
-    icon: Brain,
+      "A vetted delivery network that matches your readiness gaps to specialized experts—so progress is fast and measurable.",
+    icon: Users,
     color: "text-accent",
     bgColor: "bg-accent/10",
-    href: "/intelledge",
+    href: "/affiliates",
     features: [
-      "Data-driven real-time dashboards",
-      "Prescriptive decision tools",
-      "Scenario modeling for executive strategy",
-      "Enhanced visibility and long-term planning",
+      "Targeted assignments by stage and need",
+      "Clear deliverables and milestones",
+      "Collaborative execution",
+      "Designed for repeatable outcomes",
     ],
   },
 ];
@@ -64,14 +64,13 @@ export function ServicesOverview() {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <Badge variant="outline" className="mb-4">
-            Modular Industry 4.0/5.0 for Manufacturers
+            Supplier Readiness for Manufacturers
           </Badge>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-            The EDGE™ Platform
+            The readiness path to OEM qualification
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            We help small- and mid-sized manufacturers drive real, scalable progress. 
-            Start where you need it most — then expand with purpose, precision, and measurable results.
+            Start with a readiness assessment and roadmap. Then execute improvements with the right experts and tools.
           </p>
         </div>
 
@@ -101,7 +100,7 @@ export function ServicesOverview() {
                 </ul>
                 <Button variant="ghost" className="group/btn p-0 h-auto" asChild>
                   <Link href={service.href}>
-                    Learn more
+                    {service.title === "Supplier Readiness" ? "Request assessment" : "Learn more"}
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
                   </Link>
                 </Button>
@@ -117,7 +116,7 @@ export function ServicesOverview() {
           </p>
           <Button size="lg" asChild>
             <Link href="/contact">
-              Schedule a Discovery Call
+              Request Supplier Readiness Assessment
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>

@@ -15,13 +15,13 @@ export function Hero() {
         <div className="mx-auto max-w-4xl text-center">
           {/* Badge */}
           <Badge variant="outline" className="mb-6 border-primary/50 text-primary">
-            Introducing EDGE-X™ — Next-Gen Manufacturing Intelligence
+            Supplier Readiness & OEM Qualification
           </Badge>
 
           {/* Headline */}
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-            Win OEM Contracts.{" "}
-            <span className="text-primary">Transform</span> Your Manufacturing.
+            Become OEM-ready.{" "}
+            <span className="text-primary">Qualify</span> Your Manufacturing.
           </h1>
 
           {/* Subheadline */}
@@ -50,14 +50,14 @@ export function Hero() {
           <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
             <Button size="lg" className="text-lg px-8" asChild>
               <Link href="/contact">
-                Get Your Free Assessment
+                Request Assessment
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="text-lg px-8 border-white/20 hover:bg-white/10" asChild>
-              <Link href="/case-studies">
+              <Link href="/oem">
                 <Play className="mr-2 h-5 w-5" />
-                See Success Stories
+                For OEM Buyers
               </Link>
             </Button>
           </div>

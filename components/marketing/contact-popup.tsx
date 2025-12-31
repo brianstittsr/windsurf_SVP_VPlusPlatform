@@ -15,6 +15,9 @@ import {
 } from "@/components/ui/dialog";
 import { X, MessageCircle, Send, Factory } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { db } from "@/lib/firebase";
+import { addDoc, collection, Timestamp } from "firebase/firestore";
+import { COLLECTIONS } from "@/lib/schema";
 
 export interface PopupField {
   id: string;
@@ -46,31 +49,24 @@ export interface PopupConfig {
 export const defaultPopupConfig: PopupConfig = {
   enabled: true,
   title: "Strategic Value+ Solutions",
-  subtitle: "Take advantage of our complimentary 45-minute Impact Session to resolve your pressing pain points.",
-  description: "Our Value+ Team will develop quality-driven strategies to address your primary issues and transform your company.",
-  buttonText: "Request Free Session",
+  subtitle: "Request a supplier readiness assessment to identify gaps and define the fastest path to OEM qualification.",
+  description: "Tell us what you're aiming to qualify for and where you're stuck. We'll follow up with next steps.",
+  buttonText: "Request Assessment",
   successMessage: "Thank you! We'll be in touch within 24 hours.",
   triggerDelay: 0,
   showOnPages: [],
   position: "bottom-right",
   fields: [
-    { id: "firstName", type: "text", label: "First Name", placeholder: "First Name", required: false, enabled: true },
-    { id: "lastName", type: "text", label: "Last Name", placeholder: "Last Name", required: false, enabled: true },
-    { id: "phone", type: "phone", label: "Phone", placeholder: "Phone", required: true, enabled: true },
+    { id: "name", type: "text", label: "Name", placeholder: "Full name", required: true, enabled: true },
     { id: "email", type: "email", label: "Email", placeholder: "Email", required: true, enabled: true },
-    { id: "website", type: "url", label: "Website", placeholder: "Web URL goes here", required: false, enabled: true },
-    { id: "company", type: "text", label: "Company", placeholder: "Company Name", required: false, enabled: false },
-    { id: "message", type: "textarea", label: "Message", placeholder: "How can we help you?", required: false, enabled: false },
+    { id: "phone", type: "phone", label: "Phone", placeholder: "Phone", required: true, enabled: true },
   ],
   productOptions: [
-    "V+ EDGE Balanced Scorecard™",
-    "V+ EDGE™",
-    "V+ TwinEDGE™",
-    "V+ IntellEDGE™",
-    "EDGE-X™",
+    "Supplier",
+    "OEM",
   ],
-  productLabel: "For a free demo, please select one of the EDGE products below:",
-  allowCustomProduct: true,
+  productLabel: "I am a:",
+  allowCustomProduct: false,
 };
 
 interface ContactPopupProps {
@@ -86,27 +82,68 @@ export function ContactPopup({ config = defaultPopupConfig }: ContactPopupProps)
   const [showTriggerButton, setShowTriggerButton] = useState(true);
 
   useEffect(() => {
-    if (config.triggerDelay > 0) {
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-      }, config.triggerDelay * 1000);
-      return () => clearTimeout(timer);
+    const isBrowser = typeof window !== "undefined";
+    if (!isBrowser) return;
+
+    const shownKey = "svp_booking_popup_shown";
+    if (sessionStorage.getItem(shownKey) === "true") {
+      return;
     }
+
+    const timer = setTimeout(
+      () => {
+        setIsOpen(true);
+        sessionStorage.setItem(shownKey, "true");
+      },
+      Math.max(0, config.triggerDelay) * 1000
+    );
+
+    return () => clearTimeout(timer);
   }, [config.triggerDelay]);
 
   if (!config.enabled) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", { ...formData, product: selectedProduct || customProduct });
-    setIsSubmitted(true);
-    setTimeout(() => {
-      setIsOpen(false);
-      setIsSubmitted(false);
-      setFormData({});
-      setSelectedProduct("");
-      setCustomProduct("");
-    }, 3000);
+
+    const persona = selectedProduct;
+    if (!persona) return;
+
+    try {
+      if (db) {
+        const name = (formData.name || "").trim();
+        const [firstName, ...rest] = name.split(" ");
+        const lastName = rest.join(" ").trim();
+
+        await addDoc(collection(db, COLLECTIONS.BOOK_CALL_LEADS), {
+          firstName: firstName || null,
+          lastName: lastName || null,
+          email: (formData.email || "").trim(),
+          phone: (formData.phone || "").trim(),
+          company: null,
+          jobTitle: null,
+          preferredDate: null,
+          preferredTime: null,
+          message: null,
+          source: "popup",
+          status: "new",
+          persona,
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now(),
+        });
+      }
+
+      setIsSubmitted(true);
+      setTimeout(() => {
+        setIsOpen(false);
+        setIsSubmitted(false);
+        setFormData({});
+        setSelectedProduct("");
+        setCustomProduct("");
+      }, 3000);
+    } catch (error) {
+      console.error("Popup submit error:", error);
+    }
   };
 
   const updateField = (fieldId: string, value: string) => {
@@ -233,7 +270,7 @@ export function ContactPopup({ config = defaultPopupConfig }: ContactPopupProps)
                 </div>
               )}
 
-              <Button type="submit" className="w-full" size="lg">
+              <Button type="submit" className="w-full" size="lg" disabled={!selectedProduct}>
                 {config.buttonText}
               </Button>
             </form>

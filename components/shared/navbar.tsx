@@ -30,54 +30,42 @@ import { cn } from "@/lib/utils";
 
 const services = [
   {
+    title: "Supplier Readiness",
+    href: "/",
+    description: "OEM qualification and supplier readiness assessments",
+    icon: Factory,
+    items: [
+      { title: "Request Readiness Assessment", href: "/contact" },
+      { title: "For OEM Buyers", href: "/oem" },
+      { title: "Join Affiliate Network", href: "/affiliates" },
+    ],
+  },
+  {
     title: "V+ EDGE™",
     href: "/v-edge",
-    description: "Modular Industry 4.0 transformation platform",
+    description: "Modular platform that accelerates readiness execution",
     icon: Wrench,
     items: [
-      { title: "Lean Manufacturing", href: "/v-edge/lean" },
-      { title: "Automation", href: "/v-edge/automation" },
-      { title: "Quality & ISO", href: "/v-edge/quality" },
-      { title: "Digital Transformation", href: "/v-edge/digital" },
-      { title: "Workforce Development", href: "/v-edge/workforce" },
-      { title: "Reshoring", href: "/v-edge/reshore" },
-    ],
-  },
-  {
-    title: "TwinEDGE™",
-    href: "/twinedge",
-    description: "Digital twin technology for simulation and optimization",
-    icon: Cpu,
-    items: [
-      { title: "Process Simulation", href: "/twinedge/process" },
-      { title: "Supply Chain Modeling", href: "/twinedge/supply-chain" },
-      { title: "Predictive Maintenance", href: "/twinedge/maintenance" },
-    ],
-  },
-  {
-    title: "IntellEDGE™",
-    href: "/intelledge",
-    description: "Executive decision intelligence and AI-powered insights",
-    icon: Brain,
-    items: [
-      { title: "Command Center", href: "/intelledge/command" },
-      { title: "Analytics Dashboard", href: "/intelledge/analytics" },
-      { title: "Ask IntellEDGE", href: "/intelledge/ask" },
+      { title: "Explore V+ EDGE", href: "/v-edge" },
+      { title: "Quality & ISO", href: "/v-edge" },
+      { title: "Reshoring", href: "/v-edge" },
     ],
   },
 ];
 
 const resources = [
-  { title: "Case Studies", href: "/case-studies", icon: FileCheck },
-  { title: "Resources", href: "/resources", icon: BarChart3 },
-  { title: "Events", href: "/events", icon: Globe },
-  { title: "FAQ", href: "/faq", icon: Zap },
+  { title: "About", href: "/about", icon: Globe },
+  { title: "Leadership", href: "/leadership", icon: Users },
+  { title: "AntiFragile", href: "/antifragile", icon: Zap },
+  { title: "Accessibility", href: "/accessibility", icon: FileCheck },
 ];
 
 const companyLinks = [
   { title: "About Us", href: "/about", icon: Globe },
   { title: "Leadership Team", href: "/leadership", icon: Users },
   { title: "Core Team", href: "/company", icon: Users },
+  { title: "OEM Buyers", href: "/oem", icon: Factory },
+  { title: "Affiliates", href: "/affiliates", icon: Users },
 ];
 
 export function Navbar() {

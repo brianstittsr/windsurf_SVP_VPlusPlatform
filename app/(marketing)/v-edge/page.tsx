@@ -46,7 +46,7 @@ const modules = [
       "15-30% productivity improvement",
       "Significant waste reduction",
     ],
-    href: "/v-edge/lean",
+    href: "/v-edge",
   },
   {
     id: "automation",
@@ -68,7 +68,7 @@ const modules = [
       "Improved consistency and quality",
       "Increased throughput",
     ],
-    href: "/v-edge/automation",
+    href: "/v-edge",
   },
   {
     id: "quality",
@@ -90,7 +90,7 @@ const modules = [
       "OEM supplier qualification",
       "Reduced quality costs",
     ],
-    href: "/v-edge/quality",
+    href: "/v-edge",
   },
   {
     id: "digital",
@@ -112,7 +112,7 @@ const modules = [
       "Data-driven decisions",
       "Reduced downtime",
     ],
-    href: "/v-edge/digital",
+    href: "/v-edge",
   },
   {
     id: "workforce",
@@ -134,7 +134,7 @@ const modules = [
       "Improved skills coverage",
       "Stronger leadership pipeline",
     ],
-    href: "/v-edge/workforce",
+    href: "/v-edge",
   },
   {
     id: "reshore",
@@ -156,7 +156,7 @@ const modules = [
       "Improved lead times",
       "Access to incentives",
     ],
-    href: "/v-edge/reshore",
+    href: "/v-edge",
   },
 ];
 
@@ -310,8 +310,8 @@ export default function VEdgePage() {
                           ))}
                         </ul>
                         <Button className="mt-6" asChild>
-                          <Link href={module.href}>
-                            Learn More
+                          <Link href="/contact">
+                            Request Assessment
                             <ArrowRight className="ml-2 h-4 w-4" />
                           </Link>
                         </Button>

@@ -75,6 +75,7 @@ import {
   Eye,
   EyeOff,
   UserCheck,
+  Megaphone,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -232,6 +233,12 @@ const adminItems = [
     title: "Events",
     href: "/portal/admin/events",
     icon: CalendarClock,
+  },
+  {
+    title: "Marketing Hub",
+    href: "/portal/admin/marketing-hub",
+    icon: Megaphone,
+    badge: "NEW",
   },
 ];
 
@@ -567,6 +574,9 @@ export function PortalSidebar() {
                             )}
                           </Link>
                         </SidebarMenuButton>
+                        {item.badge && !hidden && (
+                          <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
+                        )}
                       </SidebarMenuItem>
                     );
                   })}

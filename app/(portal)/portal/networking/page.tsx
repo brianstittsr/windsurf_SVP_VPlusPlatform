@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AffiliateOnboardingProgress } from "@/components/portal/affiliate-onboarding-progress";
+import { AINetworkingRecommendations } from "@/components/portal/ai-networking-recommendations";
 import {
   Dialog,
   DialogContent,
@@ -269,12 +271,21 @@ export default function NetworkingPage() {
         </Card>
       </div>
 
-      <Tabs defaultValue="directory" className="space-y-6">
+      {/* Onboarding Progress */}
+      <AffiliateOnboardingProgress />
+
+      <Tabs defaultValue="ai-matches" className="space-y-6">
         <TabsList>
+          <TabsTrigger value="ai-matches">AI Matches</TabsTrigger>
           <TabsTrigger value="directory">Member Directory</TabsTrigger>
           <TabsTrigger value="one-to-ones">My One-to-Ones</TabsTrigger>
           <TabsTrigger value="leadership">Leadership Team</TabsTrigger>
         </TabsList>
+
+        {/* AI Recommendations Tab */}
+        <TabsContent value="ai-matches" className="space-y-6">
+          <AINetworkingRecommendations />
+        </TabsContent>
 
         {/* Member Directory */}
         <TabsContent value="directory" className="space-y-6">
