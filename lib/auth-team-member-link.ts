@@ -131,6 +131,50 @@ export async function getTeamMemberByAuthUid(firebaseUid: string): Promise<TeamM
 }
 
 /**
+ * Update a Team Member's profile data
+ * @param teamMemberId - The Firestore document ID of the Team Member
+ * @param updates - Partial TeamMemberDoc with fields to update
+ * @returns Updated TeamMemberDoc if successful, null otherwise
+ */
+export async function updateTeamMemberProfile(
+  teamMemberId: string,
+  updates: Partial<Omit<TeamMemberDoc, "id" | "createdAt">>
+): Promise<TeamMemberDoc | null> {
+  if (!db) {
+    console.error("Firebase not initialized");
+    return null;
+  }
+
+  try {
+    const teamMemberRef = doc(db, COLLECTIONS.TEAM_MEMBERS, teamMemberId);
+    
+    // Get current document to merge with updates
+    const currentDoc = await getDoc(teamMemberRef);
+    if (!currentDoc.exists()) {
+      console.error(`Team Member ${teamMemberId} not found`);
+      return null;
+    }
+
+    await updateDoc(teamMemberRef, {
+      ...updates,
+      updatedAt: Timestamp.now(),
+    });
+
+    // Fetch and return the updated document
+    const updatedDoc = await getDoc(teamMemberRef);
+    if (updatedDoc.exists()) {
+      console.log(`Updated Team Member profile: ${teamMemberId}`);
+      return { id: updatedDoc.id, ...updatedDoc.data() } as TeamMemberDoc;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error("Error updating team member profile:", error);
+    return null;
+  }
+}
+
+/**
  * Find and link a Team Member by email during sign-up/sign-in
  * This is the main function to call when a user authenticates
  * @param email - User's email address

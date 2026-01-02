@@ -75,7 +75,7 @@ const steps = [
 ];
 
 export function ProfileCompletionWizard() {
-  const { profile, updateProfile, profileCompletion, showProfileWizard, setShowProfileWizard } = useUserProfile();
+  const { profile, updateProfile, saveProfile, isSaving, profileCompletion, showProfileWizard, setShowProfileWizard } = useUserProfile();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     firstName: profile.firstName || "",
@@ -104,17 +104,21 @@ export function ProfileCompletionWizard() {
     }
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     updateProfile({
       ...formData,
       profileCompletedAt: new Date().toISOString(),
     });
+    // Save to Firestore
+    await saveProfile();
     setShowProfileWizard(false);
   };
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
     // Save what we have so far
     updateProfile(formData);
+    // Save to Firestore
+    await saveProfile();
     setShowProfileWizard(false);
   };
 
@@ -325,9 +329,9 @@ export function ProfileCompletionWizard() {
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             ) : (
-              <Button onClick={handleComplete} disabled={!isStepValid()}>
+              <Button onClick={handleComplete} disabled={!isStepValid() || isSaving}>
                 <CheckCircle className="h-4 w-4 mr-2" />
-                Complete Profile
+                {isSaving ? "Saving..." : "Complete Profile"}
               </Button>
             )}
           </div>

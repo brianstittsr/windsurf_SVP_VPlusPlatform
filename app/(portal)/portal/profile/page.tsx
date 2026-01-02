@@ -178,7 +178,7 @@ const mockOneToOnes = [
 ];
 
 export default function ProfilePage() {
-  const { profile: userProfile, getDisplayName, getInitials } = useUserProfile();
+  const { profile: userProfile, getDisplayName, getInitials, updateProfile: updateContextProfile, saveProfile: saveContextProfile, isSaving: contextIsSaving, linkedTeamMember } = useUserProfile();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   
@@ -225,7 +225,8 @@ export default function ProfilePage() {
     date: "",
     expires: "",
   });
-  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [showCertDialog, setShowCertDialog] = useState(false);
 
   // Password change state
@@ -240,6 +241,25 @@ export default function ProfilePage() {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [passwordSuccess, setPasswordSuccess] = useState("");
+
+  // Sync local profile state with context profile when it changes
+  useEffect(() => {
+    setProfile((prev) => ({
+      ...prev,
+      role: userProfile.role || "affiliate",
+      firstName: userProfile.firstName || "",
+      lastName: userProfile.lastName || "",
+      email: userProfile.email || "",
+      phone: userProfile.phone || "",
+      title: userProfile.jobTitle || "",
+      company: userProfile.company || "",
+      location: userProfile.location || "",
+      bio: userProfile.bio || "",
+    }));
+    if (userProfile.avatarUrl) {
+      setAvatarPreview(userProfile.avatarUrl);
+    }
+  }, [userProfile]);
 
   const updateProfile = (field: string, value: any) => {
     setProfile({ ...profile, [field]: value });
@@ -304,10 +324,31 @@ export default function ProfilePage() {
   };
 
   const saveProfile = async () => {
-    setIsSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsSaving(false);
-    alert("Profile saved successfully!");
+    setSaveError(null);
+    setSaveSuccess(false);
+    
+    // First update the context profile with local changes
+    updateContextProfile({
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      email: profile.email,
+      phone: profile.phone,
+      jobTitle: profile.title,
+      company: profile.company,
+      location: profile.location,
+      bio: profile.bio,
+      avatarUrl: avatarPreview || userProfile.avatarUrl,
+    });
+    
+    // Then save to Firestore
+    const result = await saveContextProfile();
+    
+    if (result.success) {
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } else {
+      setSaveError(result.error || "Failed to save profile");
+    }
   };
 
   const handleChangePassword = async () => {
@@ -358,11 +399,35 @@ export default function ProfilePage() {
             Manage your profile, networking preferences, and SVP tools
           </p>
         </div>
-        <Button onClick={saveProfile} disabled={isSaving}>
+        <Button onClick={saveProfile} disabled={contextIsSaving}>
           <Save className="mr-2 h-4 w-4" />
-          {isSaving ? "Saving..." : "Save Changes"}
+          {contextIsSaving ? "Saving..." : "Save Changes"}
         </Button>
       </div>
+
+      {/* Save Status Alerts */}
+      {saveSuccess && (
+        <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-700 dark:text-green-300">
+            Profile saved successfully!
+          </AlertDescription>
+        </Alert>
+      )}
+      
+      {saveError && (
+        <Alert variant="destructive">
+          <AlertDescription>{saveError}</AlertDescription>
+        </Alert>
+      )}
+
+      {!linkedTeamMember && (
+        <Alert className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950">
+          <AlertDescription className="text-yellow-700 dark:text-yellow-300">
+            Your account is not linked to a team member profile. Profile changes cannot be saved until your account is linked.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Profile Header Card with Photo */}
       <Card>

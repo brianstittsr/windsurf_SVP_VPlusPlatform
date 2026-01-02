@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { getTeamMemberByAuthUid, findAndLinkTeamMember } from "@/lib/auth-team-member-link";
+import { getTeamMemberByAuthUid, findAndLinkTeamMember, updateTeamMemberProfile } from "@/lib/auth-team-member-link";
 import type { TeamMemberDoc } from "@/lib/schema";
 
 // User profile fields
@@ -148,11 +148,28 @@ function mapTeamMemberToProfile(teamMember: TeamMemberDoc): Partial<UserProfile>
   };
 }
 
+// Map UserProfile back to TeamMemberDoc for saving
+function mapProfileToTeamMember(profile: UserProfile): Partial<TeamMemberDoc> {
+  return {
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    emailPrimary: profile.email,
+    mobile: profile.phone,
+    company: profile.company,
+    title: profile.jobTitle,
+    location: profile.location,
+    bio: profile.bio,
+    avatar: profile.avatarUrl,
+  };
+}
+
 // Context type
 interface UserProfileContextType {
   profile: UserProfile;
   setProfile: (profile: UserProfile) => void;
   updateProfile: (updates: Partial<UserProfile>) => void;
+  saveProfile: () => Promise<{ success: boolean; error?: string }>;
+  isSaving: boolean;
   profileCompletion: number;
   networkingCompletion: number;
   isComplete: boolean;
@@ -177,6 +194,7 @@ export function UserProfileProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [linkedTeamMember, setLinkedTeamMember] = useState<TeamMemberDoc | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const profileCompletion = calculateProfileCompletion(profile);
   const networkingCompletion = calculateNetworkingCompletion(profile);
@@ -270,6 +288,31 @@ export function UserProfileProvider({ children }: { children: ReactNode }) {
     }));
   };
 
+  const saveProfile = async (): Promise<{ success: boolean; error?: string }> => {
+    if (!linkedTeamMember) {
+      return { success: false, error: "No linked team member found. Cannot save profile." };
+    }
+
+    setIsSaving(true);
+    try {
+      const teamMemberUpdates = mapProfileToTeamMember(profile);
+      const updatedTeamMember = await updateTeamMemberProfile(linkedTeamMember.id, teamMemberUpdates);
+      
+      if (updatedTeamMember) {
+        setLinkedTeamMember(updatedTeamMember);
+        console.log("Profile saved successfully to Team Member:", updatedTeamMember.id);
+        return { success: true };
+      } else {
+        return { success: false, error: "Failed to update team member profile." };
+      }
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      return { success: false, error: "An error occurred while saving the profile." };
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const getDisplayName = () => {
     if (profile.firstName && profile.lastName) {
       return `${profile.firstName} ${profile.lastName}`;
@@ -294,6 +337,8 @@ export function UserProfileProvider({ children }: { children: ReactNode }) {
         profile,
         setProfile,
         updateProfile,
+        saveProfile,
+        isSaving,
         profileCompletion,
         networkingCompletion,
         isComplete,
