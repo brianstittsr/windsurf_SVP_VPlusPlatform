@@ -35,7 +35,7 @@ import {
   LayoutGrid,
   List,
 } from "lucide-react";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { COLLECTIONS, type TeamMemberDoc } from "@/lib/schema";
 import { cn } from "@/lib/utils";
@@ -57,11 +57,8 @@ export default function MemberDirectoryPage() {
     if (!db) return;
     setLoading(true);
     try {
-      const q = query(
-        collection(db, COLLECTIONS.TEAM_MEMBERS),
-        where("status", "==", "active")
-      );
-      const snapshot = await getDocs(q);
+      // Fetch all members without status filter to ensure we get everyone
+      const snapshot = await getDocs(collection(db, COLLECTIONS.TEAM_MEMBERS));
       const membersList = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
