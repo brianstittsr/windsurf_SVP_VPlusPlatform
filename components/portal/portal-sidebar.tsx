@@ -212,6 +212,11 @@ const workItems = [
 
 const adminItems = [
   {
+    title: "Book Call Leads",
+    href: "/portal/admin/book-call-leads",
+    icon: Phone,
+  },
+  {
     title: "Team Members",
     href: "/portal/admin/team-members",
     icon: UserCog,
@@ -330,27 +335,30 @@ export function PortalSidebar() {
     return () => unsubscribe();
   }, []);
   
-  // Load navigation settings from Firebase
+  // Load navigation settings from Firebase with real-time listener
   useEffect(() => {
-    const loadNavSettings = async () => {
-      if (!db) return;
-      try {
-        const docRef = doc(db, COLLECTIONS.PLATFORM_SETTINGS, "global");
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data() as PlatformSettingsDoc;
-          if (data.navigationSettings?.hiddenItems) {
-            setHiddenNavItems(data.navigationSettings.hiddenItems);
-          }
-          if (data.navigationSettings?.roleVisibility) {
-            setRoleVisibility(data.navigationSettings.roleVisibility);
-          }
+    if (!db) return;
+    
+    const docRef = doc(db, COLLECTIONS.PLATFORM_SETTINGS, "global");
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data() as PlatformSettingsDoc;
+        if (data.navigationSettings?.hiddenItems) {
+          setHiddenNavItems(data.navigationSettings.hiddenItems);
+        } else {
+          setHiddenNavItems([]);
         }
-      } catch (error) {
-        console.error("Error loading navigation settings:", error);
+        if (data.navigationSettings?.roleVisibility) {
+          setRoleVisibility(data.navigationSettings.roleVisibility);
+        } else {
+          setRoleVisibility({});
+        }
       }
-    };
-    loadNavSettings();
+    }, (error) => {
+      console.error("Error loading navigation settings:", error);
+    });
+    
+    return () => unsubscribe();
   }, []);
   
   // Filter nav items based on role-based visibility
@@ -553,26 +561,9 @@ export function PortalSidebar() {
             <CollapsibleContent>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {/* Book Call Leads - with dynamic count */}
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname === "/portal/admin/book-call-leads"}
-                      tooltip="Book Call Leads"
-                    >
-                      <Link href="/portal/admin/book-call-leads">
-                        <Phone className="h-4 w-4" />
-                        <span>Book Call Leads</span>
-                      </Link>
-                    </SidebarMenuButton>
-                    {bookCallLeadsCount > 0 && (
-                      <SidebarMenuBadge className="bg-red-500 text-white">
-                        {bookCallLeadsCount}
-                      </SidebarMenuBadge>
-                    )}
-                  </SidebarMenuItem>
                   {filterNavItems(adminItems).map((item) => {
                     const hidden = isItemHidden(item.href);
+                    const isBookCallLeads = item.href === "/portal/admin/book-call-leads";
                     return (
                       <SidebarMenuItem key={item.href} className={cn(hidden && isAdmin && !previewRole && "opacity-50")}>
                         <SidebarMenuButton
@@ -588,7 +579,13 @@ export function PortalSidebar() {
                             )}
                           </Link>
                         </SidebarMenuButton>
-                        {item.badge && !hidden && (
+                        {/* Show dynamic count badge for Book Call Leads */}
+                        {isBookCallLeads && bookCallLeadsCount > 0 && !hidden && (
+                          <SidebarMenuBadge className="bg-red-500 text-white">
+                            {bookCallLeadsCount}
+                          </SidebarMenuBadge>
+                        )}
+                        {item.badge && !hidden && !isBookCallLeads && (
                           <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
                         )}
                       </SidebarMenuItem>
