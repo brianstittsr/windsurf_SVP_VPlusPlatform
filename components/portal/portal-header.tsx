@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUserProfile } from "@/contexts/user-profile-context";
@@ -65,8 +68,20 @@ const notifications = [
 ];
 
 export function PortalHeader() {
+  const router = useRouter();
   const [searchOpen, setSearchOpen] = useState(false);
   const { getDisplayName, getInitials, profile } = useUserProfile();
+
+  const handleSignOut = async () => {
+    try {
+      if (auth) {
+        await signOut(auth);
+      }
+      router.push("/login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
   const unreadCount = notifications.filter((n) => n.unread).length;
 
   return (
@@ -186,7 +201,7 @@ export function PortalHeader() {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem className="text-destructive cursor-pointer" onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" />
               Sign Out
             </DropdownMenuItem>

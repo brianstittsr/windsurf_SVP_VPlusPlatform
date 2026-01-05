@@ -4,6 +4,8 @@ import { PortalHeader } from "@/components/portal/portal-header";
 import { UserProfileProvider } from "@/contexts/user-profile-context";
 import { ProfileCompletionWizard } from "@/components/portal/profile-completion-wizard";
 import { AffiliateOnboardingWizard } from "@/components/portal/affiliate-onboarding-wizard";
+import { NetworkingWizard } from "@/components/portal/networking-wizard";
+import { MeetingRecommendations } from "@/components/portal/meeting-recommendations";
 
 export default function PortalLayout({
   children,
@@ -20,6 +22,8 @@ export default function PortalLayout({
         </SidebarInset>
       </SidebarProvider>
       <ProfileCompletionWizard />
+      <NetworkingWizard />
+      <MeetingRecommendations />
       <AffiliateOnboardingWizard />
     </UserProfileProvider>
   );

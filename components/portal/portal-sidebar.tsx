@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import NextImage from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import { db } from "@/lib/firebase";
 import { collection, query, where, onSnapshot, doc, getDoc } from "firebase/firestore";
 import { COLLECTIONS, type PlatformSettingsDoc } from "@/lib/schema";
@@ -283,7 +285,19 @@ export const ALL_NAV_ITEMS = [
 
 export function PortalSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { getDisplayName, getInitials, profile } = useUserProfile();
+
+  const handleSignOut = async () => {
+    try {
+      if (auth) {
+        await signOut(auth);
+      }
+      router.push("/login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
   const [bookCallLeadsCount, setBookCallLeadsCount] = useState(0);
   const [hiddenNavItems, setHiddenNavItems] = useState<string[]>([]);
   const [roleVisibility, setRoleVisibility] = useState<Record<string, string[]>>({});
@@ -707,7 +721,7 @@ export function PortalSidebar() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive">
+                <DropdownMenuItem className="text-destructive cursor-pointer" onClick={handleSignOut}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
                 </DropdownMenuItem>

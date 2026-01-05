@@ -178,6 +178,8 @@ interface UserProfileContextType {
   setShowProfileWizard: (show: boolean) => void;
   showAffiliateOnboarding: boolean;
   setShowAffiliateOnboarding: (show: boolean) => void;
+  showNetworkingWizard: boolean;
+  setShowNetworkingWizard: (show: boolean) => void;
   getDisplayName: () => string;
   getInitials: () => string;
   isLoading: boolean;
@@ -191,6 +193,7 @@ export function UserProfileProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile>(defaultProfile);
   const [showProfileWizard, setShowProfileWizard] = useState(false);
   const [showAffiliateOnboarding, setShowAffiliateOnboarding] = useState(false);
+  const [showNetworkingWizard, setShowNetworkingWizard] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [linkedTeamMember, setLinkedTeamMember] = useState<TeamMemberDoc | null>(null);
@@ -239,14 +242,36 @@ export function UserProfileProvider({ children }: { children: ReactNode }) {
           } else {
             console.log("No linked Team Member found for user:", firebaseUser.email);
             setLinkedTeamMember(null);
-            // Set basic profile from Firebase Auth
+            
+            // Try to get registration data from sessionStorage (set during sign-up)
+            const registrationName = typeof window !== 'undefined' ? sessionStorage.getItem("svp_user_name") : null;
+            const registrationEmail = typeof window !== 'undefined' ? sessionStorage.getItem("svp_user_email") : null;
+            const registrationCompany = typeof window !== 'undefined' ? sessionStorage.getItem("svp_user_company") : null;
+            const registrationPhone = typeof window !== 'undefined' ? sessionStorage.getItem("svp_user_phone") : null;
+            const registrationType = typeof window !== 'undefined' ? sessionStorage.getItem("svp_user_type") : null;
+            
+            // Parse name from registration or Firebase
+            let firstName = firebaseUser.displayName?.split(" ")[0] || "";
+            let lastName = firebaseUser.displayName?.split(" ").slice(1).join(" ") || "";
+            
+            if (registrationName) {
+              const nameParts = registrationName.split(" ");
+              firstName = nameParts[0] || firstName;
+              lastName = nameParts.slice(1).join(" ") || lastName;
+            }
+            
+            // Set profile from Firebase Auth + registration data
             setProfile((prev) => ({
               ...prev,
               id: firebaseUser.uid,
-              email: firebaseUser.email || "",
-              firstName: firebaseUser.displayName?.split(" ")[0] || "",
-              lastName: firebaseUser.displayName?.split(" ").slice(1).join(" ") || "",
+              email: registrationEmail || firebaseUser.email || "",
+              firstName,
+              lastName,
+              company: registrationCompany || "",
+              phone: registrationPhone || "",
               avatarUrl: firebaseUser.photoURL || "",
+              isAffiliate: registrationType === "affiliate",
+              role: registrationType === "affiliate" ? "affiliate" : prev.role,
               updatedAt: new Date().toISOString(),
             }));
           }
@@ -275,10 +300,15 @@ export function UserProfileProvider({ children }: { children: ReactNode }) {
     // Only show profile wizard if profile is incomplete
     if (!isComplete) {
       setShowProfileWizard(true);
+      setShowNetworkingWizard(false);
+    } else if (profile.isAffiliate && networkingCompletion < 100) {
+      // Profile is complete, show networking wizard for affiliates with incomplete networking profile
+      setShowProfileWizard(false);
+      setShowNetworkingWizard(true);
     } else if (needsOnboarding) {
       setShowAffiliateOnboarding(true);
     }
-  }, [isLoading, isAuthenticated, isComplete, needsOnboarding]);
+  }, [isLoading, isAuthenticated, isComplete, needsOnboarding, profile.isAffiliate, networkingCompletion]);
 
   const updateProfile = (updates: Partial<UserProfile>) => {
     setProfile((prev) => ({
@@ -347,6 +377,8 @@ export function UserProfileProvider({ children }: { children: ReactNode }) {
         setShowProfileWizard,
         showAffiliateOnboarding,
         setShowAffiliateOnboarding,
+        showNetworkingWizard,
+        setShowNetworkingWizard,
         getDisplayName,
         getInitials,
         isLoading,

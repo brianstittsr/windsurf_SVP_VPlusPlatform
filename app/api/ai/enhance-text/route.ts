@@ -11,12 +11,13 @@ interface EnhanceTextRequest {
     description?: string;
   };
   prompt?: string;
+  fieldType?: string; // For networking profile fields
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body: EnhanceTextRequest = await request.json();
-    const { text, context, prompt } = body;
+    const { text, context, prompt, fieldType } = body;
 
     if (!text && !context?.opportunityName) {
       return NextResponse.json(
@@ -203,9 +204,12 @@ ${text || "No initial notes provided."}
 *Note: To enable AI-powered text enhancement, please configure your OpenAI API key or Ollama in Settings → LLM Configuration.*`;
   }
 
-  // Generic fallback
-  return `${text}
-
----
-*To enable AI-powered text enhancement, please configure your OpenAI API key or Ollama in Settings → LLM Configuration.*`;
+  // Generic fallback - convert bullet points to prose
+  const lines = text.split("\n").map(line => line.replace(/^[-•*]\s*/, "").trim()).filter(Boolean);
+  if (lines.length > 0) {
+    const enhanced = lines.join(". ") + ".";
+    return enhanced.charAt(0).toUpperCase() + enhanced.slice(1);
+  }
+  
+  return text;
 }

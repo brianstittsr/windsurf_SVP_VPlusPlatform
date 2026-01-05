@@ -63,7 +63,8 @@ const expertiseCategories = [
 ];
 
 // Helper function to categorize a team member based on their expertise
-function categorizeExpertise(expertise: string): string[] {
+function categorizeExpertise(expertise: string | undefined): string[] {
+  if (!expertise) return [];
   const lowerExpertise = expertise.toLowerCase();
   return expertiseCategories
     .filter(cat => cat.keywords.some(keyword => lowerExpertise.includes(keyword)))
@@ -135,11 +136,12 @@ export default function NetworkingPage() {
     if (roleFilter !== "all" && member.role !== roleFilter) return false;
     
     // Search filter
-    const fullName = `${member.firstName} ${member.lastName}`.toLowerCase();
+    const fullName = `${member.firstName || ''} ${member.lastName || ''}`.toLowerCase();
+    const searchLower = searchQuery.toLowerCase();
     const matchesSearch =
-      fullName.includes(searchQuery.toLowerCase()) ||
-      (member.company?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
-      member.expertise.toLowerCase().includes(searchQuery.toLowerCase());
+      fullName.includes(searchLower) ||
+      (member.company?.toLowerCase() || "").includes(searchLower) ||
+      (member.expertise?.toLowerCase() || "").includes(searchLower);
     
     // Category filter
     const memberCategories = categorizeExpertise(member.expertise);
