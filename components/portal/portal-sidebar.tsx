@@ -247,6 +247,11 @@ const adminItems = [
     icon: Megaphone,
     badge: "NEW",
   },
+  {
+    title: "Member Directory",
+    href: "/portal/member-directory",
+    icon: Users,
+  },
 ];
 
 const initiativeItems = [
