@@ -78,6 +78,7 @@ import {
   EyeOff,
   UserCheck,
   Megaphone,
+  Database,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -251,6 +252,11 @@ const adminItems = [
     title: "Member Directory",
     href: "/portal/member-directory",
     icon: Users,
+  },
+  {
+    title: "Backups",
+    href: "/portal/admin/backups",
+    icon: Database,
   },
 ];
 
