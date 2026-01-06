@@ -22,12 +22,19 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // In production, this would call your password reset API
-      if (email) {
+      // Call the password reset API
+      const response = await fetch("/api/admin/send-password-reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
         setIsSubmitted(true);
+      } else {
+        setError(data.error || "Failed to send reset email. Please try again.");
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
