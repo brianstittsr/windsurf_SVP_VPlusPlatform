@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useUserProfile } from "@/contexts/user-profile-context";
+import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +25,7 @@ import {
   ArrowDown,
   Minus,
   CheckCircle2,
+  RefreshCw,
 } from "lucide-react";
 
 interface AffiliateMetrics {
@@ -48,8 +51,74 @@ interface LeaderboardCategory {
 }
 
 export function NetworkingLeaderboard() {
+  const { linkedTeamMember } = useUserProfile();
   const [activeCategory, setActiveCategory] = useState("overall");
   const [timeframe, setTimeframe] = useState("month");
+  const [isLoading, setIsLoading] = useState(true);
+  const [leaderboard, setLeaderboard] = useState<AffiliateMetrics[]>([]);
+  const [currentUserMetrics, setCurrentUserMetrics] = useState<AffiliateMetrics | null>(null);
+  const [earnedBadges, setEarnedBadges] = useState<string[]>([]);
+
+  // Fetch leaderboard data from API
+  const fetchLeaderboardData = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/affiliate-metrics?timeframe=${timeframe}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.metrics) {
+          // Transform API data to leaderboard format
+          const transformedData: AffiliateMetrics[] = data.metrics.map((m: any, index: number) => ({
+            id: m.affiliateId,
+            name: m.affiliateName,
+            avatar: undefined,
+            rank: index + 1,
+            previousRank: index + 1, // TODO: Track historical ranks
+            totalMeetings: m.totalOneToOnes || 0,
+            referralsGiven: m.referralsGiven || 0,
+            referralsReceived: m.referralsReceived || 0,
+            svpReferrals: m.svpReferralsGiven || 0,
+            networkingScore: m.engagementScore || 0,
+            streak: 0, // TODO: Calculate streak from meeting history
+            lastActive: "Recently",
+          }));
+
+          // Sort by networking score
+          transformedData.sort((a, b) => b.networkingScore - a.networkingScore);
+          transformedData.forEach((item, idx) => item.rank = idx + 1);
+
+          setLeaderboard(transformedData);
+
+          // Find current user in the leaderboard
+          if (linkedTeamMember?.id) {
+            const userMetrics = transformedData.find(m => m.id === linkedTeamMember.id);
+            if (userMetrics) {
+              setCurrentUserMetrics(userMetrics);
+              // Calculate earned badges based on metrics
+              const badges: string[] = [];
+              if (userMetrics.totalMeetings >= 1) badges.push("First Connection");
+              if (userMetrics.totalMeetings >= 5) badges.push("Networking Newbie");
+              if (userMetrics.referralsGiven >= 10) badges.push("Referral Pro");
+              if (userMetrics.svpReferrals >= 5) badges.push("SVP Champion");
+              if (userMetrics.totalMeetings >= 20) badges.push("Networking Ninja");
+              if (userMetrics.streak >= 10) badges.push("Streak Master");
+              if (userMetrics.rank <= 10) badges.push("Community Leader");
+              if (userMetrics.totalMeetings >= 50) badges.push("Networking Legend");
+              setEarnedBadges(badges);
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching leaderboard data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLeaderboardData();
+  }, [timeframe, linkedTeamMember?.id]);
 
   const categories: LeaderboardCategory[] = [
     {
@@ -78,90 +147,18 @@ export function NetworkingLeaderboard() {
     },
   ];
 
-  const [leaderboard, setLeaderboard] = useState<AffiliateMetrics[]>([
-    {
-      id: "1",
-      name: "Sarah Johnson",
-      avatar: undefined,
-      rank: 1,
-      previousRank: 2,
-      totalMeetings: 24,
-      referralsGiven: 18,
-      referralsReceived: 15,
-      svpReferrals: 8,
-      networkingScore: 950,
-      streak: 12,
-      lastActive: "2 hours ago",
-    },
-    {
-      id: "2",
-      name: "Michael Chen",
-      avatar: undefined,
-      rank: 2,
-      previousRank: 1,
-      totalMeetings: 22,
-      referralsGiven: 16,
-      referralsReceived: 19,
-      svpReferrals: 7,
-      networkingScore: 920,
-      streak: 8,
-      lastActive: "5 hours ago",
-    },
-    {
-      id: "3",
-      name: "Emily Rodriguez",
-      avatar: undefined,
-      rank: 3,
-      previousRank: 4,
-      totalMeetings: 20,
-      referralsGiven: 15,
-      referralsReceived: 12,
-      svpReferrals: 9,
-      networkingScore: 890,
-      streak: 15,
-      lastActive: "1 day ago",
-    },
-    {
-      id: "4",
-      name: "David Thompson",
-      avatar: undefined,
-      rank: 4,
-      previousRank: 3,
-      totalMeetings: 19,
-      referralsGiven: 14,
-      referralsReceived: 16,
-      svpReferrals: 6,
-      networkingScore: 850,
-      streak: 6,
-      lastActive: "3 hours ago",
-    },
-    {
-      id: "5",
-      name: "Jennifer Martinez",
-      avatar: undefined,
-      rank: 5,
-      previousRank: 5,
-      totalMeetings: 18,
-      referralsGiven: 13,
-      referralsReceived: 14,
-      svpReferrals: 5,
-      networkingScore: 820,
-      streak: 10,
-      lastActive: "6 hours ago",
-    },
-  ]);
-
-  const currentUser = {
-    id: "current",
+  // Default current user metrics if not found in leaderboard
+  const currentUser = currentUserMetrics || {
+    id: linkedTeamMember?.id || "current",
     name: "You",
-    rank: 8,
-    previousRank: 9,
-    totalMeetings: 15,
-    referralsGiven: 10,
-    referralsReceived: 11,
-    svpReferrals: 4,
-    networkingScore: 720,
-    streak: 5,
+    rank: leaderboard.length + 1,
+    previousRank: leaderboard.length + 1,
+    totalMeetings: 0,
+    referralsGiven: 0,
+    referralsReceived: 0,
+    svpReferrals: 0,
+    networkingScore: 0,
+    streak: 0,
     lastActive: "Just now",
   };
 
@@ -454,49 +451,49 @@ export function NetworkingLeaderboard() {
               {
                 title: "First Connection",
                 description: "Complete your first 1-to-1",
-                earned: true,
+                earned: earnedBadges.includes("First Connection"),
                 icon: Handshake,
               },
               {
                 title: "Networking Newbie",
                 description: "5 meetings completed",
-                earned: true,
+                earned: earnedBadges.includes("Networking Newbie"),
                 icon: Users,
               },
               {
                 title: "Referral Pro",
                 description: "Give 10 referrals",
-                earned: true,
+                earned: earnedBadges.includes("Referral Pro"),
                 icon: Target,
               },
               {
                 title: "SVP Champion",
                 description: "5 SVP referrals",
-                earned: false,
+                earned: earnedBadges.includes("SVP Champion"),
                 icon: Trophy,
               },
               {
                 title: "Networking Ninja",
                 description: "20 meetings completed",
-                earned: false,
+                earned: earnedBadges.includes("Networking Ninja"),
                 icon: Zap,
               },
               {
                 title: "Streak Master",
                 description: "10 week streak",
-                earned: false,
+                earned: earnedBadges.includes("Streak Master"),
                 icon: Calendar,
               },
               {
                 title: "Community Leader",
                 description: "Top 10 ranking",
-                earned: false,
+                earned: earnedBadges.includes("Community Leader"),
                 icon: Crown,
               },
               {
                 title: "Networking Legend",
                 description: "50 meetings completed",
-                earned: false,
+                earned: earnedBadges.includes("Networking Legend"),
                 icon: Medal,
               },
             ].map((achievement, idx) => {

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useUserProfile } from "@/contexts/user-profile-context";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -67,113 +68,94 @@ interface ActivityAlert {
 }
 
 export function AINetworkingRecommendations() {
+  const { linkedTeamMember } = useUserProfile();
   const [activeTab, setActiveTab] = useState("recommendations");
   const [selectedMatch, setSelectedMatch] = useState<NetworkingMatch | null>(null);
   const [customMessage, setCustomMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [matches, setMatches] = useState<NetworkingMatch[]>([]);
+  const [alerts, setAlerts] = useState<ActivityAlert[]>([]);
 
-  const [matches, setMatches] = useState<NetworkingMatch[]>([
-    {
-      id: "1",
-      name: "Sarah Johnson",
-      company: "TechManufacturing Inc",
-      title: "VP of Operations",
-      matchScore: 95,
-      matchReason: "Highly complementary business goals and shared target markets",
-      complementaryGoals: [
-        "Looking for supply chain partners",
-        "Seeking operational efficiency experts",
-      ],
-      sharedIndustries: ["Manufacturing", "Technology"],
-      potentialSynergies: [
-        "Your automation expertise matches their needs",
-        "They serve your target customer base",
-        "Geographic overlap in Midwest region",
-      ],
-      availability: "Available Tue-Thu mornings",
-      lastActive: "2 hours ago",
-      meetingCount: 0,
-      referralsGiven: 12,
-      aiInsight:
-        "Sarah is actively seeking automation solutions for her manufacturing clients. Your expertise in Industry 4.0 would be highly valuable to her network.",
-      matchType: "high-value",
-    },
-    {
-      id: "2",
-      name: "Michael Chen",
-      company: "Precision Parts Co",
-      title: "Business Development Manager",
-      matchScore: 88,
-      matchReason: "Strong referral potential and complementary service offerings",
-      complementaryGoals: ["Generate B2B referrals", "Expand into new markets"],
-      sharedIndustries: ["Manufacturing", "Professional Services"],
-      potentialSynergies: [
-        "Non-competing services with shared clients",
-        "Active networker with 22 meetings this month",
-        "Strong track record of giving referrals",
-      ],
-      availability: "Flexible, prefers virtual",
-      lastActive: "5 hours ago",
-      meetingCount: 22,
-      referralsGiven: 16,
-      aiInsight:
-        "Michael has given 16 referrals this month and is known for quality introductions. He's looking for partners in automation and quality management.",
-      matchType: "complementary",
-    },
-    {
-      id: "3",
-      name: "Jennifer Martinez",
-      company: "Global Logistics Solutions",
-      title: "Director of Partnerships",
-      matchScore: 72,
-      matchReason: "Unlikely connection that could unlock new opportunities",
-      complementaryGoals: ["Strategic partnerships", "Market expansion"],
-      sharedIndustries: ["Transportation", "Manufacturing"],
-      potentialSynergies: [
-        "Different industry but overlapping client base",
-        "Could provide unique perspective on supply chain",
-        "Looking to understand manufacturing sector better",
-      ],
-      availability: "Monday afternoons",
-      lastActive: "1 day ago",
-      meetingCount: 8,
-      referralsGiven: 5,
-      aiInsight:
-        "While from a different sector, Jennifer's logistics expertise could complement your manufacturing focus. This 'unlikely' pairing often leads to innovative collaborations.",
-      matchType: "unlikely",
-    },
-  ]);
+  // Fetch AI recommendations from the API
+  const fetchRecommendations = async (refresh = false) => {
+    if (refresh) {
+      setIsRefreshing(true);
+    } else {
+      setIsLoading(true);
+    }
 
-  const [alerts, setAlerts] = useState<ActivityAlert[]>([
-    {
-      id: "1",
-      type: "low-activity",
-      title: "Networking Activity Below Average",
-      message: "You've had only 1 meeting in the past 2 weeks",
-      recommendation:
-        "Schedule 2-3 meetings this week to maintain momentum and stay visible in the network",
-      suggestedAction: "Book a meeting with Sarah Johnson (95% match)",
-      priority: "high",
-    },
-    {
-      id: "2",
-      type: "streak-risk",
-      title: "Weekly Streak at Risk",
-      message: "Your 5-week networking streak ends in 2 days",
-      recommendation: "Schedule at least one meeting before Friday to maintain your streak",
-      suggestedAction: "Quick virtual coffee with Michael Chen",
-      priority: "medium",
-    },
-    {
-      id: "3",
-      type: "missed-opportunity",
-      title: "High-Value Match Available",
-      message: "Sarah Johnson is a 95% match and actively looking for connections",
-      recommendation:
-        "Reach out soon - she's been active in the last 2 hours and responds quickly",
-      suggestedAction: "Send connection request with AI-generated message",
-      priority: "high",
-    },
-  ]);
+    try {
+      if (!linkedTeamMember?.id) {
+        setIsLoading(false);
+        setIsRefreshing(false);
+        return;
+      }
+
+      // Fetch AI match recommendations
+      const response = await fetch("/api/ai/networking/recommendations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          affiliateId: linkedTeamMember.id,
+          limit: 5,
+          includeUnlikely: true,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.recommendations) {
+          const transformedMatches: NetworkingMatch[] = data.recommendations.map((rec: any) => ({
+            id: rec.id,
+            name: rec.name,
+            company: rec.company || "Unknown Company",
+            title: rec.title || "Professional",
+            matchScore: rec.matchScore || 0,
+            matchReason: rec.matchReason || "Potential networking opportunity",
+            complementaryGoals: rec.complementaryGoals || [],
+            sharedIndustries: rec.sharedIndustries || [],
+            potentialSynergies: rec.potentialSynergies || [],
+            availability: rec.availability || "Flexible",
+            lastActive: rec.lastActive || "Recently",
+            meetingCount: rec.meetingCount || 0,
+            referralsGiven: rec.referralsGiven || 0,
+            aiInsight: rec.aiInsight || "This connection could provide valuable networking opportunities.",
+            matchType: rec.matchType || "complementary",
+          }));
+          setMatches(transformedMatches);
+
+          // Generate activity alerts based on data
+          const newAlerts: ActivityAlert[] = [];
+          
+          // Check for high-value matches
+          const highValueMatch = transformedMatches.find((m: NetworkingMatch) => m.matchScore >= 90);
+          if (highValueMatch) {
+            newAlerts.push({
+              id: "high-value",
+              type: "missed-opportunity",
+              title: "High-Value Match Available",
+              message: `${highValueMatch.name} is a ${highValueMatch.matchScore}% match`,
+              recommendation: "Reach out soon to connect with this highly compatible partner.",
+              suggestedAction: `Request meeting with ${highValueMatch.name}`,
+              priority: "high",
+            });
+          }
+
+          setAlerts(newAlerts);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching recommendations:", error);
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRecommendations();
+  }, [linkedTeamMember?.id]);
 
   const getMatchTypeBadge = (type: NetworkingMatch["matchType"]) => {
     const configs = {

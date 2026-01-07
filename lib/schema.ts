@@ -422,6 +422,9 @@ export interface ReferralDoc {
   isSvpReferral: boolean;
   svpServiceInterest?: string; // Which SVP service they might need
   
+  // Commission tracking (for SVP referrals/deals)
+  commissionTier?: "referral" | "assist" | "co-sell"; // Level of involvement
+  
   // Pipeline status
   status: "submitted" | "contacted" | "meeting-scheduled" | "proposal" | "negotiation" | "won" | "lost";
   

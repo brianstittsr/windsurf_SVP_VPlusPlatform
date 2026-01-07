@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -55,8 +55,11 @@ import {
   Pencil,
   Trash2,
   Eye,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUserProfile } from "@/contexts/user-profile-context";
+import { toast } from "sonner";
 
 // Deal stages
 const dealStages = [
@@ -75,90 +78,43 @@ const commissionTiers = [
   { level: "co-sell", name: "Co-Sell & Close", rate: 17, description: "Support sales process" },
 ];
 
-// Mock deals data
-const mockDeals = [
-  {
-    id: "1",
-    companyName: "Precision Manufacturing Co.",
-    contactName: "John Smith",
-    contactEmail: "john@precisionmfg.com",
-    stage: "proposal",
-    value: 45000,
-    commissionTier: "assist",
-    referredBy: "Sarah Chen",
-    referredByType: "affiliate",
-    createdAt: "2024-11-15",
-    lastActivity: "2024-12-05",
-    notes: "Interested in ISO 9001 certification and lean manufacturing consulting.",
-    services: ["ISO 9001", "Lean Manufacturing"],
-  },
-  {
-    id: "2",
-    companyName: "TechParts Industries",
-    contactName: "Maria Garcia",
-    contactEmail: "maria@techparts.com",
-    stage: "negotiation",
-    value: 85000,
-    commissionTier: "co-sell",
-    referredBy: "You",
-    referredByType: "self",
-    createdAt: "2024-10-20",
-    lastActivity: "2024-12-08",
-    notes: "Large digital transformation project. Multiple phases planned.",
-    services: ["Digital Twins", "AI Implementation", "Industry 4.0"],
-  },
-  {
-    id: "3",
-    companyName: "Midwest Metals LLC",
-    contactName: "Robert Johnson",
-    contactEmail: "rjohnson@midwestmetals.com",
-    stage: "closed-won",
-    value: 32000,
-    commissionTier: "referral",
-    referredBy: "Michael Rodriguez",
-    referredByType: "affiliate",
-    createdAt: "2024-09-10",
-    lastActivity: "2024-11-28",
-    notes: "IATF 16949 certification completed successfully.",
-    services: ["IATF 16949"],
-  },
-  {
-    id: "4",
-    companyName: "Global Components Inc.",
-    contactName: "Lisa Wang",
-    contactEmail: "lwang@globalcomp.com",
-    stage: "qualified",
-    value: 120000,
-    commissionTier: "assist",
-    referredBy: "You",
-    referredByType: "self",
-    createdAt: "2024-12-01",
-    lastActivity: "2024-12-07",
-    notes: "Reshoring project from China. Complex supply chain restructuring.",
-    services: ["Reshoring", "Supply Chain", "Quality Management"],
-  },
-  {
-    id: "5",
-    companyName: "AutoParts Express",
-    contactName: "David Thompson",
-    contactEmail: "dthompson@autoparts.com",
-    stage: "closed-lost",
-    value: 28000,
-    commissionTier: "referral",
-    referredBy: "Jennifer Park",
-    referredByType: "affiliate",
-    createdAt: "2024-08-15",
-    lastActivity: "2024-10-20",
-    notes: "Lost to competitor. Budget constraints cited.",
-    services: ["Automation"],
-  },
-];
+// Deal interface mapped from ReferralDoc
+interface Deal {
+  id: string;
+  companyName: string;
+  contactName: string;
+  contactEmail: string;
+  stage: string;
+  value: number;
+  commissionTier: string;
+  referredBy: string;
+  referredByType: "affiliate" | "self";
+  createdAt: string;
+  lastActivity: string;
+  notes: string;
+  services: string[];
+}
+
+// Map referral status to deal stage
+const statusToStage: Record<string, string> = {
+  "submitted": "referral",
+  "contacted": "qualified",
+  "meeting-scheduled": "qualified",
+  "proposal": "proposal",
+  "negotiation": "negotiation",
+  "won": "closed-won",
+  "lost": "closed-lost",
+};
 
 export default function DealsPage() {
+  const { linkedTeamMember } = useUserProfile();
   const [searchQuery, setSearchQuery] = useState("");
   const [stageFilter, setStageFilter] = useState<string | null>(null);
   const [isNewDealOpen, setIsNewDealOpen] = useState(false);
-  const [selectedDeal, setSelectedDeal] = useState<typeof mockDeals[0] | null>(null);
+  const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
+  const [deals, setDeals] = useState<Deal[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [newDeal, setNewDeal] = useState({
     companyName: "",
     contactName: "",
@@ -169,7 +125,56 @@ export default function DealsPage() {
     notes: "",
   });
 
-  const filteredDeals = mockDeals.filter((deal) => {
+  // Fetch deals from Firebase
+  const fetchDeals = async () => {
+    if (!linkedTeamMember?.id) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      // Fetch SVP referrals (deals) where the current user is the referrer
+      const response = await fetch(`/api/referrals?affiliateId=${linkedTeamMember.id}&type=given`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.referrals) {
+          // Filter for SVP referrals only (these are the "deals")
+          const svpReferrals = data.referrals.filter((r: any) => r.isSvpReferral);
+          
+          // Transform referrals to deals format
+          const transformedDeals: Deal[] = svpReferrals.map((ref: any) => ({
+            id: ref.id,
+            companyName: ref.prospectCompany || "Unknown Company",
+            contactName: ref.prospectName,
+            contactEmail: ref.prospectEmail || "",
+            stage: statusToStage[ref.status] || "referral",
+            value: ref.dealValue || 0,
+            commissionTier: ref.commissionTier || "referral",
+            referredBy: `${linkedTeamMember.firstName} ${linkedTeamMember.lastName}`,
+            referredByType: "self" as const,
+            createdAt: ref.createdAt || new Date().toISOString(),
+            lastActivity: ref.updatedAt || ref.createdAt || new Date().toISOString(),
+            notes: ref.description || "",
+            services: ref.svpServiceInterest ? [ref.svpServiceInterest] : [],
+          }));
+          
+          setDeals(transformedDeals);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching deals:", error);
+      toast.error("Failed to load deals");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDeals();
+  }, [linkedTeamMember?.id]);
+
+  const filteredDeals = deals.filter((deal) => {
     const matchesSearch =
       deal.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       deal.contactName.toLowerCase().includes(searchQuery.toLowerCase());
@@ -177,22 +182,22 @@ export default function DealsPage() {
     return matchesSearch && matchesStage;
   });
 
-  const totalPipelineValue = mockDeals
+  const totalPipelineValue = deals
     .filter((d) => !["closed-won", "closed-lost"].includes(d.stage))
     .reduce((sum, d) => sum + d.value, 0);
 
-  const totalWonValue = mockDeals
+  const totalWonValue = deals
     .filter((d) => d.stage === "closed-won")
     .reduce((sum, d) => sum + d.value, 0);
 
-  const totalCommissionEarned = mockDeals
+  const totalCommissionEarned = deals
     .filter((d) => d.stage === "closed-won")
     .reduce((sum, d) => {
       const tier = commissionTiers.find((t) => t.level === d.commissionTier);
       return sum + (d.value * (tier?.rate || 0)) / 100;
     }, 0);
 
-  const potentialCommission = mockDeals
+  const potentialCommission = deals
     .filter((d) => !["closed-won", "closed-lost"].includes(d.stage))
     .reduce((sum, d) => {
       const tier = commissionTiers.find((t) => t.level === d.commissionTier);
@@ -215,19 +220,71 @@ export default function DealsPage() {
     }).format(value);
   };
 
-  const submitNewDeal = () => {
-    console.log("Creating new deal:", newDeal);
-    setIsNewDealOpen(false);
-    setNewDeal({
-      companyName: "",
-      contactName: "",
-      contactEmail: "",
-      value: "",
-      commissionTier: "referral",
-      services: "",
-      notes: "",
-    });
+  const submitNewDeal = async () => {
+    if (!linkedTeamMember?.id) {
+      toast.error("Unable to create deal. Please try again.");
+      return;
+    }
+
+    if (!newDeal.companyName || !newDeal.contactName) {
+      toast.error("Company name and contact name are required.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Create as an SVP referral in Firebase
+      const response = await fetch("/api/referrals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          referrerId: linkedTeamMember.id,
+          recipientId: "svp", // SVP is the recipient for deals
+          prospectName: newDeal.contactName,
+          prospectCompany: newDeal.companyName,
+          prospectEmail: newDeal.contactEmail,
+          description: newDeal.notes || `Referral for ${newDeal.services || "SVP services"}`,
+          isSvpReferral: true,
+          svpServiceInterest: newDeal.services,
+          referralType: "short-term",
+          dealValue: parseFloat(newDeal.value) || 0,
+          commissionTier: newDeal.commissionTier,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("Deal created successfully!");
+        setIsNewDealOpen(false);
+        setNewDeal({
+          companyName: "",
+          contactName: "",
+          contactEmail: "",
+          value: "",
+          commissionTier: "referral",
+          services: "",
+          notes: "",
+        });
+        // Refresh deals list
+        fetchDeals();
+      } else {
+        const error = await response.json();
+        toast.error(error.error || "Failed to create deal");
+      }
+    } catch (error) {
+      console.error("Error creating deal:", error);
+      toast.error("Failed to create deal. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -443,6 +500,17 @@ export default function DealsPage() {
                   </TableRow>
                 );
               })}
+              {filteredDeals.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-32 text-center">
+                    <div className="flex flex-col items-center justify-center text-muted-foreground">
+                      <DollarSign className="h-8 w-8 mb-2" />
+                      <p className="font-medium">No deals found</p>
+                      <p className="text-sm">Create your first SVP referral to start tracking deals</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
@@ -545,12 +613,21 @@ export default function DealsPage() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsNewDealOpen(false)}>
+            <Button variant="outline" onClick={() => setIsNewDealOpen(false)} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button onClick={submitNewDeal}>
-              <Plus className="mr-2 h-4 w-4" />
-              Create Referral
+            <Button onClick={submitNewDeal} disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Referral
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

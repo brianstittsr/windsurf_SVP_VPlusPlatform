@@ -423,6 +423,152 @@ Weekly/Monthly:
 | `affiliateStats` | Aggregated metrics |
 | `aiMatchSuggestions` | AI-generated partner suggestions |
 
+### Key Schema Details
+
+#### OneToOneMeetingDoc (oneToOneMeetings)
+```typescript
+{
+  id: string;
+  initiatorId: string;        // Affiliate who scheduled
+  partnerId: string;          // Partner affiliate
+  scheduledDate: Timestamp;
+  scheduledTime: string;
+  duration: number;           // Minutes (typically 60)
+  meetingType: "virtual" | "in-person";
+  location?: string;
+  status: "scheduled" | "confirmed" | "completed" | "cancelled" | "no-show";
+  
+  // Pre-meeting
+  agendaItems?: string[];
+  worksheetsShared: boolean;
+  
+  // Post-meeting outcomes
+  meetingNotes?: string;
+  shortTermReferralCommitment?: string;
+  longTermReferralCommitment?: string;
+  svpReferralDiscussed: boolean;
+  svpReferralDetails?: string;
+  
+  // Follow-up
+  followUpDate?: Timestamp;
+  followUpCompleted: boolean;
+  nextMeetingScheduled: boolean;
+  
+  // AI matching data
+  matchScore?: number;        // 0-100 compatibility score
+  matchReasons?: string[];    // Why AI suggested this pairing
+  
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+```
+
+#### ReferralDoc (referrals)
+```typescript
+{
+  id: string;
+  referrerId: string;         // Affiliate who gave the referral
+  recipientId: string;        // Affiliate who received it
+  oneToOneMeetingId?: string; // Source meeting (if from a 1-to-1)
+  
+  referralType: "short-term" | "long-term";
+  prospectName: string;
+  prospectCompany?: string;
+  prospectEmail?: string;
+  prospectPhone?: string;
+  
+  description: string;
+  whyGoodFit?: string;
+  isSvpReferral: boolean;     // Is this for SVP?
+  svpServiceInterest?: string;
+  
+  // Pipeline status
+  status: "submitted" | "contacted" | "meeting-scheduled" | "proposal" | "negotiation" | "won" | "lost";
+  
+  // Deal tracking
+  dealValue?: number;         // In dollars, when won
+  dealClosedDate?: Timestamp;
+  lostReason?: string;
+  contactAttempts: number;
+  
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+```
+
+#### AffiliateStatsDoc (affiliateStats)
+```typescript
+{
+  id: string;
+  affiliateId: string;
+  
+  // Profile completion
+  profileCompletionPercent: number;
+  
+  // One-to-one activity
+  totalOneToOnesScheduled: number;
+  totalOneToOnesCompleted: number;
+  oneToOnesThisMonth: number;
+  oneToOnesThisQuarter: number;
+  lastOneToOneDate?: Timestamp;
+  
+  // Referral activity
+  referralsGiven: number;
+  referralsReceived: number;
+  referralsGivenThisMonth: number;
+  referralsReceivedThisMonth: number;
+  
+  // Deal outcomes
+  dealsClosedFromReferralsGiven: number;
+  dealsClosedFromReferralsReceived: number;
+  totalRevenueGenerated: number;
+  totalRevenueReceived: number;
+  
+  // SVP-specific
+  svpReferralsGiven: number;
+  svpReferralsClosed: number;
+  svpRevenueGenerated: number;
+  
+  // Engagement score (0-100)
+  engagementScore: number;
+  
+  // Streaks
+  currentOneToOneStreak: number;
+  longestOneToOneStreak: number;
+  
+  updatedAt: Timestamp;
+}
+```
+
+### Metrics Calculation
+
+The **Engagement Score** is calculated based on:
+
+| Activity | Points |
+|----------|--------|
+| Complete a 1-to-1 meeting | +10 |
+| Give a referral to another affiliate | +15 |
+| Receive a referral from another affiliate | +5 |
+| Give a referral to SVP | +25 |
+| Maintain weekly meeting streak | +5 |
+| Submit detailed meeting summary | +3 |
+| Successful referral conversion | +50 |
+
+### Badges & Achievements
+
+Badges are calculated dynamically based on affiliate metrics:
+
+| Badge | Requirement |
+|-------|-------------|
+| First Connection | Complete 1 meeting |
+| Networking Newbie | Complete 5 meetings |
+| Referral Pro | Give 10 referrals |
+| SVP Champion | Give 5 SVP referrals |
+| Networking Ninja | Complete 20 meetings |
+| Streak Master | 10-week meeting streak |
+| Community Leader | Top 10 ranking |
+| Networking Legend | Complete 50 meetings |
+
 ---
 
 ## Key Pages & Routes

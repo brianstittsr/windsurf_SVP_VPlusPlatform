@@ -262,6 +262,7 @@ export function NetworkingWizard() {
   const handleComplete = async () => {
     updateProfile({
       networkingProfile: {
+        ...profile.networkingProfile,
         expertise: formData.expertise.split(",").map((e) => e.trim()).filter(Boolean),
         categories: formData.categories,
         idealReferralPartner: formData.idealReferralPartner,
@@ -281,6 +282,7 @@ export function NetworkingWizard() {
     // Save what we have so far
     updateProfile({
       networkingProfile: {
+        ...profile.networkingProfile,
         expertise: formData.expertise.split(",").map((e) => e.trim()).filter(Boolean),
         categories: formData.categories,
         idealReferralPartner: formData.idealReferralPartner,

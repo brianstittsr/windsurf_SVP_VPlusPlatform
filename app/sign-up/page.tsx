@@ -15,6 +15,7 @@ import { Loader2, Eye, EyeOff, AlertCircle, Users, Building2, CheckCircle, Facto
 import { auth } from "@/lib/firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { findAndLinkTeamMember } from "@/lib/auth-team-member-link";
+import { RegistrationProfileModal, type RegistrationData } from "@/components/portal/registration-profile-modal";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -34,6 +35,8 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [linkedTeamMember, setLinkedTeamMember] = useState<string | null>(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [registrationData, setRegistrationData] = useState<RegistrationData | null>(null);
 
   const validateStep1 = () => {
     if (!accountType) {
@@ -112,6 +115,19 @@ export default function SignUpPage() {
             // Store team member info in session
             sessionStorage.setItem("svp_team_member_id", teamMember.id);
             sessionStorage.setItem("svp_user_role", teamMember.role);
+            
+            // Existing team member found - redirect directly to portal
+            sessionStorage.setItem("svp_authenticated", "true");
+            sessionStorage.setItem("svp_user_email", email);
+            sessionStorage.setItem("svp_user_type", accountType);
+            sessionStorage.setItem("svp_user_name", `${firstName} ${lastName}`);
+            sessionStorage.setItem("svp_user_company", company);
+            sessionStorage.setItem("svp_user_phone", phone);
+            sessionStorage.setItem("svp_firebase_uid", firebaseUid);
+            
+            setIsLoading(false);
+            router.push("/portal");
+            return;
           }
         } catch (authError: any) {
           // Handle specific Firebase Auth errors
@@ -121,33 +137,70 @@ export default function SignUpPage() {
             return;
           }
           console.error("Firebase Auth error:", authError);
-          // Continue with session-based auth as fallback
+          setError("Failed to create account. Please try again.");
+          setIsLoading(false);
+          return;
         }
-      }
-
-      // Store session info
-      sessionStorage.setItem("svp_authenticated", "true");
-      sessionStorage.setItem("svp_user_email", email);
-      sessionStorage.setItem("svp_user_type", accountType);
-      sessionStorage.setItem("svp_user_name", `${firstName} ${lastName}`);
-      sessionStorage.setItem("svp_user_company", company);
-      sessionStorage.setItem("svp_user_phone", phone);
-      if (firebaseUid) {
-        sessionStorage.setItem("svp_firebase_uid", firebaseUid);
-      }
-
-      // Redirect based on account type
-      if (accountType === "client") {
-        router.push("/onboarding/client");
-      } else if (accountType === "affiliate") {
-        router.push("/portal");
       } else {
-        router.push("/portal");
+        setError("Authentication service not available. Please try again later.");
+        setIsLoading(false);
+        return;
+      }
+
+      // No existing team member - show profile modal to create one
+      // Store registration data for the modal
+      if (firebaseUid && accountType) {
+        setRegistrationData({
+          firebaseUid,
+          firstName,
+          lastName,
+          email,
+          phone,
+          company,
+          accountType: accountType as "affiliate" | "strategic_partner" | "client",
+        });
+        
+        // Store session info
+        sessionStorage.setItem("svp_authenticated", "true");
+        sessionStorage.setItem("svp_user_email", email);
+        sessionStorage.setItem("svp_user_type", accountType);
+        sessionStorage.setItem("svp_user_name", `${firstName} ${lastName}`);
+        sessionStorage.setItem("svp_user_company", company);
+        sessionStorage.setItem("svp_user_phone", phone);
+        sessionStorage.setItem("svp_firebase_uid", firebaseUid);
+        
+        // Show the profile completion modal
+        setShowProfileModal(true);
       }
     } catch (err) {
       setError("An error occurred during registration. Please try again.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Handle profile modal completion - redirect to portal
+  const handleProfileComplete = (teamMemberId: string) => {
+    console.log("Profile created with team member ID:", teamMemberId);
+    setShowProfileModal(false);
+    
+    // Redirect based on account type
+    if (accountType === "client") {
+      router.push("/onboarding/client");
+    } else {
+      router.push("/portal");
+    }
+  };
+
+  // Handle profile modal skip - redirect anyway but without full profile
+  const handleProfileSkip = () => {
+    setShowProfileModal(false);
+    
+    // Redirect based on account type
+    if (accountType === "client") {
+      router.push("/onboarding/client");
+    } else {
+      router.push("/portal");
     }
   };
 
@@ -499,6 +552,16 @@ export default function SignUpPage() {
           <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
         </p>
       </div>
+
+      {/* Profile Completion Modal - shown after Firebase Auth is created */}
+      {registrationData && (
+        <RegistrationProfileModal
+          isOpen={showProfileModal}
+          onClose={handleProfileSkip}
+          onComplete={handleProfileComplete}
+          registrationData={registrationData}
+        />
+      )}
     </div>
   );
 }

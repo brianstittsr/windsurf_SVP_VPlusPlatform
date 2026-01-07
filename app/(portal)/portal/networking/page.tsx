@@ -46,9 +46,11 @@ import {
   Briefcase,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, addDoc, query, where, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { COLLECTIONS, type TeamMemberDoc } from "@/lib/schema";
+import { COLLECTIONS, type TeamMemberDoc, type OneToOneMeetingDoc } from "@/lib/schema";
+import { useUserProfile } from "@/contexts/user-profile-context";
+import { toast } from "sonner";
 
 // Expertise categories for filtering
 const expertiseCategories = [
@@ -85,8 +87,10 @@ interface OneToOneRequest {
 }
 
 export default function NetworkingPage() {
+  const { linkedTeamMember } = useUserProfile();
   const [teamMembers, setTeamMembers] = useState<TeamMemberDoc[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>("all");
@@ -164,29 +168,66 @@ export default function NetworkingPage() {
     setIsRequestDialogOpen(true);
   };
 
-  const submitRequest = () => {
-    const newRequest: OneToOneRequest = {
-      id: Date.now().toString(),
-      requesterId: "current-user",
-      requesterName: "You",
-      targetId: requestForm.targetId,
-      targetName: selectedMember ? `${selectedMember.firstName} ${selectedMember.lastName}` : "",
-      status: "pending",
-      proposedDate: `${requestForm.proposedDate}T${requestForm.proposedTime}:00`,
-      topic: requestForm.topic,
-      notes: requestForm.notes,
-    };
-    setOneToOnes([...oneToOnes, newRequest]);
-    setIsRequestDialogOpen(false);
-    setRequestForm({
-      targetType: "affiliate",
-      targetId: "",
-      proposedDate: "",
-      proposedTime: "",
-      topic: "",
-      notes: "",
-    });
-    setSelectedMember(null);
+  const submitRequest = async () => {
+    if (!linkedTeamMember?.id || !db) {
+      toast.error("Unable to submit request. Please try again.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Create the meeting document in Firebase
+      const meetingData: Omit<OneToOneMeetingDoc, "id"> = {
+        initiatorId: linkedTeamMember.id,
+        partnerId: requestForm.targetId,
+        scheduledDate: Timestamp.fromDate(new Date(`${requestForm.proposedDate}T${requestForm.proposedTime}:00`)),
+        scheduledTime: requestForm.proposedTime,
+        duration: 60,
+        meetingType: "virtual",
+        status: "scheduled",
+        worksheetsShared: false,
+        svpReferralDiscussed: false,
+        followUpCompleted: false,
+        nextMeetingScheduled: false,
+        agendaItems: requestForm.topic ? [requestForm.topic] : [],
+        meetingNotes: requestForm.notes || "",
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+      };
+
+      const docRef = await addDoc(collection(db, COLLECTIONS.ONE_TO_ONE_MEETINGS), meetingData);
+
+      // Add to local state for immediate UI update
+      const newRequest: OneToOneRequest = {
+        id: docRef.id,
+        requesterId: linkedTeamMember.id,
+        requesterName: `${linkedTeamMember.firstName} ${linkedTeamMember.lastName}`,
+        targetId: requestForm.targetId,
+        targetName: selectedMember ? `${selectedMember.firstName} ${selectedMember.lastName}` : "",
+        status: "pending",
+        proposedDate: `${requestForm.proposedDate}T${requestForm.proposedTime}:00`,
+        topic: requestForm.topic,
+        notes: requestForm.notes,
+      };
+      setOneToOnes([...oneToOnes, newRequest]);
+      
+      toast.success("One-to-One meeting request sent!");
+      setIsRequestDialogOpen(false);
+      setRequestForm({
+        targetType: "affiliate",
+        targetId: "",
+        proposedDate: "",
+        proposedTime: "",
+        topic: "",
+        notes: "",
+      });
+      setSelectedMember(null);
+    } catch (error) {
+      console.error("Error creating meeting request:", error);
+      toast.error("Failed to send meeting request. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const getInitials = (firstName: string, lastName: string) => {

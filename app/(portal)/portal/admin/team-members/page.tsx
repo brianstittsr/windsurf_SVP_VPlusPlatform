@@ -334,23 +334,38 @@ export default function TeamMembersPage() {
     }
   };
 
-  // Delete member
+  // Delete member (also deletes Firebase Auth account via API)
   const handleDeleteMember = async (id: string, memberName: string) => {
-    if (!db) return;
-    if (!confirm("Are you sure you want to delete this team member?")) return;
+    if (!confirm(`Are you sure you want to delete ${memberName}? This will also remove their login account.`)) return;
+    
     try {
-      await deleteDoc(doc(db, COLLECTIONS.TEAM_MEMBERS, id));
+      // Call API to delete team member and their Firebase Auth account
+      const response = await fetch("/api/admin/delete-team-member", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ teamMemberId: id }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to delete team member");
+      }
+
       // Log activity
       await logActivity({
         type: "delete",
         entityType: "team-member",
         entityId: id,
         entityName: memberName,
-        description: `Team member removed: ${memberName}`,
+        description: `Team member removed: ${memberName}${result.authDeleted ? " (login account also deleted)" : ""}`,
       });
+
       await fetchMembers();
-    } catch (error) {
+      console.log(`Deleted team member: ${memberName}`, result);
+    } catch (error: any) {
       console.error("Error deleting member:", error);
+      alert(`Failed to delete team member: ${error.message}`);
     }
   };
 

@@ -17,8 +17,10 @@ import {
   Sparkles,
   Calendar,
   FileText,
+  Award,
 } from "lucide-react";
 import Link from "next/link";
+import { useUserProfile } from "@/contexts/user-profile-context";
 
 interface OnboardingStep {
   id: string;
@@ -29,6 +31,7 @@ interface OnboardingStep {
   required: boolean;
   href: string;
   action?: string;
+  bonus?: number; // Bonus points for completing this step
 }
 
 interface AffiliateOnboardingProgressProps {
@@ -36,13 +39,18 @@ interface AffiliateOnboardingProgressProps {
 }
 
 export function AffiliateOnboardingProgress({ userId }: AffiliateOnboardingProgressProps) {
+  const { profile, setShowAffiliateOnboarding } = useUserProfile();
+  
+  // Check if affiliate onboarding wizard is complete - this marks steps 1-3 as done
+  const onboardingComplete = profile.affiliateOnboardingComplete;
+  
   const [steps, setSteps] = useState<OnboardingStep[]>([
     {
       id: "register",
       title: "Register on Platform",
       description: "Create your affiliate account",
       icon: UserPlus,
-      completed: true,
+      completed: true, // Always true if they're viewing this
       required: true,
       href: "/sign-up",
     },
@@ -51,7 +59,7 @@ export function AffiliateOnboardingProgress({ userId }: AffiliateOnboardingProgr
       title: "Setup Your Profile",
       description: "Complete your professional profile with bio, expertise, and contact info",
       icon: User,
-      completed: false,
+      completed: onboardingComplete,
       required: true,
       href: "/portal/profile",
       action: "Complete Profile",
@@ -61,7 +69,7 @@ export function AffiliateOnboardingProgress({ userId }: AffiliateOnboardingProgr
       title: "Complete Networking Form",
       description: "Fill out your networking preferences and goals",
       icon: Network,
-      completed: false,
+      completed: onboardingComplete,
       required: true,
       href: "/portal/networking/setup",
       action: "Fill Form",
@@ -86,7 +94,33 @@ export function AffiliateOnboardingProgress({ userId }: AffiliateOnboardingProgr
       href: "/portal/networking/meetings",
       action: "Submit Summary",
     },
+    {
+      id: "networking-profile",
+      title: "Complete My Networking Profile",
+      description: "Fill out your detailed networking profile for better AI matching",
+      icon: Award,
+      completed: false,
+      required: false,
+      href: "/portal/networking/profile",
+      action: "Complete Profile",
+      bonus: 500,
+    },
   ]);
+
+  // Update steps when onboarding status changes
+  useEffect(() => {
+    setSteps(prev => prev.map(step => {
+      if (step.id === "profile" || step.id === "networking-form") {
+        return { ...step, completed: onboardingComplete };
+      }
+      return step;
+    }));
+  }, [onboardingComplete]);
+
+  // Handler to open the onboarding wizard
+  const handleOpenOnboarding = () => {
+    setShowAffiliateOnboarding(true);
+  };
 
   const completedSteps = steps.filter(s => s.completed).length;
   const totalSteps = steps.length;
@@ -215,6 +249,12 @@ export function AffiliateOnboardingProgress({ userId }: AffiliateOnboardingProgr
                             {step.required && !step.completed && (
                               <Badge variant="outline" className="text-xs">Required</Badge>
                             )}
+                            {step.bonus && !step.completed && (
+                              <Badge className="text-xs bg-yellow-500 text-white">
+                                <Sparkles className="h-3 w-3 mr-1" />
+                                +{step.bonus} pts
+                              </Badge>
+                            )}
                             {isNext && (
                               <Badge className="text-xs bg-primary">Next Step</Badge>
                             )}
@@ -223,12 +263,23 @@ export function AffiliateOnboardingProgress({ userId }: AffiliateOnboardingProgr
                         </div>
 
                         {!step.completed && step.action && (
-                          <Button asChild size="sm" variant={isNext ? "default" : "outline"}>
-                            <Link href={step.href}>
-                              {step.action}
+                          (step.id === "profile" || step.id === "networking-form") ? (
+                            <Button 
+                              size="sm" 
+                              variant={isNext ? "default" : "outline"}
+                              onClick={handleOpenOnboarding}
+                            >
+                              {step.id === "profile" ? "Complete Profile" : "Fill Form"}
                               <ArrowRight className="h-4 w-4 ml-2" />
-                            </Link>
-                          </Button>
+                            </Button>
+                          ) : (
+                            <Button asChild size="sm" variant={isNext ? "default" : "outline"}>
+                              <Link href={step.href}>
+                                {step.action}
+                                <ArrowRight className="h-4 w-4 ml-2" />
+                              </Link>
+                            </Button>
+                          )
                         )}
 
                         {step.completed && (

@@ -83,6 +83,7 @@ export function PostMeetingForm() {
   });
 
   const [rawNotes, setRawNotes] = useState("");
+  const [isEnhancingNotes, setIsEnhancingNotes] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<{
     summary?: string;
     topics?: string[];
@@ -137,6 +138,32 @@ export function PostMeetingForm() {
       });
       setIsEnhancing(false);
     }, 2000);
+  };
+
+  const enhanceAdditionalNotes = async () => {
+    if (!formData.additionalNotes.trim()) return;
+    
+    setIsEnhancingNotes(true);
+    
+    // Simulate AI processing to format notes
+    setTimeout(() => {
+      const rawText = formData.additionalNotes;
+      
+      // Format the notes with bullet points and structure
+      const lines = rawText.split(/[.\n]+/).filter(line => line.trim());
+      const formattedNotes = lines.length > 1 
+        ? lines.map(line => `• ${line.trim()}`).join('\n')
+        : `• ${rawText.trim()}`;
+      
+      // Add a header if it looks like observations
+      const enhancedNotes = `Key Observations:\n${formattedNotes}\n\nNext Steps:\n• Review notes and follow up as needed\n• Update CRM with meeting outcomes`;
+      
+      setFormData({
+        ...formData,
+        additionalNotes: enhancedNotes,
+      });
+      setIsEnhancingNotes(false);
+    }, 1500);
   };
 
   const addReferral = (type: "affiliate" | "svp") => {
@@ -492,7 +519,7 @@ export function PostMeetingForm() {
             <Card key={referral.id} className="border-2">
               <CardContent className="pt-6 space-y-4">
                 <div className="flex items-start justify-between">
-                  <Badge className={referral.type === "svp" ? "bg-green-600" : "bg-blue-600"}>
+                  <Badge className={referral.type === "svp" ? "bg-green-600 text-white" : "bg-blue-600 text-white"}>
                     {referral.type === "svp" ? (
                       <>
                         <Target className="h-3 w-3 mr-1" />
@@ -643,7 +670,28 @@ export function PostMeetingForm() {
       {/* Additional Notes */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Additional Notes</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">Additional Notes</CardTitle>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={enhanceAdditionalNotes}
+              disabled={isEnhancingNotes || !formData.additionalNotes.trim()}
+              className="text-purple-600 border-purple-300 hover:bg-purple-50"
+            >
+              {isEnhancingNotes ? (
+                <>
+                  <Wand2 className="h-4 w-4 mr-2 animate-spin" />
+                  Formatting...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Enhance with AI
+                </>
+              )}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <Textarea

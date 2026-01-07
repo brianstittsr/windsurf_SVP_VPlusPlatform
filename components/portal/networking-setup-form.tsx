@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +30,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useUserProfile } from "@/contexts/user-profile-context";
 
 interface NetworkingFormData {
   businessType: string;
@@ -53,26 +54,57 @@ interface NetworkingFormData {
 
 export function NetworkingSetupForm() {
   const router = useRouter();
+  const { profile, updateProfile, saveProfile } = useUserProfile();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSaving, setIsSaving] = useState(false);
+  
+  // Initialize form data from profile's networkingProfile
+  const networkingProfile = profile.networkingProfile as any;
   const [formData, setFormData] = useState<NetworkingFormData>({
-    businessType: "",
-    industry: [],
-    targetCustomers: "",
-    servicesOffered: "",
-    geographicFocus: [],
-    networkingGoals: [],
-    idealReferralPartner: "",
-    meetingFrequency: "",
+    businessType: networkingProfile?.businessType || "",
+    industry: networkingProfile?.industry || [],
+    targetCustomers: networkingProfile?.targetCustomers || "",
+    servicesOffered: networkingProfile?.servicesOffered || "",
+    geographicFocus: networkingProfile?.geographicFocus || [],
+    networkingGoals: networkingProfile?.networkingGoals || [],
+    idealReferralPartner: networkingProfile?.idealReferralPartner || "",
+    meetingFrequency: networkingProfile?.meetingFrequency || "",
     availability: {
-      days: [],
-      timePreference: "",
+      days: networkingProfile?.availableDays || [],
+      timePreference: networkingProfile?.timePreference || "",
     },
-    communicationPreference: "",
-    expertise: [],
-    lookingFor: [],
-    canProvide: [],
-    additionalNotes: "",
+    communicationPreference: networkingProfile?.communicationPreference || "",
+    expertise: networkingProfile?.expertise || [],
+    lookingFor: networkingProfile?.lookingFor || [],
+    canProvide: networkingProfile?.canProvide || [],
+    additionalNotes: networkingProfile?.additionalNotes || "",
   });
+
+  // Update form data when profile changes
+  useEffect(() => {
+    const np = profile.networkingProfile as any;
+    if (np) {
+      setFormData({
+        businessType: np.businessType || "",
+        industry: np.industry || [],
+        targetCustomers: np.targetCustomers || "",
+        servicesOffered: np.servicesOffered || "",
+        geographicFocus: np.geographicFocus || [],
+        networkingGoals: np.networkingGoals || [],
+        idealReferralPartner: np.idealReferralPartner || "",
+        meetingFrequency: np.meetingFrequency || "",
+        availability: {
+          days: np.availableDays || [],
+          timePreference: np.timePreference || "",
+        },
+        communicationPreference: np.communicationPreference || "",
+        expertise: np.expertise || [],
+        lookingFor: np.lookingFor || [],
+        canProvide: np.canProvide || [],
+        additionalNotes: np.additionalNotes || "",
+      });
+    }
+  }, [profile.networkingProfile]);
 
   const totalSteps = 4;
 
@@ -126,9 +158,40 @@ export function NetworkingSetupForm() {
     }
   };
 
-  const handleSubmit = () => {
-    console.log("Form submitted:", formData);
-    router.push("/portal/networking");
+  const handleSubmit = async () => {
+    setIsSaving(true);
+    try {
+      // Save networking profile data to user profile context
+      updateProfile({
+        networkingProfile: {
+          ...profile.networkingProfile,
+          businessType: formData.businessType,
+          industry: formData.industry,
+          targetCustomers: formData.targetCustomers,
+          servicesOffered: formData.servicesOffered,
+          geographicFocus: formData.geographicFocus,
+          networkingGoals: formData.networkingGoals,
+          idealReferralPartner: formData.idealReferralPartner,
+          meetingFrequency: formData.meetingFrequency,
+          availableDays: formData.availability.days,
+          timePreference: formData.availability.timePreference,
+          communicationPreference: formData.communicationPreference,
+          expertise: formData.expertise,
+          lookingFor: formData.lookingFor,
+          canProvide: formData.canProvide,
+          additionalNotes: formData.additionalNotes,
+        },
+      });
+      
+      // Save to Firestore
+      await saveProfile();
+      console.log("Networking profile saved successfully");
+      router.push("/portal/networking");
+    } catch (error) {
+      console.error("Error saving networking profile:", error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const toggleArrayItem = (array: string[], item: string) => {

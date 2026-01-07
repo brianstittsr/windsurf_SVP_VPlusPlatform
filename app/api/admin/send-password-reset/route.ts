@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
+import { adminAuth } from "@/lib/firebase-admin";
 import { COLLECTIONS } from "@/lib/schema";
-import { collection, query, where, getDocs, addDoc, Timestamp } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { Resend } from "resend";
 
 // Professional password reset email template
 function generatePasswordResetEmail(
@@ -163,15 +165,20 @@ This is an automated message. For support, contact us at support@strategicvaluep
   return { subject, html, text };
 }
 
-// Generate a secure reset token
+// Generate a secure reset token using Web Crypto API (Edge Runtime compatible)
 function generateResetToken(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let token = '';
+  const randomValues = new Uint32Array(64);
+  crypto.getRandomValues(randomValues);
   for (let i = 0; i < 64; i++) {
-    token += chars.charAt(Math.floor(Math.random() * chars.length));
+    token += chars.charAt(randomValues[i] % chars.length);
   }
   return token;
 }
+
+// Initialize Resend client
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 export async function POST(request: NextRequest) {
   try {
@@ -181,75 +188,110 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
-    if (!db) {
-      return NextResponse.json({ error: "Database not initialized" }, { status: 500 });
+    if (!adminAuth) {
+      return NextResponse.json({ error: "Firebase Admin not initialized" }, { status: 500 });
     }
 
-    // Find the team member by email
-    const teamMembersRef = collection(db, COLLECTIONS.TEAM_MEMBERS);
-    const q = query(teamMembersRef, where("emailPrimary", "==", email));
-    const snapshot = await getDocs(q);
-
+    // Find the team member by email to get their name
     let firstName = "User";
     let memberId = null;
 
-    if (!snapshot.empty) {
-      const memberData = snapshot.docs[0].data();
-      firstName = memberData.firstName || "User";
-      memberId = snapshot.docs[0].id;
-    } else {
-      // Try secondary email
-      const q2 = query(teamMembersRef, where("emailSecondary", "==", email));
-      const snapshot2 = await getDocs(q2);
-      if (!snapshot2.empty) {
-        const memberData = snapshot2.docs[0].data();
-        firstName = memberData.firstName || "User";
-        memberId = snapshot2.docs[0].id;
+    if (db) {
+      try {
+        const teamMembersRef = collection(db, COLLECTIONS.TEAM_MEMBERS);
+        const q1 = query(teamMembersRef, where("emailPrimary", "==", email));
+        const snapshot1 = await getDocs(q1);
+        
+        if (!snapshot1.empty) {
+          const memberData = snapshot1.docs[0].data();
+          firstName = memberData.firstName || "User";
+          memberId = snapshot1.docs[0].id;
+        } else {
+          // Try email field
+          const q2 = query(teamMembersRef, where("email", "==", email));
+          const snapshot2 = await getDocs(q2);
+          
+          if (!snapshot2.empty) {
+            const memberData = snapshot2.docs[0].data();
+            firstName = memberData.firstName || "User";
+            memberId = snapshot2.docs[0].id;
+          }
+        }
+      } catch (queryError: any) {
+        console.error("Error querying team members:", queryError);
       }
     }
 
-    // Generate reset token and expiration
-    const resetToken = generateResetToken();
-    const expirationHours = 24;
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + expirationHours);
+    // Generate password reset link using Firebase Admin SDK
+    // The link will use Firebase's default action URL, but we send it in our branded email
+    // Users can also be directed to our custom /auth/action page
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const actionCodeSettings = {
+      // This URL is where users go AFTER completing the reset on Firebase's page
+      // To use fully custom page, configure Action URL in Firebase Console → Authentication → Templates
+      url: `${baseUrl}/sign-in?resetComplete=true`,
+      handleCodeInApp: false,
+    };
 
-    // Store the reset token in Firestore
-    const resetTokensRef = collection(db, "passwordResetTokens");
-    await addDoc(resetTokensRef, {
-      email,
-      token: resetToken,
-      memberId,
-      createdAt: Timestamp.now(),
-      expiresAt: Timestamp.fromDate(expiresAt),
-      used: false,
-      adminInitiated,
-    });
+    let resetLink: string;
+    try {
+      resetLink = await adminAuth.generatePasswordResetLink(email, actionCodeSettings);
+    } catch (authError: any) {
+      if (authError.code === "auth/user-not-found") {
+        // For security, don't reveal if user exists or not
+        return NextResponse.json({
+          success: true,
+          message: "If an account exists with this email, a password reset link has been sent.",
+        });
+      }
+      throw authError;
+    }
 
-    // Generate the reset link
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://app.strategicvalueplus.com";
-    const resetLink = `${baseUrl}/reset-password?token=${resetToken}`;
-
-    // Generate the email content
-    const emailContent = generatePasswordResetEmail(firstName, resetLink, expirationHours);
-
-    // Return the email content for sending via your email service
-    // In production, you would integrate with SendGrid, AWS SES, or similar
-    return NextResponse.json({
-      success: true,
-      message: `Password reset email prepared for ${email}`,
-      emailContent: {
+    // Send branded email using Resend
+    if (resend) {
+      const emailContent = generatePasswordResetEmail(firstName, resetLink, 24);
+      
+      const { data, error } = await resend.emails.send({
+        from: process.env.RESEND_FROM_EMAIL || "Strategic Value+ <noreply@strategicvalueplus.com>",
         to: email,
         subject: emailContent.subject,
         html: emailContent.html,
         text: emailContent.text,
-      },
-      resetToken, // Only return in development for testing
-      expiresAt: expiresAt.toISOString(),
+      });
+
+      if (error) {
+        console.error("Resend error:", error);
+        throw new Error(`Failed to send email: ${error.message}`);
+      }
+
+      console.log(`Branded password reset email sent to ${email} (${firstName}, ID: ${memberId || 'unknown'}), Resend ID: ${data?.id}`);
+    } else {
+      // Fallback: Log the reset link (for development/testing)
+      console.warn("Resend not configured. Password reset link:", resetLink);
+      console.log(`Password reset requested for ${email} (${firstName}, ID: ${memberId || 'unknown'})`);
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: `Password reset email sent to ${email}`,
+      note: resend ? "Branded email sent via Resend" : "Email service not configured - check server logs for reset link",
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Password reset error:", error);
-    return NextResponse.json({ error: "Failed to process password reset" }, { status: 500 });
+    
+    if (error?.code === "auth/invalid-email") {
+      return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
+    }
+    
+    if (error?.code === "auth/too-many-requests") {
+      return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+    }
+
+    return NextResponse.json({ 
+      error: "Failed to send password reset email",
+      details: error?.message || "Unknown error",
+      code: error?.code || "UNKNOWN"
+    }, { status: 500 });
   }
 }

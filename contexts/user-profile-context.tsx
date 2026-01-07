@@ -2,9 +2,12 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
 import { getTeamMemberByAuthUid, findAndLinkTeamMember, updateTeamMemberProfile } from "@/lib/auth-team-member-link";
 import type { TeamMemberDoc } from "@/lib/schema";
+import { ENHANCED_COLLECTIONS, type NetworkingProfileDoc } from "@/lib/schema-extensions";
+import { doc, setDoc, getDoc, Timestamp, addDoc, collection } from "firebase/firestore";
+import { COLLECTIONS } from "@/lib/schema";
 
 // User profile fields
 export interface UserProfile {
@@ -37,6 +40,20 @@ export interface UserProfile {
     targetClientProfile: string;
     problemsYouSolve: string;
     successStory: string;
+    // Business information fields (from Networking Profile Setup)
+    businessType: string;
+    industry: string[];
+    targetCustomers: string;
+    servicesOffered: string;
+    geographicFocus: string[];
+    networkingGoals: string[];
+    meetingFrequency: string;
+    availableDays: string[];
+    timePreference: string;
+    communicationPreference: string;
+    lookingFor: string[];
+    canProvide: string[];
+    additionalNotes: string;
   };
   
   // Profile completion tracking
@@ -72,6 +89,20 @@ const defaultProfile: UserProfile = {
     targetClientProfile: "",
     problemsYouSolve: "",
     successStory: "",
+    // Business information fields
+    businessType: "",
+    industry: [],
+    targetCustomers: "",
+    servicesOffered: "",
+    geographicFocus: [],
+    networkingGoals: [],
+    meetingFrequency: "",
+    availableDays: [],
+    timePreference: "",
+    communicationPreference: "",
+    lookingFor: [],
+    canProvide: [],
+    additionalNotes: "",
   },
   profileCompletedAt: null,
   createdAt: new Date().toISOString(),
@@ -160,7 +191,112 @@ function mapProfileToTeamMember(profile: UserProfile): Partial<TeamMemberDoc> {
     location: profile.location,
     bio: profile.bio,
     avatar: profile.avatarUrl,
+    // Include expertise as comma-separated string for TeamMemberDoc
+    expertise: profile.networkingProfile?.expertise?.join(", ") || "",
   };
+}
+
+// Save networking profile to the networkingProfiles collection
+async function saveNetworkingProfile(
+  affiliateId: string,
+  networkingProfile: UserProfile["networkingProfile"]
+): Promise<boolean> {
+  if (!db) {
+    console.error("Firebase not initialized");
+    return false;
+  }
+
+  try {
+    const profileRef = doc(db, ENHANCED_COLLECTIONS.NETWORKING_PROFILES, affiliateId);
+    const existingDoc = await getDoc(profileRef);
+    
+    // Save all networking profile fields including business information
+    const profileData: Record<string, any> = {
+      affiliateId,
+      expertise: networkingProfile.expertise || [],
+      categories: networkingProfile.categories || [],
+      idealReferralPartner: networkingProfile.idealReferralPartner || "",
+      topReferralSources: networkingProfile.topReferralSources || "",
+      goalsThisQuarter: networkingProfile.goalsThisQuarter || "",
+      uniqueValueProposition: networkingProfile.uniqueValueProposition || "",
+      targetClientProfile: networkingProfile.targetClientProfile || "",
+      problemsYouSolve: networkingProfile.problemsYouSolve || "",
+      successStory: networkingProfile.successStory || "",
+      // Business information fields
+      businessType: networkingProfile.businessType || "",
+      industry: networkingProfile.industry || [],
+      targetCustomers: networkingProfile.targetCustomers || "",
+      servicesOffered: networkingProfile.servicesOffered || "",
+      geographicFocus: networkingProfile.geographicFocus || [],
+      networkingGoals: networkingProfile.networkingGoals || [],
+      meetingFrequency: networkingProfile.meetingFrequency || "",
+      availableDays: networkingProfile.availableDays || [],
+      timePreference: networkingProfile.timePreference || "",
+      communicationPreference: networkingProfile.communicationPreference || "",
+      lookingFor: networkingProfile.lookingFor || [],
+      canProvide: networkingProfile.canProvide || [],
+      additionalNotes: networkingProfile.additionalNotes || "",
+      updatedAt: Timestamp.now(),
+    };
+
+    if (existingDoc.exists()) {
+      // Update existing document
+      await setDoc(profileRef, profileData, { merge: true });
+    } else {
+      // Create new document
+      await setDoc(profileRef, {
+        ...profileData,
+        id: affiliateId,
+        isComplete: false,
+        createdAt: Timestamp.now(),
+      });
+    }
+    
+    console.log("Networking profile saved for affiliate:", affiliateId);
+    return true;
+  } catch (error) {
+    console.error("Error saving networking profile:", error);
+    return false;
+  }
+}
+
+// Create a new team member record for a new user
+async function createTeamMember(
+  profile: UserProfile,
+  firebaseUid: string
+): Promise<TeamMemberDoc | null> {
+  if (!db) {
+    console.error("Firebase not initialized");
+    return null;
+  }
+
+  try {
+    const teamMemberData = {
+      firebaseUid,
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      emailPrimary: profile.email,
+      mobile: profile.phone || "",
+      company: profile.company || "",
+      title: profile.jobTitle || "",
+      location: profile.location || "",
+      bio: profile.bio || "",
+      avatar: profile.avatarUrl || "",
+      expertise: profile.networkingProfile?.expertise?.join(", ") || "",
+      role: profile.isAffiliate ? "affiliate" as const : "team" as const,
+      status: "active" as const,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    };
+
+    const docRef = await addDoc(collection(db, COLLECTIONS.TEAM_MEMBERS), teamMemberData);
+    console.log("Created new team member:", docRef.id);
+    
+    return { id: docRef.id, ...teamMemberData } as TeamMemberDoc;
+  } catch (error) {
+    console.error("Error creating team member:", error);
+    return null;
+  }
 }
 
 // Context type
@@ -234,9 +370,51 @@ export function UserProfileProvider({ children }: { children: ReactNode }) {
             
             // Map Team Member data to profile
             const mappedProfile = mapTeamMemberToProfile(teamMember);
+            
+            // Also fetch networking profile from separate collection
+            let networkingProfileData = defaultProfile.networkingProfile;
+            if (db) {
+              try {
+                const networkingProfileRef = doc(db, ENHANCED_COLLECTIONS.NETWORKING_PROFILES, teamMember.id);
+                const networkingDoc = await getDoc(networkingProfileRef);
+                if (networkingDoc.exists()) {
+                  const npData = networkingDoc.data() as any;
+                  networkingProfileData = {
+                    expertise: npData.expertise || [],
+                    categories: npData.categories || [],
+                    idealReferralPartner: npData.idealReferralPartner || "",
+                    topReferralSources: npData.topReferralSources || "",
+                    goalsThisQuarter: npData.networkingGoals?.[0] || npData.goalsThisQuarter || "",
+                    uniqueValueProposition: npData.canProvide?.[0] || npData.uniqueValueProposition || "",
+                    targetClientProfile: npData.lookingFor?.[0] || npData.targetClientProfile || "",
+                    problemsYouSolve: npData.problemsYouSolve || "",
+                    successStory: npData.successStory || "",
+                    // Business information fields
+                    businessType: npData.businessType || "",
+                    industry: npData.industry || [],
+                    targetCustomers: npData.targetCustomers || "",
+                    servicesOffered: npData.servicesOffered || "",
+                    geographicFocus: npData.geographicFocus || [],
+                    networkingGoals: npData.networkingGoals || [],
+                    meetingFrequency: npData.meetingFrequency || "",
+                    availableDays: npData.availableDays || [],
+                    timePreference: npData.timePreference || "",
+                    communicationPreference: npData.communicationPreference || "",
+                    lookingFor: npData.lookingFor || [],
+                    canProvide: npData.canProvide || [],
+                    additionalNotes: npData.additionalNotes || "",
+                  };
+                  console.log("Loaded networking profile for:", teamMember.id);
+                }
+              } catch (npError) {
+                console.error("Error fetching networking profile:", npError);
+              }
+            }
+            
             setProfile((prev) => ({
               ...prev,
               ...mappedProfile,
+              networkingProfile: networkingProfileData,
               updatedAt: new Date().toISOString(),
             }));
           } else {
@@ -297,18 +475,30 @@ export function UserProfileProvider({ children }: { children: ReactNode }) {
       return;
     }
     
-    // Only show profile wizard if profile is incomplete
+    // For AFFILIATES: Use the Affiliate Onboarding Wizard which includes ALL profile and networking fields
+    // Skip the separate profile wizard entirely for affiliates
+    if (profile.isAffiliate) {
+      // If affiliate onboarding is not complete, show the affiliate onboarding wizard
+      if (!profile.affiliateOnboardingComplete) {
+        setShowProfileWizard(false); // Never show profile wizard for affiliates
+        setShowNetworkingWizard(false); // Never show networking wizard for affiliates
+        setShowAffiliateOnboarding(true);
+      } else {
+        // Affiliate onboarding is complete - don't show any wizards
+        setShowProfileWizard(false);
+        setShowNetworkingWizard(false);
+        setShowAffiliateOnboarding(false);
+      }
+      return;
+    }
+    
+    // For NON-AFFILIATES: Use the standard profile wizard
     if (!isComplete) {
       setShowProfileWizard(true);
       setShowNetworkingWizard(false);
-    } else if (profile.isAffiliate && networkingCompletion < 100) {
-      // Profile is complete, show networking wizard for affiliates with incomplete networking profile
-      setShowProfileWizard(false);
-      setShowNetworkingWizard(true);
-    } else if (needsOnboarding) {
-      setShowAffiliateOnboarding(true);
+      setShowAffiliateOnboarding(false);
     }
-  }, [isLoading, isAuthenticated, isComplete, needsOnboarding, profile.isAffiliate, networkingCompletion]);
+  }, [isLoading, isAuthenticated, isComplete, profile.isAffiliate, profile.affiliateOnboardingComplete]);
 
   const updateProfile = (updates: Partial<UserProfile>) => {
     setProfile((prev) => ({
@@ -319,22 +509,47 @@ export function UserProfileProvider({ children }: { children: ReactNode }) {
   };
 
   const saveProfile = async (): Promise<{ success: boolean; error?: string }> => {
-    if (!linkedTeamMember) {
-      return { success: false, error: "No linked team member found. Cannot save profile." };
-    }
-
     setIsSaving(true);
+    
     try {
+      let teamMemberId = linkedTeamMember?.id;
+      let currentTeamMember = linkedTeamMember;
+      
+      // If no linked team member, create one
+      if (!currentTeamMember && profile.id) {
+        console.log("No linked team member, creating new one...");
+        const newTeamMember = await createTeamMember(profile, profile.id);
+        if (newTeamMember) {
+          currentTeamMember = newTeamMember;
+          teamMemberId = newTeamMember.id;
+          setLinkedTeamMember(newTeamMember);
+        } else {
+          return { success: false, error: "Failed to create team member profile." };
+        }
+      }
+      
+      if (!teamMemberId) {
+        return { success: false, error: "No team member ID available. Please sign in again." };
+      }
+
+      // Update team member basic profile
       const teamMemberUpdates = mapProfileToTeamMember(profile);
-      const updatedTeamMember = await updateTeamMemberProfile(linkedTeamMember.id, teamMemberUpdates);
+      const updatedTeamMember = await updateTeamMemberProfile(teamMemberId, teamMemberUpdates);
       
       if (updatedTeamMember) {
         setLinkedTeamMember(updatedTeamMember);
         console.log("Profile saved successfully to Team Member:", updatedTeamMember.id);
-        return { success: true };
-      } else {
-        return { success: false, error: "Failed to update team member profile." };
       }
+      
+      // Save networking profile to separate collection (for affiliates)
+      if (profile.isAffiliate && profile.networkingProfile) {
+        const networkingSaved = await saveNetworkingProfile(teamMemberId, profile.networkingProfile);
+        if (!networkingSaved) {
+          console.warn("Failed to save networking profile, but team member was updated");
+        }
+      }
+      
+      return { success: true };
     } catch (error) {
       console.error("Error saving profile:", error);
       return { success: false, error: "An error occurred while saving the profile." };

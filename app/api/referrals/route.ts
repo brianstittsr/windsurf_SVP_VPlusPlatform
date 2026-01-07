@@ -108,6 +108,8 @@ export async function POST(request: NextRequest) {
       whyGoodFit,
       isSvpReferral,
       svpServiceInterest,
+      commissionTier,
+      dealValue,
     } = body;
 
     if (!referrerId || !recipientId || !prospectName || !description) {
@@ -135,6 +137,8 @@ export async function POST(request: NextRequest) {
       whyGoodFit: whyGoodFit || null,
       isSvpReferral: isSvpReferral || false,
       svpServiceInterest: svpServiceInterest || null,
+      commissionTier: commissionTier || null,
+      dealValue: dealValue || null,
       status: "submitted",
       contactAttempts: 0,
       createdAt: Timestamp.now(),
