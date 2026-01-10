@@ -538,6 +538,284 @@ export interface RockMilestoneDoc extends Omit<RockMilestone, "completedDate"> {
 }
 
 // ============================================================================
+// Customers
+// ============================================================================
+
+/** Customer Contact embedded document */
+export interface CustomerContact {
+  id: string;
+  name: string;
+  role: string;
+  email?: string;
+  phone?: string;
+  isPrimary: boolean;
+}
+
+/** Customer document in Firestore */
+export interface CustomerDoc {
+  id: string;
+  
+  // Company Information
+  name: string;                   // Company name
+  industry: string;
+  size: "1-10" | "10-25" | "25-100" | "100-250" | "250-500" | "500-1000" | "1000+";
+  
+  // Location
+  address?: string;
+  city: string;
+  state: string;
+  zipCode?: string;
+  country?: string;
+  
+  // Contact Information
+  website?: string;
+  phone?: string;
+  email?: string;
+  
+  // Contacts (embedded array)
+  contacts: CustomerContact[];
+  
+  // Status
+  status: "prospect" | "active" | "inactive" | "completed";
+  
+  // Engagement
+  projectCount: number;           // Number of active/completed projects
+  totalRevenue?: number;          // Total revenue from this customer
+  
+  // Notes
+  notes?: string;
+  tags?: string[];
+  
+  // Source tracking
+  source?: "referral" | "website" | "cold-outreach" | "event" | "partner" | "other";
+  referredById?: string;          // If source is referral, who referred them
+  
+  // Activity tracking
+  lastActivityDate?: Timestamp;
+  lastActivityType?: string;
+  
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+// ============================================================================
+// Fathom Integration
+// ============================================================================
+
+/** Fathom Action Item from meeting */
+export interface FathomActionItem {
+  id: string;
+  text: string;
+  assigneeId?: string;           // Linked team member ID
+  assigneeName?: string;         // Name from Fathom
+  status: "pending" | "in_progress" | "completed" | "cancelled";
+  dueDate?: Timestamp;
+  completedAt?: Timestamp;
+  createdFromTranscript: boolean;
+}
+
+/** Fathom Transcript Entry */
+export interface FathomTranscriptEntry {
+  speaker: string;
+  text: string;
+  startTime: number;             // Seconds from start
+  endTime: number;
+}
+
+/** Fathom Meeting document in Firestore */
+export interface FathomMeetingDoc {
+  id: string;
+  fathomMeetingId: string;       // ID from Fathom
+  
+  // Meeting Info
+  title: string;
+  meetingDate: Timestamp;
+  duration: number;              // Duration in seconds
+  recordingUrl?: string;
+  
+  // Participants
+  participants: string[];
+  hostEmail?: string;
+  
+  // Content from Fathom
+  summary?: string;
+  transcript?: FathomTranscriptEntry[];
+  transcriptText?: string;       // Full text for search
+  
+  // Action Items (from Fathom + AI extracted)
+  actionItems: FathomActionItem[];
+  
+  // CRM Matches from Fathom
+  crmMatches?: Array<{
+    type: string;
+    name: string;
+    email?: string;
+    company?: string;
+  }>;
+  
+  // Linking to SVP entities
+  linkedCustomerId?: string;
+  linkedProjectId?: string;
+  linkedOpportunityId?: string;
+  linkedTeamMemberIds?: string[];
+  
+  // Processing status
+  processingStatus: "pending" | "processed" | "failed";
+  aiTasksExtracted: boolean;
+  
+  // Metadata
+  source: "webhook" | "manual" | "api";
+  webhookReceivedAt?: Timestamp;
+  
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+/** Fathom Webhook Configuration */
+export interface FathomWebhookDoc {
+  id: string;
+  fathomWebhookId: string;       // ID from Fathom
+  destinationUrl: string;
+  secret: string;                // For signature verification
+  
+  // Configuration
+  triggeredFor: Array<"my_recordings" | "shared_external_recordings" | "my_shared_with_team_recordings" | "shared_team_recordings">;
+  includeTranscript: boolean;
+  includeSummary: boolean;
+  includeActionItems: boolean;
+  includeCrmMatches: boolean;
+  
+  // Status
+  isActive: boolean;
+  lastTriggeredAt?: Timestamp;
+  totalMeetingsReceived: number;
+  
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+/** Fathom Integration Settings */
+export interface FathomSettingsDoc {
+  id: string;
+  
+  // API Configuration
+  apiKey?: string;               // Encrypted
+  isConnected: boolean;
+  
+  // Default Settings
+  autoExtractTasks: boolean;     // Use AI to extract additional tasks
+  autoAssignTasks: boolean;      // Try to match tasks to team members
+  defaultTaskDueDays: number;    // Days from meeting for task due date
+  
+  // Notification Settings
+  notifyOnNewMeeting: boolean;
+  notifyOnTaskCreated: boolean;
+  notificationEmails: string[];
+  
+  // Linking Preferences
+  autoLinkToCustomers: boolean;
+  autoLinkToProjects: boolean;
+  
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+// ============================================================================
+// Backup & Restore
+// ============================================================================
+
+/** Storage location for a backup */
+export interface BackupStorageLocation {
+  provider: "firebase" | "google_drive" | "local";
+  path: string;
+  fileId?: string;           // Google Drive file ID
+  url?: string;              // Download URL
+  uploadedAt: Timestamp;
+}
+
+/** Backup metadata document in Firestore */
+export interface BackupMetadataDoc {
+  id: string;
+  
+  // Backup info
+  type: "full" | "incremental" | "collections";
+  status: "pending" | "in_progress" | "success" | "failed" | "partial";
+  
+  // Timing
+  createdAt: Timestamp;
+  completedAt?: Timestamp;
+  duration: number;          // milliseconds
+  
+  // Content
+  collections: string[];
+  documentCounts: Record<string, number>;
+  size: number;              // bytes
+  compressedSize: number;    // bytes after compression
+  
+  // Storage
+  storageLocations: BackupStorageLocation[];
+  
+  // Options
+  compression: "gzip" | "none";
+  encryptionEnabled: boolean;
+  
+  // Trigger
+  triggeredBy: "manual" | "scheduled";
+  triggeredByUserId?: string;
+  
+  // Error tracking
+  error?: string;
+  warnings?: string[];
+}
+
+/** Backup settings document in Firestore */
+export interface BackupSettingsDoc {
+  id: string;
+  
+  // Schedule
+  autoBackupEnabled: boolean;
+  backupFrequency: "daily" | "weekly" | "monthly";
+  backupTime: string;        // HH:mm format
+  backupDay?: number;        // Day of week (0-6) or month (1-31)
+  
+  // Retention
+  retentionDays: number;
+  maxBackups: number;
+  
+  // Default options
+  defaultCompression: "gzip" | "none";
+  defaultEncryption: boolean;
+  
+  // Storage providers
+  enableFirebaseStorage: boolean;
+  enableGoogleDrive: boolean;
+  googleDriveFolderId?: string;
+  
+  // Collections to backup
+  collectionsToBackup: string[];
+  
+  // Notifications
+  notifyOnSuccess: boolean;
+  notifyOnFailure: boolean;
+  notificationEmails: string[];
+  
+  updatedAt: Timestamp;
+}
+
+/** Google Drive OAuth tokens document in Firestore */
+export interface GoogleDriveTokensDoc {
+  id: string;
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: number;         // Unix timestamp
+  scope: string;
+  tokenType: string;
+  connectedEmail?: string;
+  connectedAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+// ============================================================================
 // Strategic Partners
 // ============================================================================
 
@@ -1487,6 +1765,8 @@ export const COLLECTIONS = {
   REFERRALS: "referrals",
   AFFILIATE_STATS: "affiliateStats",
   AI_MATCH_SUGGESTIONS: "aiMatchSuggestions",
+  // Customers
+  CUSTOMERS: "customers",
   // Strategic Partners
   STRATEGIC_PARTNERS: "strategicPartners",
   // Team Members
@@ -1539,6 +1819,14 @@ export const COLLECTIONS = {
   // NDA Management
   NDA_TEMPLATES: "ndaTemplates",
   NDA_DOCUMENTS: "ndaDocuments",
+  // Fathom Integration
+  FATHOM_MEETINGS: "fathomMeetings",
+  FATHOM_WEBHOOKS: "fathomWebhooks",
+  FATHOM_SETTINGS: "fathomSettings",
+  // Backup & Restore
+  BACKUP_METADATA: "backupMetadata",
+  BACKUP_SETTINGS: "backupSettings",
+  GOOGLE_DRIVE_TOKENS: "googleDriveTokens",
 } as const;
 
 // ============================================================================

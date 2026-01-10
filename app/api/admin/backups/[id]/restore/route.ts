@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
-import { collection, getDocs, doc, getDoc, setDoc, writeBatch, Timestamp } from "firebase/firestore";
+import { doc, getDoc, writeBatch, Timestamp } from "firebase/firestore";
+import { COLLECTIONS } from "@/lib/schema";
+import {
+  createDriveClient,
+  downloadBackupFromGoogleDrive,
+  refreshAccessToken,
+} from "@/lib/google-drive";
 
 export async function POST(
   request: NextRequest,
@@ -13,10 +19,10 @@ export async function POST(
 
     const { id: backupId } = await params;
     const body = await request.json();
-    const { collections, overwrite = false, dryRun = false } = body;
+    const { collections, overwrite = false, dryRun = false, source = "firebase" } = body;
 
     // Get backup metadata
-    const metadataRef = doc(db, "backupMetadata", backupId);
+    const metadataRef = doc(db, COLLECTIONS.BACKUP_METADATA, backupId);
     const metadataSnap = await getDoc(metadataRef);
 
     if (!metadataSnap.exists()) {
@@ -24,15 +30,59 @@ export async function POST(
     }
 
     const metadata = metadataSnap.data();
-    
-    // Check if backup has inline data (demo mode)
-    if (!metadata.backupData) {
+    let backupDataString: string | null = null;
+
+    // Try to get backup data from the specified source
+    if (source === "google_drive") {
+      // Find Google Drive storage location
+      const gdLocation = metadata.storageLocations?.find(
+        (loc: { provider: string }) => loc.provider === "google_drive"
+      );
+      
+      if (!gdLocation?.fileId) {
+        return NextResponse.json({ 
+          error: "Backup not found in Google Drive" 
+        }, { status: 400 });
+      }
+
+      // Get Google Drive tokens
+      const tokensRef = doc(db, COLLECTIONS.GOOGLE_DRIVE_TOKENS, "default");
+      const tokensDoc = await getDoc(tokensRef);
+      
+      if (!tokensDoc.exists()) {
+        return NextResponse.json({ 
+          error: "Google Drive not connected" 
+        }, { status: 400 });
+      }
+
+      const tokens = tokensDoc.data();
+      let accessToken = tokens.accessToken;
+      
+      // Refresh token if needed
+      if (tokens.expiresAt < Date.now()) {
+        const refreshed = await refreshAccessToken(tokens.refreshToken);
+        accessToken = refreshed.accessToken;
+      }
+
+      const drive = createDriveClient(accessToken, tokens.refreshToken);
+      backupDataString = await downloadBackupFromGoogleDrive(drive, gdLocation.fileId);
+    } else {
+      // Use inline backup data (Firebase storage)
+      if (!metadata.backupData) {
+        return NextResponse.json({ 
+          error: "Backup data not available in Firebase storage" 
+        }, { status: 400 });
+      }
+      backupDataString = metadata.backupData;
+    }
+
+    if (!backupDataString) {
       return NextResponse.json({ 
-        error: "Backup data not available. Storage provider restore not yet implemented." 
+        error: "Could not retrieve backup data" 
       }, { status: 400 });
     }
 
-    const backupData = JSON.parse(metadata.backupData);
+    const backupData = JSON.parse(backupDataString);
     const collectionsToRestore = collections || Object.keys(backupData.data);
     const restoredCounts: Record<string, number> = {};
     const errors: string[] = [];

@@ -79,6 +79,7 @@ import {
   UserCheck,
   Megaphone,
   Database,
+  Video,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -257,6 +258,12 @@ const adminItems = [
     title: "Backups",
     href: "/portal/admin/backups",
     icon: Database,
+  },
+  {
+    title: "Fathom Meetings",
+    href: "/portal/admin/fathom",
+    icon: Video,
+    badge: "NEW",
   },
 ];
 
