@@ -6,6 +6,7 @@ import { ProfileCompletionWizard } from "@/components/portal/profile-completion-
 import { AffiliateOnboardingWizard } from "@/components/portal/affiliate-onboarding-wizard";
 import { NetworkingWizard } from "@/components/portal/networking-wizard";
 import { MeetingRecommendations } from "@/components/portal/meeting-recommendations";
+import { AuthGuard } from "@/components/portal/auth-guard";
 
 export default function PortalLayout({
   children,
@@ -14,17 +15,19 @@ export default function PortalLayout({
 }) {
   return (
     <UserProfileProvider>
-      <SidebarProvider>
-        <PortalSidebar />
-        <SidebarInset>
-          <PortalHeader />
-          <main className="flex-1 p-4 md:p-6">{children}</main>
-        </SidebarInset>
-      </SidebarProvider>
-      <ProfileCompletionWizard />
-      <NetworkingWizard />
-      <MeetingRecommendations />
-      <AffiliateOnboardingWizard />
+      <AuthGuard>
+        <SidebarProvider>
+          <PortalSidebar />
+          <SidebarInset>
+            <PortalHeader />
+            <main className="flex-1 p-4 md:p-6">{children}</main>
+          </SidebarInset>
+        </SidebarProvider>
+        <ProfileCompletionWizard />
+        <NetworkingWizard />
+        <MeetingRecommendations />
+        <AffiliateOnboardingWizard />
+      </AuthGuard>
     </UserProfileProvider>
   );
 }
