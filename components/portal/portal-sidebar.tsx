@@ -80,6 +80,7 @@ import {
   Megaphone,
   Database,
   Video,
+  Flame,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -90,13 +91,40 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { GraduationCap, Paintbrush, BookOpen, Network, Briefcase, Ticket } from "lucide-react";
 
-const mainNavItems = [
+// ============================================================================
+// SECTION DEFINITIONS
+// ============================================================================
+export const SECTIONS = {
+  systemManagement: { label: "System Management" },
+  projectManagement: { label: "Project Management" },
+  data: { label: "Data" },
+  people: { label: "People" },
+  productivity: { label: "Productivity" },
+  affiliateCenter: { label: "Affiliate Center" },
+  content: { label: "Content" },
+  admin: { label: "Admin" },
+  initiatives: { label: "Initiatives" },
+  intelligence: { label: "Intelligence" },
+  other: { label: "Other" },
+} as const;
+
+// ============================================================================
+// SYSTEM MANAGEMENT
+// ============================================================================
+const systemManagementItems = [
   {
-    title: "Command Center",
-    href: "/portal/command-center",
-    icon: LayoutDashboard,
+    title: "Bug Tracker",
+    href: "/portal/bug-tracker",
+    icon: Bug,
   },
+];
+
+// ============================================================================
+// PROJECT MANAGEMENT
+// ============================================================================
+const projectManagementItems = [
   {
     title: "Opportunities",
     href: "/portal/opportunities",
@@ -110,18 +138,54 @@ const mainNavItems = [
     badge: "3",
   },
   {
-    title: "Affiliates",
-    href: "/portal/affiliates",
+    title: "Calendar",
+    href: "/portal/calendar",
+    icon: Calendar,
+  },
+  {
+    title: "Meetings",
+    href: "/portal/meetings",
     icon: Users,
   },
   {
-    title: "Customers",
-    href: "/portal/customers",
-    icon: Building,
+    title: "Availability",
+    href: "/portal/availability",
+    icon: CalendarDays,
+  },
+  {
+    title: "Proposal Creator",
+    href: "/portal/proposals",
+    icon: FileText,
+    badge: "AI",
+  },
+  {
+    title: "AI Workforce",
+    href: "/portal/ai-workforce",
+    icon: Bot,
+    badge: "AI",
+  },
+  {
+    title: "Events",
+    href: "/portal/admin/events",
+    icon: Ticket,
+  },
+  {
+    title: "EOS2 Dashboard",
+    href: "/portal/eos2",
+    icon: Target,
+    badge: "EOS",
+  },
+  {
+    title: "Rocks",
+    href: "/portal/rocks",
+    icon: CheckSquare,
   },
 ];
 
-const workItems = [
+// ============================================================================
+// DATA
+// ============================================================================
+const dataItems = [
   {
     title: "Apollo Search",
     href: "/portal/apollo-search",
@@ -134,31 +198,38 @@ const workItems = [
     icon: Factory,
     badge: "AI",
   },
+];
+
+// ============================================================================
+// PEOPLE
+// ============================================================================
+const peopleItems = [
   {
-    title: "Documents",
-    href: "/portal/documents",
-    icon: FileText,
+    title: "Team Members",
+    href: "/portal/admin/team-members",
+    icon: UserCog,
   },
   {
-    title: "Calendar",
-    href: "/portal/calendar",
-    icon: Calendar,
-  },
-  {
-    title: "Availability",
-    href: "/portal/availability",
-    icon: CalendarDays,
-  },
-  {
-    title: "Meetings",
-    href: "/portal/meetings",
+    title: "Affiliates",
+    href: "/portal/affiliates",
     icon: Users,
   },
   {
-    title: "Rocks",
-    href: "/portal/rocks",
-    icon: CheckSquare,
+    title: "Customers",
+    href: "/portal/customers",
+    icon: Building,
   },
+  {
+    title: "Member Directory",
+    href: "/portal/member-directory",
+    icon: Users,
+  },
+];
+
+// ============================================================================
+// PRODUCTIVITY
+// ============================================================================
+const productivityItems = [
   {
     title: "Networking",
     href: "/portal/networking",
@@ -169,30 +240,50 @@ const workItems = [
     href: "/portal/deals",
     icon: DollarSign,
   },
+];
+
+// ============================================================================
+// AFFILIATE CENTER
+// ============================================================================
+const affiliateCenterItems = [
+  {
+    title: "Affiliates",
+    href: "/portal/affiliates",
+    icon: Users,
+  },
+  {
+    title: "Networking",
+    href: "/portal/networking",
+    icon: Network,
+  },
+  {
+    title: "Deals",
+    href: "/portal/deals",
+    icon: Briefcase,
+  },
+];
+
+// ============================================================================
+// CONTENT
+// ============================================================================
+const contentItems = [
+  {
+    title: "Documents",
+    href: "/portal/documents",
+    icon: FileText,
+  },
   {
     title: "LinkedIn Content",
     href: "/portal/linkedin-content",
     icon: Linkedin,
     badge: "AI",
   },
-  {
-    title: "EOS2 Dashboard",
-    href: "/portal/eos2",
-    icon: Target,
-    badge: "EOS",
-  },
-  {
-    title: "AI Workforce",
-    href: "/portal/ai-workforce",
-    icon: Bot,
-    badge: "AI",
-  },
-  {
-    title: "Proposal Creator",
-    href: "/portal/proposals",
-    icon: FileText,
-    badge: "AI",
-  },
+];
+
+// ============================================================================
+// ADMIN
+// ============================================================================
+const adminItems = [
   {
     title: "GoHighLevel",
     href: "/portal/gohighlevel",
@@ -200,9 +291,74 @@ const workItems = [
     badge: "CRM",
   },
   {
-    title: "Bug Tracker",
-    href: "/portal/bug-tracker",
-    icon: Bug,
+    title: "Page Designer",
+    href: "/portal/admin/page-designer",
+    icon: Paintbrush,
+  },
+  {
+    title: "Academy Admin",
+    href: "/portal/admin/academy",
+    icon: GraduationCap,
+  },
+  {
+    title: "Backup & Restore",
+    href: "/portal/admin/backups",
+    icon: Database,
+  },
+  {
+    title: "Fathom Meetings",
+    href: "/portal/admin/fathom",
+    icon: Video,
+    badge: "NEW",
+  },
+  {
+    title: "Fireflies.ai",
+    href: "/portal/admin/fireflies",
+    icon: Flame,
+    badge: "NEW",
+  },
+];
+
+// ============================================================================
+// INITIATIVES
+// ============================================================================
+const initiativeItems = [
+  {
+    title: "Initiatives",
+    href: "/portal/admin/initiatives",
+    icon: Rocket,
+  },
+  {
+    title: "TBMNC Suppliers",
+    href: "/portal/admin/initiatives/tbmnc",
+    icon: Battery,
+  },
+];
+
+// ============================================================================
+// INTELLIGENCE (AI)
+// ============================================================================
+const intelligenceItems = [
+  {
+    title: "Ask IntellEDGE",
+    href: "/portal/ask",
+    icon: Sparkles,
+  },
+];
+
+// ============================================================================
+// OTHER (Uncategorized - For Future Organization)
+// ============================================================================
+const otherItems = [
+  {
+    title: "Command Center",
+    href: "/portal/command-center",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "DocuSeal",
+    href: "/portal/docuseal",
+    icon: FileSignature,
   },
   {
     title: "SVP Tools",
@@ -210,18 +366,10 @@ const workItems = [
     icon: Sparkles,
     badge: "AI",
   },
-];
-
-const adminItems = [
   {
     title: "Book Call Leads",
     href: "/portal/admin/book-call-leads",
     icon: Phone,
-  },
-  {
-    title: "Team Members",
-    href: "/portal/admin/team-members",
-    icon: UserCog,
   },
   {
     title: "Strategic Partners",
@@ -239,9 +387,14 @@ const adminItems = [
     icon: MessageSquare,
   },
   {
-    title: "Events",
-    href: "/portal/admin/events",
-    icon: CalendarClock,
+    title: "Growth IQ Quiz",
+    href: "/portal/admin/quiz",
+    icon: Battery,
+  },
+  {
+    title: "Image Manager",
+    href: "/portal/admin/images",
+    icon: ImageIcon,
   },
   {
     title: "Marketing Hub",
@@ -249,61 +402,29 @@ const adminItems = [
     icon: Megaphone,
     badge: "NEW",
   },
-  {
-    title: "Member Directory",
-    href: "/portal/member-directory",
-    icon: Users,
-  },
-  {
-    title: "Backups",
-    href: "/portal/admin/backups",
-    icon: Database,
-  },
-  {
-    title: "Fathom Meetings",
-    href: "/portal/admin/fathom",
-    icon: Video,
-    badge: "NEW",
-  },
-];
-
-const initiativeItems = [
-  {
-    title: "Initiatives",
-    href: "/portal/admin/initiatives",
-    icon: Rocket,
-  },
-  {
-    title: "TBMNC Suppliers",
-    href: "/portal/admin/initiatives/tbmnc",
-    icon: Battery,
-  },
-];
-
-const aiItems = [
-  {
-    title: "Ask IntellEDGE",
-    href: "/portal/ask",
-    icon: Sparkles,
-  },
 ];
 
 // All available roles for the role switcher
 const AVAILABLE_ROLES = [
+  { value: "superadmin", label: "Super Admin" },
   { value: "admin", label: "Admin" },
-  { value: "team_member", label: "Team Member" },
+  { value: "team", label: "Team Member" },
   { value: "affiliate", label: "Affiliate" },
-  { value: "client", label: "Client" },
-  { value: "viewer", label: "Viewer" },
+  { value: "consultant", label: "Consultant" },
 ];
 
 // Export all nav items for use in settings
 export const ALL_NAV_ITEMS = [
-  ...mainNavItems.map(item => ({ ...item, section: "Navigation" })),
-  ...workItems.map(item => ({ ...item, section: "Work" })),
-  ...aiItems.map(item => ({ ...item, section: "Intelligence" })),
+  ...systemManagementItems.map(item => ({ ...item, section: "System Management" })),
+  ...projectManagementItems.map(item => ({ ...item, section: "Project Management" })),
+  ...dataItems.map(item => ({ ...item, section: "Data" })),
+  ...peopleItems.map(item => ({ ...item, section: "People" })),
+  ...productivityItems.map(item => ({ ...item, section: "Productivity" })),
+  ...contentItems.map(item => ({ ...item, section: "Content" })),
   ...adminItems.map(item => ({ ...item, section: "Admin" })),
   ...initiativeItems.map(item => ({ ...item, section: "Initiatives" })),
+  ...intelligenceItems.map(item => ({ ...item, section: "Intelligence" })),
+  ...otherItems.map(item => ({ ...item, section: "Other" })),
 ];
 
 export function PortalSidebar() {
@@ -379,9 +500,17 @@ export function PortalSidebar() {
     return () => unsubscribe();
   }, []);
   
+  // Define nav item type
+  type NavItem = {
+    title: string;
+    href: string;
+    icon: React.ElementType;
+    badge?: string;
+  };
+
   // Filter nav items based on role-based visibility
-  const filterNavItems = (items: typeof mainNavItems) => {
-    return items.filter(item => {
+  const filterNavItems = (items: NavItem[]) => {
+    return items.filter((item: NavItem) => {
       // If admin is not previewing, show all items
       if (isAdmin && !previewRole) return true;
       
@@ -404,11 +533,16 @@ export function PortalSidebar() {
   
   // Collapsible state for each section
   const [openSections, setOpenSections] = useState({
-    navigation: true,
-    work: true,
-    intelligence: true,
+    systemManagement: false,
+    projectManagement: true,
+    data: true,
+    people: true,
+    productivity: true,
+    content: true,
     admin: false,
     initiatives: false,
+    intelligence: true,
+    other: false,
   });
 
   const toggleSection = (section: keyof typeof openSections) => {
@@ -434,228 +568,79 @@ export function PortalSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Main Navigation */}
-        <Collapsible open={openSections.navigation} onOpenChange={() => toggleSection("navigation")}>
-          <SidebarGroup>
-            <CollapsibleTrigger asChild>
-              <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50 rounded-md flex items-center justify-between pr-2">
-                <span>Navigation</span>
-                {openSections.navigation ? (
-                  <ChevronDown className="h-4 w-4 text-sidebar-foreground/60" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-sidebar-foreground/60" />
-                )}
-              </SidebarGroupLabel>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {filterNavItems(mainNavItems).map((item) => {
-                    const hidden = isItemHidden(item.href);
-                    return (
-                      <SidebarMenuItem key={item.href} className={cn(hidden && isAdmin && !previewRole && "opacity-50")}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={pathname === item.href}
-                          tooltip={item.title}
-                        >
-                          <Link href={item.href}>
-                            <item.icon className="h-4 w-4" />
-                            <span>{item.title}</span>
-                            {hidden && isAdmin && !previewRole && (
-                              <EyeOff className="h-3 w-3 ml-auto text-muted-foreground" />
+        {/* Reusable Section Renderer */}
+        {([
+          { key: "projectManagement", label: "Project Management", items: projectManagementItems },
+          { key: "data", label: "Data", items: dataItems },
+          { key: "people", label: "People", items: peopleItems },
+          { key: "productivity", label: "Productivity", items: productivityItems },
+          { key: "content", label: "Content", items: contentItems },
+          { key: "intelligence", label: "Intelligence", items: intelligenceItems },
+          { key: "admin", label: "Admin", items: adminItems },
+          { key: "initiatives", label: "Initiatives", items: initiativeItems },
+          { key: "systemManagement", label: "System Management", items: systemManagementItems },
+          { key: "other", label: "Other", items: otherItems },
+        ] as const).map(({ key, label, items }) => {
+          const filteredItems = filterNavItems(items as NavItem[]);
+          if (filteredItems.length === 0) return null;
+          
+          return (
+            <Collapsible 
+              key={key} 
+              open={openSections[key]} 
+              onOpenChange={() => toggleSection(key)}
+            >
+              <SidebarGroup>
+                <CollapsibleTrigger asChild>
+                  <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50 rounded-md flex items-center justify-between pr-2">
+                    <span>{label}</span>
+                    {openSections[key] ? (
+                      <ChevronDown className="h-4 w-4 text-sidebar-foreground/60" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4 text-sidebar-foreground/60" />
+                    )}
+                  </SidebarGroupLabel>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {filteredItems.map((item) => {
+                        const hidden = isItemHidden(item.href);
+                        const isBookCallLeads = item.href === "/portal/admin/book-call-leads";
+                        return (
+                          <SidebarMenuItem key={item.href} className={cn(hidden && isAdmin && !previewRole && "opacity-50")}>
+                            <SidebarMenuButton
+                              asChild
+                              isActive={pathname === item.href || pathname.startsWith(item.href + "/")}
+                              tooltip={item.title}
+                            >
+                              <Link href={item.href}>
+                                <item.icon className="h-4 w-4" />
+                                <span>{item.title}</span>
+                                {hidden && isAdmin && !previewRole && (
+                                  <EyeOff className="h-3 w-3 ml-auto text-muted-foreground" />
+                                )}
+                              </Link>
+                            </SidebarMenuButton>
+                            {/* Show dynamic count badge for Book Call Leads */}
+                            {isBookCallLeads && bookCallLeadsCount > 0 && !hidden && (
+                              <SidebarMenuBadge className="bg-red-500 text-white">
+                                {bookCallLeadsCount}
+                              </SidebarMenuBadge>
                             )}
-                          </Link>
-                        </SidebarMenuButton>
-                        {item.badge && !hidden && (
-                          <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
-                        )}
-                      </SidebarMenuItem>
-                    );
-                  })}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </CollapsibleContent>
-          </SidebarGroup>
-        </Collapsible>
-
-        {/* Work Items */}
-        <Collapsible open={openSections.work} onOpenChange={() => toggleSection("work")}>
-          <SidebarGroup>
-            <CollapsibleTrigger asChild>
-              <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50 rounded-md flex items-center justify-between pr-2">
-                <span>Work</span>
-                {openSections.work ? (
-                  <ChevronDown className="h-4 w-4 text-sidebar-foreground/60" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-sidebar-foreground/60" />
-                )}
-              </SidebarGroupLabel>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {filterNavItems(workItems).map((item) => {
-                    const hidden = isItemHidden(item.href);
-                    return (
-                      <SidebarMenuItem key={item.href} className={cn(hidden && isAdmin && !previewRole && "opacity-50")}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={pathname === item.href}
-                          tooltip={item.title}
-                        >
-                          <Link href={item.href}>
-                            <item.icon className="h-4 w-4" />
-                            <span>{item.title}</span>
-                            {hidden && isAdmin && !previewRole && (
-                              <EyeOff className="h-3 w-3 ml-auto text-muted-foreground" />
+                            {item.badge && !hidden && !isBookCallLeads && (
+                              <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
                             )}
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    );
-                  })}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </CollapsibleContent>
-          </SidebarGroup>
-        </Collapsible>
-
-        {/* AI */}
-        <Collapsible open={openSections.intelligence} onOpenChange={() => toggleSection("intelligence")}>
-          <SidebarGroup>
-            <CollapsibleTrigger asChild>
-              <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50 rounded-md flex items-center justify-between pr-2">
-                <span>Intelligence</span>
-                {openSections.intelligence ? (
-                  <ChevronDown className="h-4 w-4 text-sidebar-foreground/60" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-sidebar-foreground/60" />
-                )}
-              </SidebarGroupLabel>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {filterNavItems(aiItems).map((item) => {
-                    const hidden = isItemHidden(item.href);
-                    return (
-                      <SidebarMenuItem key={item.href} className={cn(hidden && isAdmin && !previewRole && "opacity-50")}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={pathname === item.href}
-                          tooltip={item.title}
-                        >
-                          <Link href={item.href}>
-                            <item.icon className="h-4 w-4" />
-                            <span>{item.title}</span>
-                            {hidden && isAdmin && !previewRole && (
-                              <EyeOff className="h-3 w-3 ml-auto text-muted-foreground" />
-                            )}
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    );
-                  })}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </CollapsibleContent>
-          </SidebarGroup>
-        </Collapsible>
-
-        {/* Admin */}
-        <Collapsible open={openSections.admin} onOpenChange={() => toggleSection("admin")}>
-          <SidebarGroup>
-            <CollapsibleTrigger asChild>
-              <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50 rounded-md flex items-center justify-between pr-2">
-                <span>Admin</span>
-                {openSections.admin ? (
-                  <ChevronDown className="h-4 w-4 text-sidebar-foreground/60" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-sidebar-foreground/60" />
-                )}
-              </SidebarGroupLabel>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {filterNavItems(adminItems).map((item) => {
-                    const hidden = isItemHidden(item.href);
-                    const isBookCallLeads = item.href === "/portal/admin/book-call-leads";
-                    return (
-                      <SidebarMenuItem key={item.href} className={cn(hidden && isAdmin && !previewRole && "opacity-50")}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={pathname === item.href || pathname.startsWith(item.href)}
-                          tooltip={item.title}
-                        >
-                          <Link href={item.href}>
-                            <item.icon className="h-4 w-4" />
-                            <span>{item.title}</span>
-                            {hidden && isAdmin && !previewRole && (
-                              <EyeOff className="h-3 w-3 ml-auto text-muted-foreground" />
-                            )}
-                          </Link>
-                        </SidebarMenuButton>
-                        {/* Show dynamic count badge for Book Call Leads */}
-                        {isBookCallLeads && bookCallLeadsCount > 0 && !hidden && (
-                          <SidebarMenuBadge className="bg-red-500 text-white">
-                            {bookCallLeadsCount}
-                          </SidebarMenuBadge>
-                        )}
-                        {item.badge && !hidden && !isBookCallLeads && (
-                          <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
-                        )}
-                      </SidebarMenuItem>
-                    );
-                  })}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </CollapsibleContent>
-          </SidebarGroup>
-        </Collapsible>
-
-        {/* Initiatives */}
-        <Collapsible open={openSections.initiatives} onOpenChange={() => toggleSection("initiatives")}>
-          <SidebarGroup>
-            <CollapsibleTrigger asChild>
-              <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50 rounded-md flex items-center justify-between pr-2">
-                <span>Initiatives</span>
-                {openSections.initiatives ? (
-                  <ChevronDown className="h-4 w-4 text-sidebar-foreground/60" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-sidebar-foreground/60" />
-                )}
-              </SidebarGroupLabel>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {filterNavItems(initiativeItems).map((item) => {
-                    const hidden = isItemHidden(item.href);
-                    return (
-                      <SidebarMenuItem key={item.href} className={cn(hidden && isAdmin && !previewRole && "opacity-50")}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={pathname === item.href || pathname.startsWith(item.href + "/")}
-                          tooltip={item.title}
-                        >
-                          <Link href={item.href}>
-                            <item.icon className="h-4 w-4" />
-                            <span>{item.title}</span>
-                            {hidden && isAdmin && !previewRole && (
-                              <EyeOff className="h-3 w-3 ml-auto text-muted-foreground" />
-                            )}
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    );
-                  })}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </CollapsibleContent>
-          </SidebarGroup>
-        </Collapsible>
+                          </SidebarMenuItem>
+                        );
+                      })}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </CollapsibleContent>
+              </SidebarGroup>
+            </Collapsible>
+          );
+        })}
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border">

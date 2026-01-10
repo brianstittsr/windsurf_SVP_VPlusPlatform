@@ -721,6 +721,154 @@ export interface FathomSettingsDoc {
 }
 
 // ============================================================================
+// Fireflies.ai Integration
+// ============================================================================
+
+/** Fireflies Action Item from meeting */
+export interface FirefliesActionItem {
+  id: string;
+  text: string;
+  assigneeId?: string;
+  assigneeName?: string;
+  status: "pending" | "in_progress" | "completed" | "cancelled";
+  dueDate?: Timestamp;
+  completedAt?: Timestamp;
+  createdFromTranscript: boolean;
+}
+
+/** Fireflies Transcript Sentence */
+export interface FirefliesSentence {
+  index: number;
+  speakerName: string;
+  speakerId?: string;
+  text: string;
+  rawText?: string;
+  startTime: number;           // Milliseconds
+  endTime: number;
+  sentiment?: string;
+  isTask?: boolean;
+  isQuestion?: boolean;
+}
+
+/** Fireflies Speaker Analytics */
+export interface FirefliesSpeakerAnalytics {
+  speakerId: string;
+  name: string;
+  duration: number;
+  wordCount: number;
+  wordsPerMinute: number;
+  questionsAsked: number;
+  fillerWords: number;
+  durationPercent: number;
+}
+
+/** Fireflies Meeting document in Firestore */
+export interface FirefliesMeetingDoc {
+  id: string;
+  firefliesMeetingId: string;  // ID from Fireflies
+  
+  // Meeting Info
+  title: string;
+  meetingDate: Timestamp;
+  duration: number;            // Duration in seconds
+  transcriptUrl?: string;
+  audioUrl?: string;
+  videoUrl?: string;
+  meetingLink?: string;
+  
+  // Participants
+  participants: string[];
+  hostEmail?: string;
+  organizerEmail?: string;
+  meetingAttendees?: Array<{
+    name: string;
+    email?: string;
+    displayName?: string;
+  }>;
+  
+  // Speakers
+  speakers?: Array<{
+    id: string;
+    name: string;
+  }>;
+  
+  // Content from Fireflies
+  summary?: {
+    keywords?: string[];
+    actionItems?: string[];
+    outline?: string;
+    overview?: string;
+    shortSummary?: string;
+    meetingType?: string;
+    topicsDiscussed?: string[];
+  };
+  sentences?: FirefliesSentence[];
+  transcriptText?: string;     // Full text for search
+  
+  // Analytics
+  analytics?: {
+    sentiments?: {
+      positivePct: number;
+      neutralPct: number;
+      negativePct: number;
+    };
+    speakers?: FirefliesSpeakerAnalytics[];
+    taskCount?: number;
+    questionCount?: number;
+  };
+  
+  // Action Items (from Fireflies + AI extracted)
+  actionItems: FirefliesActionItem[];
+  
+  // Linking to SVP entities
+  linkedCustomerId?: string;
+  linkedProjectId?: string;
+  linkedOpportunityId?: string;
+  linkedTeamMemberIds?: string[];
+  
+  // Processing status
+  processingStatus: "pending" | "processed" | "failed";
+  aiTasksExtracted: boolean;
+  
+  // Metadata
+  source: "webhook" | "manual" | "api";
+  webhookReceivedAt?: Timestamp;
+  
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+/** Fireflies Integration Settings */
+export interface FirefliesSettingsDoc {
+  id: string;
+  
+  // API Configuration
+  apiKey?: string;             // Bearer token for GraphQL API
+  isConnected: boolean;
+  
+  // Webhook Configuration
+  webhookUrl?: string;
+  webhookSecret?: string;
+  
+  // Default Settings
+  autoExtractTasks: boolean;
+  autoAssignTasks: boolean;
+  defaultTaskDueDays: number;
+  
+  // Notification Settings
+  notifyOnNewMeeting: boolean;
+  notifyOnTaskCreated: boolean;
+  notificationEmails: string[];
+  
+  // Linking Preferences
+  autoLinkToCustomers: boolean;
+  autoLinkToProjects: boolean;
+  
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+// ============================================================================
 // Backup & Restore
 // ============================================================================
 
@@ -1823,6 +1971,9 @@ export const COLLECTIONS = {
   FATHOM_MEETINGS: "fathomMeetings",
   FATHOM_WEBHOOKS: "fathomWebhooks",
   FATHOM_SETTINGS: "fathomSettings",
+  // Fireflies.ai Integration
+  FIREFLIES_MEETINGS: "firefliesMeetings",
+  FIREFLIES_SETTINGS: "firefliesSettings",
   // Backup & Restore
   BACKUP_METADATA: "backupMetadata",
   BACKUP_SETTINGS: "backupSettings",
