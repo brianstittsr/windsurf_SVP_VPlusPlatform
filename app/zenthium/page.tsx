@@ -84,8 +84,17 @@ export default function ZenthiumPage() {
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-black text-white min-h-[600px] flex items-center">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1a1a2e_1px,transparent_1px),linear-gradient(to_bottom,#1a1a2e_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="https://images.pexels.com/photos/325229/pexels-photo-325229.jpeg?auto=compress&cs=tinysrgb&w=1920"
+            alt="Modern data center server room with rows of server racks"
+            fill
+            className="object-cover opacity-60"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
+        </div>
         
         <div className="relative z-10 py-20 md:py-32 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
@@ -112,7 +121,7 @@ export default function ZenthiumPage() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="text-lg px-8 border-white/20 hover:bg-white/10 text-white" asChild>
+              <Button size="lg" variant="outline" className="text-lg px-8 bg-black/40 border-white/40 hover:bg-black/60 hover:border-white/60 text-white backdrop-blur-sm" asChild>
                 <Link href="#how-it-works">
                   Learn How It Works
                 </Link>
