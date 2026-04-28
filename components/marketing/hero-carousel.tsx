@@ -215,7 +215,7 @@ export function HeroCarousel({ slides = defaultSlides, autoPlayInterval = 6000 }
                 </Link>
               </Button>
               {currentSlide.secondaryCta.text && (
-                <Button size="lg" variant="outline" className="text-lg px-8 border-white/20 hover:bg-white/10 text-white" asChild>
+                <Button size="lg" variant="outline" className="text-lg px-8 bg-black/40 border-white/40 hover:bg-black/60 hover:border-white/60 text-white backdrop-blur-sm" asChild>
                   <Link href={currentSlide.secondaryCta.href}>
                     {currentSlide.secondaryCta.text}
                   </Link>
