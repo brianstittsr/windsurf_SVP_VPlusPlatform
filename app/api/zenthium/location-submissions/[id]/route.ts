@@ -5,11 +5,13 @@ import { Timestamp } from "firebase-admin/firestore";
 import { z } from "zod";
 
 const patchSchema = z.object({
+  title: z.string().optional(),
   submitterName: z.string().optional(),
   submitterEmail: z.string().email().optional(),
   submitterPhone: z.string().optional(),
   submitterCompany: z.string().optional(),
   propertyName: z.string().optional(),
+  parcelNumber: z.string().optional(),
   propertyType: z.enum(["vacant_land", "warehouse", "industrial", "office", "data_center", "power_plant", "other"]).optional(),
   propertyTypeOther: z.string().optional(),
   address: z.string().optional(),
@@ -69,6 +71,7 @@ export async function GET(
 
     const flattened = {
       id: doc.id,
+      title: raw.title ?? `${raw.propertyName ?? "Property"} — ${address.city ?? "Unknown Location"}`,
       // Submitter info (from POC in new format)
       submitterName: poc.name ?? "",
       submitterEmail: poc.email ?? "",
@@ -85,6 +88,7 @@ export async function GET(
       zip: address.zip ?? "",
       country: address.country ?? "US",
       coordinates: raw.coordinates ?? "",
+      parcelNumber: raw.parcelNumber ?? "",
       // Size
       squareFootage: raw.squareFootage ?? undefined,
       acreage: raw.acreage ?? undefined,

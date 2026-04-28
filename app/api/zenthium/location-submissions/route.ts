@@ -53,6 +53,7 @@ function flattenSubmission(doc: any, id: string) {
 
   return {
     id,
+    title: raw.title ?? `${raw.propertyName ?? "Property"} — ${address.city ?? "Unknown Location"}`,
     // Submitter info (from POC)
     submitterName: poc.name ?? "",
     submitterEmail: poc.email ?? "",
