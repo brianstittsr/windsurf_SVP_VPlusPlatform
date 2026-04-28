@@ -1536,6 +1536,12 @@ export const COLLECTIONS = {
   // NDA Management
   NDA_TEMPLATES: "ndaTemplates",
   NDA_DOCUMENTS: "ndaDocuments",
+  // Zenthium Data Center Referrals
+  ZENTHIUM_LOCATION_SUBMISSIONS: "zenthiumLocationSubmissions",
+  ZENTHIUM_REFERRALS: "zenthiumReferrals",
+  ZENTHIUM_MEETINGS: "zenthiumMeetings",
+  ZENTHIUM_DIRECT_CONTACTS: "zenthiumDirectContacts",
+  ZENTHIUM_STATUS_HISTORY: "zenthiumStatusHistory",
 } as const;
 
 // ============================================================================
