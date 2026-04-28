@@ -34,6 +34,7 @@ import {
   Trash2,
   Edit,
   Calendar,
+  FileText,
 } from "lucide-react";
 import {
   Dialog,
@@ -146,8 +147,16 @@ export default function SubmissionDetailPage({ params }: PageProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [letterheadDialogOpen, setLetterheadDialogOpen] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [id, setId] = useState<string>("");
+  const [letterheadData, setLetterheadData] = useState({
+    recipientEmail: "",
+    recipientName: "",
+    recipientCompany: "",
+    message: "",
+  });
+  const [isGeneratingLetterhead, setIsGeneratingLetterhead] = useState(false);
 
   useEffect(() => {
     params.then(({ id }) => {
@@ -239,6 +248,57 @@ export default function SubmissionDetailPage({ params }: PageProps) {
     }
   };
 
+  const handleGenerateLetterhead = async () => {
+    if (!id || !letterheadData.recipientEmail) {
+      toast.error("Recipient email is required");
+      return;
+    }
+
+    setIsGeneratingLetterhead(true);
+
+    try {
+      const res = await fetch("/api/zenthium/generate-letterhead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          submissionId: id,
+          recipientEmail: letterheadData.recipientEmail,
+          recipientName: letterheadData.recipientName,
+          recipientCompany: letterheadData.recipientCompany,
+          message: letterheadData.message,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to generate letterhead");
+
+      const data = await res.json();
+      
+      // Download the PDF
+      const link = document.createElement("a");
+      link.href = `data:application/pdf;base64,${data.pdfBase64}`;
+      link.download = data.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success("Letterhead generated and downloaded");
+      setLetterheadDialogOpen(false);
+      
+      // Reset form
+      setLetterheadData({
+        recipientEmail: "",
+        recipientName: "",
+        recipientCompany: "",
+        message: "",
+      });
+    } catch (error) {
+      console.error("Letterhead generation error:", error);
+      toast.error("Failed to generate letterhead");
+    } finally {
+      setIsGeneratingLetterhead(false);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     if (!dateString) return "—";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -283,6 +343,14 @@ export default function SubmissionDetailPage({ params }: PageProps) {
                 Unsaved Changes
               </Badge>
             )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setLetterheadDialogOpen(true)}
+            >
+              <FileText className="h-4 w-4 mr-1" />
+              Generate Letterhead
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -854,6 +922,81 @@ export default function SubmissionDetailPage({ params }: PageProps) {
                 <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Deleting...</>
               ) : (
                 "Delete"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Letterhead Generation Dialog */}
+      <Dialog open={letterheadDialogOpen} onOpenChange={setLetterheadDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Generate Letterhead PDF</DialogTitle>
+            <DialogDescription>
+              Create a professional letterhead PDF to send to data center partners. 
+              The PDF will include response links for the recipient to indicate interest.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="recipientEmail">
+                Recipient Email <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="recipientEmail"
+                type="email"
+                placeholder="partner@datacenter.com"
+                value={letterheadData.recipientEmail}
+                onChange={(e) => setLetterheadData({ ...letterheadData, recipientEmail: e.target.value })}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="recipientName">Recipient Name</Label>
+              <Input
+                id="recipientName"
+                placeholder="John Smith"
+                value={letterheadData.recipientName}
+                onChange={(e) => setLetterheadData({ ...letterheadData, recipientName: e.target.value })}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="recipientCompany">Company</Label>
+              <Input
+                id="recipientCompany"
+                placeholder="Data Center Partners LLC"
+                value={letterheadData.recipientCompany}
+                onChange={(e) => setLetterheadData({ ...letterheadData, recipientCompany: e.target.value })}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="message">Custom Message (Optional)</Label>
+              <Textarea
+                id="message"
+                placeholder="Add a personalized message to include in the letterhead..."
+                value={letterheadData.message}
+                onChange={(e) => setLetterheadData({ ...letterheadData, message: e.target.value })}
+                rows={3}
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setLetterheadDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleGenerateLetterhead}
+              disabled={isGeneratingLetterhead || !letterheadData.recipientEmail}
+            >
+              {isGeneratingLetterhead ? (
+                <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Generating...</>
+              ) : (
+                <><FileText className="h-4 w-4 mr-1" /> Generate PDF</>
               )}
             </Button>
           </DialogFooter>
