@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +25,8 @@ export interface HeroSlide {
   };
   isPublished: boolean;
   order: number;
+  image?: string;
+  imageAlt?: string;
 }
 
 // Default slides - in production these would come from a database
@@ -39,6 +42,8 @@ const defaultSlides: HeroSlide[] = [
     secondaryCta: { text: "See Success Stories", href: "/case-studies" },
     isPublished: true,
     order: 1,
+    image: "/images/hero-manufacturing.jpg",
+    imageAlt: "Modern manufacturing facility with advanced robotics and automation",
   },
   {
     id: "2",
@@ -51,6 +56,8 @@ const defaultSlides: HeroSlide[] = [
     secondaryCta: { text: "Watch Demo", href: "/demo" },
     isPublished: true,
     order: 2,
+    image: "/images/hero-digital-twin.jpg",
+    imageAlt: "Digital twin visualization of factory operations with real-time data overlay",
   },
   {
     id: "3",
@@ -63,6 +70,8 @@ const defaultSlides: HeroSlide[] = [
     secondaryCta: { text: "Learn More", href: "/about" },
     isPublished: true,
     order: 3,
+    image: "/images/hero-ai-analytics.jpg",
+    imageAlt: "AI-powered manufacturing analytics dashboard with predictive insights",
   },
   {
     id: "4",
@@ -75,6 +84,8 @@ const defaultSlides: HeroSlide[] = [
     secondaryCta: { text: "View Case Studies", href: "/case-studies" },
     isPublished: true,
     order: 4,
+    image: "/images/hero-reshoring.jpg",
+    imageAlt: "American manufacturing facility representing the reshoring movement",
   },
   {
     id: "5",
@@ -87,6 +98,8 @@ const defaultSlides: HeroSlide[] = [
     secondaryCta: { text: "Learn More", href: "/antifragile" },
     isPublished: true,
     order: 5,
+    image: "/images/hero-supply-chain.jpg",
+    imageAlt: "Resilient supply chain network visualization with redundancy mapping",
   },
 ];
 
@@ -129,11 +142,27 @@ export function HeroCarousel({ slides = defaultSlides, autoPlayInterval = 6000 }
   const currentSlide = publishedSlides[currentIndex];
 
   return (
-    <section className="relative overflow-hidden bg-black text-white">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1a1a1a_1px,transparent_1px),linear-gradient(to_bottom,#1a1a1a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
+    <section className="relative overflow-hidden bg-black text-white min-h-[700px] md:min-h-[800px] flex items-center">
+      {/* Background Image */}
+      {currentSlide.image && (
+        <div className="absolute inset-0 z-0">
+          <Image
+            src={currentSlide.image}
+            alt={currentSlide.imageAlt || "Hero background"}
+            fill
+            className="object-cover opacity-40"
+            priority={currentIndex === 0}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+        </div>
+      )}
       
-      <div className="relative py-20 md:py-32 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+      {/* Background Pattern (fallback) */}
+      {!currentSlide.image && (
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1a1a1a_1px,transparent_1px),linear-gradient(to_bottom,#1a1a1a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
+      )}
+      
+      <div className="relative z-10 py-20 md:py-32 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           {/* Slide Content with Fade Animation */}
           <div key={currentSlide.id} className="animate-in fade-in duration-500">
