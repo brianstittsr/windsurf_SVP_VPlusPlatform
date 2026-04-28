@@ -101,6 +101,20 @@ const defaultSlides: HeroSlide[] = [
     image: "/images/hero-supply-chain.svg",
     imageAlt: "Supply chain network visualization"
   },
+  {
+    id: "6",
+    badge: "Zenthium — Data Center Partnership",
+    headline: "Submit Your Location.",
+    highlightedText: "Power the Future",
+    subheadline: "Have land or a building suitable for data center development? We evaluate properties for hyperscale data center opportunities with leading technology partners.",
+    benefits: ["Land Evaluation", "Power Assessment", "Fast Track to Market"],
+    primaryCta: { text: "Submit Your Location", href: "/zenthium/submit" },
+    secondaryCta: { text: "Learn More", href: "/zenthium" },
+    isPublished: true,
+    order: 6,
+    image: "/images/hero-datacenter.svg",
+    imageAlt: "Modern data center facility with servers and infrastructure"
+  },
 ];
 
 interface HeroCarouselProps {
@@ -150,10 +164,10 @@ export function HeroCarousel({ slides = defaultSlides, autoPlayInterval = 6000 }
             src={currentSlide.image}
             alt={currentSlide.imageAlt || "Hero background"}
             fill
-            className="object-cover opacity-40"
+            className="object-cover opacity-70"
             priority={currentIndex === 0}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50" />
         </div>
       )}
       

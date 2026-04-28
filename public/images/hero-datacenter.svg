@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="dcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a1628;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1a2a4a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0f3460;stop-opacity:1" />
+    </linearGradient>
+    <pattern id="serverRack" width="80" height="120" patternUnits="userSpaceOnUse">
+      <rect x="5" y="5" width="70" height="110" rx="3" fill="#1a3a5c" stroke="#2a5a8c" stroke-width="1"/>
+      <rect x="15" y="15" width="50" height="8" rx="1" fill="#e94560" opacity="0.6"/>
+      <rect x="15" y="30" width="50" height="8" rx="1" fill="#00d4aa" opacity="0.4"/>
+      <rect x="15" y="45" width="50" height="8" rx="1" fill="#00d4aa" opacity="0.4"/>
+      <rect x="15" y="60" width="50" height="8" rx="1" fill="#00d4aa" opacity="0.4"/>
+      <rect x="15" y="75" width="50" height="8" rx="1" fill="#00d4aa" opacity="0.4"/>
+      <rect x="15" y="90" width="50" height="8" rx="1" fill="#e94560" opacity="0.5"/>
+    </pattern>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#dcGrad)"/>
+  
+  <!-- Server racks background -->
+  <g opacity="0.3">
+    <rect x="200" y="100" width="400" height="800" fill="url(#serverRack)"/>
+    <rect x="650" y="100" width="400" height="800" fill="url(#serverRack)"/>
+    <rect x="1100" y="100" width="400" height="800" fill="url(#serverRack)"/>
+    <rect x="1550" y="100" width="250" height="800" fill="url(#serverRack)"/>
+  </g>
+  
+  <!-- Glowing lines representing data flow -->
+  <g opacity="0.4">
+    <line x1="400" y1="500" x2="850" y2="500" stroke="#00d4aa" stroke-width="2"/>
+    <line x1="850" y1="500" x2="1300" y2="500" stroke="#00d4aa" stroke-width="2"/>
+    <line x1="1300" y1="500" x2="1675" y2="500" stroke="#00d4aa" stroke-width="2"/>
+    
+    <line x1="400" y1="550" x2="850" y2="550" stroke="#e94560" stroke-width="1"/>
+    <line x1="850" y1="550" x2="1300" y2="550" stroke="#e94560" stroke-width="1"/>
+    <line x1="1300" y1="550" x2="1675" y2="550" stroke="#e94560" stroke-width="1"/>
+  </g>
+  
+  <!-- Central glowing element -->
+  <circle cx="960" cy="540" r="150" fill="url(#dcGrad)" opacity="0.5"/>
+  <circle cx="960" cy="540" r="100" fill="none" stroke="#00d4aa" stroke-width="2" opacity="0.3"/>
+  <circle cx="960" cy="540" r="70" fill="none" stroke="#e94560" stroke-width="1" opacity="0.4"/>
+  
+  <!-- Light rays from top -->
+  <g opacity="0.1">
+    <polygon points="960,0 800,1080 1120,1080" fill="#fff"/>
+    <polygon points="600,0 400,1080 700,1080" fill="#fff"/>
+    <polygon points="1320,0 1220,1080 1520,1080" fill="#fff"/>
+  </g>
+</svg>
