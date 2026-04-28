@@ -42,8 +42,8 @@ const defaultSlides: HeroSlide[] = [
     secondaryCta: { text: "For OEM Buyers", href: "/oem-buyers" },
     isPublished: true,
     order: 1,
-    image: "/images/hero-manufacturing.svg",
-    imageAlt: "Manufacturing worker in safety gear operating machinery",
+    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1920&q=80",
+    imageAlt: "Manufacturing worker operating industrial CNC machinery in factory",
   },
   {
     id: "2",
@@ -56,8 +56,8 @@ const defaultSlides: HeroSlide[] = [
     secondaryCta: { text: "Watch Demo", href: "/demo" },
     isPublished: true,
     order: 2,
-    image: "/images/hero-digital-twin.svg",
-    imageAlt: "Digital twin visualization of factory operations",
+    image: "https://images.unsplash.com/photo-1639322537228-f710d846310a?w=1920&q=80",
+    imageAlt: "Digital twin technology visualization with holographic factory model",
   },
   {
     id: "3",
@@ -70,8 +70,8 @@ const defaultSlides: HeroSlide[] = [
     secondaryCta: { text: "Learn More", href: "/about" },
     isPublished: true,
     order: 3,
-    image: "/images/hero-ai-analytics.svg",
-    imageAlt: "AI-powered manufacturing analytics dashboard",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1920&q=80",
+    imageAlt: "AI analytics dashboard with data visualization charts and graphs",
   },
   {
     id: "4",
@@ -84,8 +84,8 @@ const defaultSlides: HeroSlide[] = [
     secondaryCta: { text: "View Case Studies", href: "/case-studies" },
     isPublished: true,
     order: 4,
-    image: "/images/hero-reshoring.svg",
-    imageAlt: "American manufacturing facility",
+    image: "https://images.unsplash.com/photo-1565043666747-69f6646db940?w=1920&q=80",
+    imageAlt: "Modern American manufacturing facility with industrial equipment",
   },
   {
     id: "5",
@@ -98,8 +98,8 @@ const defaultSlides: HeroSlide[] = [
     secondaryCta: { text: "Learn More", href: "/antifragile" },
     isPublished: true,
     order: 5,
-    image: "/images/hero-supply-chain.svg",
-    imageAlt: "Supply chain network visualization"
+    image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1920&q=80",
+    imageAlt: "Supply chain logistics with shipping containers and warehouse operations"
   },
   {
     id: "6",
@@ -112,8 +112,8 @@ const defaultSlides: HeroSlide[] = [
     secondaryCta: { text: "Learn More", href: "/zenthium" },
     isPublished: true,
     order: 6,
-    image: "/images/hero-datacenter.svg",
-    imageAlt: "Modern data center facility with servers and infrastructure"
+    image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1920&q=80",
+    imageAlt: "Modern data center server room with rows of server racks and blue lighting"
   },
 ];
 
