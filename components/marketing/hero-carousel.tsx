@@ -33,17 +33,17 @@ export interface HeroSlide {
 const defaultSlides: HeroSlide[] = [
   {
     id: "1",
-    badge: "Introducing EDGE-X™ — Next-Gen Manufacturing Intelligence",
-    headline: "Win OEM Contracts.",
-    highlightedText: "Transform",
-    subheadline: "We help small- and mid-sized U.S. manufacturers become qualified suppliers through ISO certification, operational readiness, and supplier development.",
-    benefits: ["OEM Supplier Qualification", "ISO/QMS Certification", "Industry 4.0 Ready"],
-    primaryCta: { text: "Get Your Free Assessment", href: "/contact" },
-    secondaryCta: { text: "See Success Stories", href: "/case-studies" },
+    badge: "Supplier Readiness & OEM Qualification",
+    headline: "Close the gaps.",
+    highlightedText: "Win OEM Business",
+    subheadline: "We help manufacturers with 25-500 employees close readiness gaps across quality, delivery, and compliance— so you can win and keep OEM business.",
+    benefits: ["Readiness Assessment", "Qualification Roadmap", "Hands-on Execution"],
+    primaryCta: { text: "Request Assessment", href: "/contact" },
+    secondaryCta: { text: "For OEM Buyers", href: "/oem-buyers" },
     isPublished: true,
     order: 1,
-    image: "/images/hero-manufacturing.jpg",
-    imageAlt: "Modern manufacturing facility with advanced robotics and automation",
+    image: "/images/hero-manufacturing.svg",
+    imageAlt: "Manufacturing worker in safety gear operating machinery",
   },
   {
     id: "2",
@@ -56,8 +56,8 @@ const defaultSlides: HeroSlide[] = [
     secondaryCta: { text: "Watch Demo", href: "/demo" },
     isPublished: true,
     order: 2,
-    image: "/images/hero-digital-twin.jpg",
-    imageAlt: "Digital twin visualization of factory operations with real-time data overlay",
+    image: "/images/hero-digital-twin.svg",
+    imageAlt: "Digital twin visualization of factory operations",
   },
   {
     id: "3",
@@ -70,8 +70,8 @@ const defaultSlides: HeroSlide[] = [
     secondaryCta: { text: "Learn More", href: "/about" },
     isPublished: true,
     order: 3,
-    image: "/images/hero-ai-analytics.jpg",
-    imageAlt: "AI-powered manufacturing analytics dashboard with predictive insights",
+    image: "/images/hero-ai-analytics.svg",
+    imageAlt: "AI-powered manufacturing analytics dashboard",
   },
   {
     id: "4",
@@ -84,8 +84,8 @@ const defaultSlides: HeroSlide[] = [
     secondaryCta: { text: "View Case Studies", href: "/case-studies" },
     isPublished: true,
     order: 4,
-    image: "/images/hero-reshoring.jpg",
-    imageAlt: "American manufacturing facility representing the reshoring movement",
+    image: "/images/hero-reshoring.svg",
+    imageAlt: "American manufacturing facility",
   },
   {
     id: "5",
@@ -98,8 +98,8 @@ const defaultSlides: HeroSlide[] = [
     secondaryCta: { text: "Learn More", href: "/antifragile" },
     isPublished: true,
     order: 5,
-    image: "/images/hero-supply-chain.jpg",
-    imageAlt: "Resilient supply chain network visualization with redundancy mapping",
+    image: "/images/hero-supply-chain.svg",
+    imageAlt: "Supply chain network visualization"
   },
 ];
 
@@ -174,7 +174,7 @@ export function HeroCarousel({ slides = defaultSlides, autoPlayInterval = 6000 }
             {/* Headline */}
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
               {currentSlide.headline}{" "}
-              <span className="text-primary">{currentSlide.highlightedText}</span> Your Manufacturing.
+              <span className="text-primary">{currentSlide.highlightedText}</span>
             </h1>
 
             {/* Subheadline */}
@@ -193,13 +193,20 @@ export function HeroCarousel({ slides = defaultSlides, autoPlayInterval = 6000 }
             </div>
 
             {/* CTAs */}
-            <div className="mt-10 flex justify-center">
+            <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
               <Button size="lg" className="text-lg px-8" asChild>
                 <Link href={currentSlide.primaryCta.href}>
                   {currentSlide.primaryCta.text}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
+              {currentSlide.secondaryCta.text && (
+                <Button size="lg" variant="outline" className="text-lg px-8 border-white/20 hover:bg-white/10 text-white" asChild>
+                  <Link href={currentSlide.secondaryCta.href}>
+                    {currentSlide.secondaryCta.text}
+                  </Link>
+                </Button>
+              )}
             </div>
           </div>
 
