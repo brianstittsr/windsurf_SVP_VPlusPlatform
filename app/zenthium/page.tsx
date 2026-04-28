@@ -161,12 +161,23 @@ export default function ZenthiumPage() {
       {/* Benefits Section */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight">Why Partner With Zenthium?</h2>
-            <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-              We connect property owners with the world&apos;s leading data center operators, 
-              creating opportunities for significant value creation.
-            </p>
+          <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight mb-4">Why Partner With Zenthium?</h2>
+              <p className="text-lg text-muted-foreground">
+                We connect property owners with the world&apos;s leading data center operators, 
+                creating opportunities for significant value creation. Our team handles the 
+                complex evaluation process so you can focus on what matters.
+              </p>
+            </div>
+            <div className="relative h-64 lg:h-80 rounded-2xl overflow-hidden shadow-xl">
+              <Image
+                src="https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                alt="Aerial view of modern data center facility"
+                fill
+                className="object-cover"
+              />
+            </div>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -191,7 +202,18 @@ export default function ZenthiumPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
+            <div className="order-2 lg:order-1">
+              <div className="relative h-72 lg:h-96 rounded-2xl overflow-hidden shadow-xl mb-8">
+                <Image
+                  src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80"
+                  alt="Industrial development site with modern architecture"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
+            
+            <div className="order-1 lg:order-2">
               <h2 className="text-3xl font-bold tracking-tight mb-6">
                 What We&apos;re Looking For
               </h2>
@@ -210,27 +232,27 @@ export default function ZenthiumPage() {
                 ))}
               </div>
             </div>
-            
-            <div className="bg-muted rounded-2xl p-8">
-              <h3 className="font-semibold text-xl mb-6">Property Types We Accept</h3>
-              <div className="space-y-4">
-                {[
-                  { icon: MapPin, label: "Vacant / Greenfield Land", desc: "Undeveloped parcels with utilities access" },
-                  { icon: Building2, label: "Industrial Buildings", desc: "Warehouses, factories, distribution centers" },
-                  { icon: Globe, label: "Brownfield Sites", desc: "Former industrial properties ready for redevelopment" },
-                  { icon: Server, label: "Existing Data Centers", desc: "Facilities ready for expansion or retrofit" },
-                ].map((type) => (
-                  <div key={type.label} className="flex items-start gap-4 p-4 bg-background rounded-lg">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <type.icon className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <div className="font-medium">{type.label}</div>
-                      <div className="text-sm text-muted-foreground">{type.desc}</div>
-                    </div>
+          </div>
+          
+          <div className="mt-16 bg-muted rounded-2xl p-8">
+            <h3 className="font-semibold text-xl mb-6">Property Types We Accept</h3>
+            <div className="space-y-4">
+              {[
+                { icon: MapPin, label: "Vacant / Greenfield Land", desc: "Undeveloped parcels with utilities access" },
+                { icon: Building2, label: "Industrial Buildings", desc: "Warehouses, factories, distribution centers" },
+                { icon: Globe, label: "Brownfield Sites", desc: "Former industrial properties ready for redevelopment" },
+                { icon: Server, label: "Existing Data Centers", desc: "Facilities ready for expansion or retrofit" },
+              ].map((type) => (
+                <div key={type.label} className="flex items-start gap-4 p-4 bg-background rounded-lg">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <type.icon className="h-5 w-5 text-primary" />
                   </div>
-                ))}
-              </div>
+                  <div>
+                    <div className="font-medium">{type.label}</div>
+                    <div className="text-sm text-muted-foreground">{type.desc}</div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -241,12 +263,23 @@ export default function ZenthiumPage() {
       {/* Process Section */}
       <section id="how-it-works" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight">How It Works</h2>
-            <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-              Our streamlined process makes it easy to submit your property and 
-              connect with data center development opportunities.
-            </p>
+          <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
+            <div className="relative h-64 lg:h-80 rounded-2xl overflow-hidden shadow-xl">
+              <Image
+                src="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                alt="Business team meeting and handshake partnership"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight mb-4">How It Works</h2>
+              <p className="text-lg text-muted-foreground">
+                Our streamlined process makes it easy to submit your property and 
+                connect with data center development opportunities. From initial 
+                submission to partnership, we guide you every step of the way.
+              </p>
+            </div>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -271,8 +304,18 @@ export default function ZenthiumPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-muted/30">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="relative py-20 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?auto=compress&cs=tinysrgb&w=1920"
+            alt="Modern server room with blue lighting"
+            fill
+            className="object-cover opacity-20"
+          />
+        </div>
+        
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold tracking-tight mb-4">
             Ready to Submit Your Property?
           </h2>
