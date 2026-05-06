@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Download, Printer, MapPin, Zap, Building2, User, Calendar, DollarSign } from "lucide-react";
+import { Loader2, Download, Printer, MapPin, Zap, Building2, User, Calendar, DollarSign, FileText } from "lucide-react";
 
 interface Submission {
   id: string;
@@ -109,6 +109,16 @@ export default function ZenthiumReportPage() {
     URL.revokeObjectURL(url);
   };
 
+  const handleDownloadMarkdown = () => {
+    // Direct browser download from API
+    const a = document.createElement("a");
+    a.href = "/api/zenthium/report/markdown";
+    a.download = `zenthium-report-${new Date().toISOString().split("T")[0]}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -147,6 +157,10 @@ export default function ZenthiumReportPage() {
             <Button onClick={handlePrint} variant="outline">
               <Printer className="h-4 w-4 mr-2" />
               Print
+            </Button>
+            <Button onClick={handleDownloadMarkdown} variant="outline">
+              <FileText className="h-4 w-4 mr-2" />
+              Download Markdown
             </Button>
             <Button onClick={handleDownloadJSON}>
               <Download className="h-4 w-4 mr-2" />
