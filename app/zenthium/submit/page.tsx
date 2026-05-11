@@ -212,6 +212,12 @@ export default function ZenthiumSubmitPage() {
       directContactEmail: form.directContactEmail,
       directContactPhone: form.directContactPhone,
       directContactCompany: form.directContactCompany,
+      // Additional fields
+      isSingleStory: form.isSingleStory,
+      isFloor: form.isFloor,
+      floodZone: form.floodZone,
+      hasBackupPower: form.hasBackupPower,
+      hvacInstalled: form.hvacInstalled,
     };
     downloadPropertyPDF(pdfData);
     toast.success("PDF generated successfully!");
