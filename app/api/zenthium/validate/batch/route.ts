@@ -43,9 +43,31 @@ export async function POST(request: NextRequest) {
 
         const submission = submissionDoc.data();
 
+        // Query OpenGridWorks for power plant data if coordinates available
+        let powerFromOpenGrid = 0;
+        try {
+          const [lat, lon] = submission?.coordinates?.split(',').map((c: string) => parseFloat(c.trim())) || [0, 0];
+          if (lat && lon) {
+            const baseUrl = request.headers.get("host")?.includes("localhost")
+              ? `http://${request.headers.get("host")}`
+              : `https://${request.headers.get("host")}`;
+            const openGridResponse = await fetch(`${baseUrl}/api/zenthium/integrations/opengridworks`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ lat, lon, radiusKm: 50, mock: true }),
+            });
+            if (openGridResponse.ok) {
+              const openGridData = await openGridResponse.json();
+              powerFromOpenGrid = openGridData?.data?.validation?.power_capacity_mw || 0;
+            }
+          }
+        } catch (error) {
+          console.error(`OpenGridWorks error for ${id}:`, error);
+        }
+
         // Extract validation data
         const validationData = {
-          powerAvailableMW: submission?.powerCapacityMW || submission?.powerAvailableMW || 0,
+          powerAvailableMW: powerFromOpenGrid || submission?.powerCapacityMW || submission?.powerAvailableMW || 0,
           squareFootage: submission?.squareFootage || 0,
           ceilingHeightFt: submission?.ceilingHeightFt || 0,
           waterAvailable: submission?.waterAvailable || false,
@@ -149,7 +171,7 @@ export async function POST(request: NextRequest) {
  * GET /api/zenthium/validate/batch/all
  * Validates all submissions in the database
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     if (!adminDb) {
       return NextResponse.json(
@@ -185,8 +207,30 @@ export async function GET() {
 
       const submission = submissionDoc.data();
 
+      // Query OpenGridWorks for power plant data if coordinates available
+      let powerFromOpenGrid = 0;
+      try {
+        const [lat, lon] = submission?.coordinates?.split(',').map((c: string) => parseFloat(c.trim())) || [0, 0];
+        if (lat && lon) {
+          const baseUrl = request.headers.get("host")?.includes("localhost")
+            ? `http://${request.headers.get("host")}`
+            : `https://${request.headers.get("host")}`;
+          const openGridResponse = await fetch(`${baseUrl}/api/zenthium/integrations/opengridworks`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ lat, lon, radiusKm: 50, mock: true }),
+          });
+          if (openGridResponse.ok) {
+            const openGridData = await openGridResponse.json();
+            powerFromOpenGrid = openGridData?.data?.validation?.power_capacity_mw || 0;
+          }
+        }
+      } catch (error) {
+        console.error(`OpenGridWorks error for ${id}:`, error);
+      }
+
       const validationData = {
-        powerAvailableMW: submission?.powerCapacityMW || submission?.powerAvailableMW || 0,
+        powerAvailableMW: powerFromOpenGrid || submission?.powerCapacityMW || submission?.powerAvailableMW || 0,
         squareFootage: submission?.squareFootage || 0,
         ceilingHeightFt: submission?.ceilingHeightFt || 0,
         waterAvailable: submission?.waterAvailable || false,

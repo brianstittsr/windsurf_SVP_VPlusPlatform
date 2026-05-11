@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
     const validationResults = {
       realEstate: null as any,
       utilities: null as any,
+      openGridWorks: null as any,
       zenthiumRequirements: null as any,
       overallScore: 0,
       qualified: false,
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
     console.log("Validating utilities with power and water APIs...");
     try {
       const coordinates = validationResults.realEstate?.propertyDetails?.coordinates;
-      
+
       const utilitiesResponse = await fetch(`${getBaseUrl(request)}/api/zenthium/integrations/utilities`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -85,14 +86,45 @@ export async function POST(request: NextRequest) {
       validationResults.utilities = { error: "Utilities API unavailable" };
     }
 
+    // STEP 2.5: Validate with OpenGridWorks Power Plant API
+    console.log("Validating power plants with OpenGridWorks API...");
+    try {
+      const coordinates = validationResults.realEstate?.propertyDetails?.coordinates;
+      const [lat, lon] = coordinates?.split(',').map((c: string) => parseFloat(c.trim())) || [0, 0];
+
+      if (lat && lon) {
+        const openGridResponse = await fetch(`${getBaseUrl(request)}/api/zenthium/integrations/opengridworks`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lat, lon, radiusKm: 50, mock: true }), // Use mock mode for now
+        });
+
+        if (openGridResponse.ok) {
+          validationResults.openGridWorks = await openGridResponse.json();
+        } else {
+          validationResults.openGridWorks = { error: "OpenGridWorks validation failed" };
+        }
+      } else {
+        validationResults.openGridWorks = { error: "No coordinates available for OpenGridWorks query" };
+      }
+    } catch (error) {
+      console.error("OpenGridWorks API error:", error);
+      validationResults.openGridWorks = { error: "OpenGridWorks API unavailable" };
+    }
+
     // STEP 3: Validate Zenthium Requirements
     console.log("Validating Zenthium requirements...");
     try {
+      // Use OpenGridWorks power data if available, otherwise fall back to utilities or submitted data
+      const powerFromOpenGrid = validationResults.openGridWorks?.data?.validation?.power_capacity_mw;
+      const powerFromUtilities = validationResults.utilities?.power?.capacityMW;
+      const effectivePowerMW = powerFromOpenGrid || powerFromUtilities || powerAvailableMW;
+
       const zenthiumResponse = await fetch(`${getBaseUrl(request)}/api/zenthium/validate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          powerAvailableMW: validationResults.utilities?.power?.capacityMW || powerAvailableMW,
+          powerAvailableMW: effectivePowerMW,
           squareFootage: validationResults.realEstate?.propertyDetails?.squareFootage || squareFootage,
           ceilingHeightFt,
           waterAvailable: validationResults.utilities?.water?.available ?? waterAvailable,
@@ -137,13 +169,16 @@ export async function POST(request: NextRequest) {
       overallScore: validationResults.overallScore,
       realEstate: validationResults.realEstate,
       utilities: validationResults.utilities,
+      openGridWorks: validationResults.openGridWorks,
       zenthiumRequirements: validationResults.zenthiumRequirements,
       discrepancies: validationResults.discrepancies,
       recommendations: validationResults.recommendations,
       summary: {
         propertyVerified: validationResults.realEstate?.addressVerified || false,
-        powerVerified: validationResults.utilities?.power?.verified || false,
+        powerVerified: validationResults.utilities?.power?.verified || validationResults.openGridWorks?.data?.validation?.meets_20mw_requirement || false,
         waterVerified: validationResults.utilities?.water?.verified || false,
+        powerPlantsNearby: validationResults.openGridWorks?.data?.summary?.plant_count || 0,
+        maxPowerCapacityMW: validationResults.openGridWorks?.data?.validation?.power_capacity_mw || validationResults.utilities?.power?.capacityMW || 0,
         requirementsMet: validationResults.zenthiumRequirements?.passedCount || 0,
         totalRequirements: validationResults.zenthiumRequirements?.totalRequirements || 6,
       },
