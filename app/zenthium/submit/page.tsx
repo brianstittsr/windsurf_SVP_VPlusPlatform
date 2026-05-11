@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,8 +16,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { MapPin, Zap, Network, Droplets, User, Building2, Mail, Phone, Loader2, CheckCircle } from "lucide-react";
+import { MapPin, Zap, Network, Droplets, User, Building2, Mail, Phone, Loader2, CheckCircle, FileText, AlertTriangle, CheckCircle2, ExternalLink } from "lucide-react";
+import { GoogleMap } from "@/components/zenthium/google-map";
+import { downloadPropertyPDF } from "@/lib/zenthium-pdf";
+import { evaluateSite, SiteEvaluationResult } from "@/lib/zenthium-evaluation";
 
 const PROPERTY_TYPE_OPTIONS = [
   { value: "vacant_land", label: "Vacant / Greenfield Land" },
@@ -131,9 +135,86 @@ export default function ZenthiumSubmitPage() {
   const [form, setForm] = useState<FormData>(INITIAL_FORM_DATA);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [evaluation, setEvaluation] = useState<SiteEvaluationResult | null>(null);
+  const [showMap, setShowMap] = useState(false);
 
   const setField = <K extends keyof FormData>(field: K, value: FormData[K]) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Auto-evaluate site when relevant fields change
+  useEffect(() => {
+    const evaluationData = {
+      squareFootage: form.squareFootage ? Number(form.squareFootage) : undefined,
+      powerAvailableMW: form.powerAvailableMW ? Number(form.powerAvailableMW) : undefined,
+      ceilingHeightFt: form.ceilingHeightFt ? Number(form.ceilingHeightFt) : undefined,
+      isSingleStory: form.isSingleStory,
+      isFloor: form.isFloor,
+      propertyType: form.propertyType,
+      waterAvailable: form.waterAvailable,
+      waterSource: form.waterSource,
+      fiberAvailable: form.fiberAvailable,
+      fiberProviders: form.fiberProviders,
+      zoningClassification: form.zoningClassification,
+      environmentalClearance: form.environmentalClearance,
+      floodZone: form.floodZone,
+    };
+    const result = evaluateSite(evaluationData);
+    setEvaluation(result);
+  }, [
+    form.squareFootage,
+    form.powerAvailableMW,
+    form.ceilingHeightFt,
+    form.isSingleStory,
+    form.isFloor,
+    form.propertyType,
+    form.waterAvailable,
+    form.waterSource,
+    form.fiberAvailable,
+    form.fiberProviders,
+    form.zoningClassification,
+    form.environmentalClearance,
+    form.floodZone,
+  ]);
+
+  const handleGeneratePDF = () => {
+    const pdfData = {
+      propertyName: form.propertyName,
+      propertyType: form.propertyType,
+      address: form.address,
+      city: form.city,
+      state: form.state,
+      zip: form.zip,
+      country: form.country,
+      coordinates: form.coordinates,
+      squareFootage: form.squareFootage ? Number(form.squareFootage) : undefined,
+      acreage: form.acreage ? Number(form.acreage) : undefined,
+      zoningClassification: form.zoningClassification,
+      powerAvailableMW: form.powerAvailableMW ? Number(form.powerAvailableMW) : undefined,
+      powerType: form.powerType,
+      ceilingHeightFt: form.ceilingHeightFt ? Number(form.ceilingHeightFt) : undefined,
+      fiberAvailable: form.fiberAvailable,
+      fiberProviders: form.fiberProviders,
+      waterAvailable: form.waterAvailable,
+      waterSource: form.waterSource,
+      coolingCapacity: form.coolingCapacity,
+      environmentalClearance: form.environmentalClearance,
+      ownershipType: form.ownershipType,
+      askingPrice: form.askingPrice,
+      leaseRate: form.leaseRate,
+      timeline: form.timeline,
+      description: form.additionalNotes,
+      submitterName: form.submitterName,
+      submitterEmail: form.submitterEmail,
+      submitterPhone: form.submitterPhone,
+      submitterCompany: form.submitterCompany,
+      directContactName: form.directContactName,
+      directContactEmail: form.directContactEmail,
+      directContactPhone: form.directContactPhone,
+      directContactCompany: form.directContactCompany,
+    };
+    downloadPropertyPDF(pdfData);
+    toast.success("PDF generated successfully!");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -592,6 +673,151 @@ export default function ZenthiumSubmitPage() {
 
             {/* Sidebar */}
             <div className="space-y-6">
+              {/* Site Evaluation */}
+              {evaluation && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4" />
+                      Site Evaluation
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="text-center py-3">
+                      <div className="text-3xl font-bold mb-1">{evaluation.score}/100</div>
+                      <Badge variant={evaluation.meetsRequirements ? "default" : "destructive"} className="mb-2">
+                        {evaluation.meetsRequirements ? "Meets Requirements" : "Does Not Meet Requirements"}
+                      </Badge>
+                      <p className="text-xs text-muted-foreground">{evaluation.summary}</p>
+                    </div>
+                    <Separator />
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {evaluation.requirements.map((req) => (
+                        <div key={req.id} className="flex items-start gap-2 text-sm">
+                          {req.status === "pass" && <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />}
+                          {req.status === "fail" && <AlertTriangle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />}
+                          {req.status === "partial" && <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5 flex-shrink-0" />}
+                          {req.status === "pending" && <AlertTriangle className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium truncate">{req.title}</span>
+                              <Badge variant={req.isRequired ? "default" : "outline"} className="text-xs flex-shrink-0">
+                                {req.isRequired ? "Required" : "Preferred"}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground truncate">{req.currentValue}</p>
+                            {req.notes && <p className="text-xs text-muted-foreground">{req.notes}</p>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Google Map */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    Location Map
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {showMap && (form.address || form.city) ? (
+                    <GoogleMap
+                      address={form.address}
+                      city={form.city}
+                      state={form.state}
+                      zip={form.zip}
+                      height="200px"
+                    />
+                  ) : (
+                    <div className="text-center py-8 text-sm text-muted-foreground">
+                      Enter address details to view map
+                    </div>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => setShowMap(!showMap)}
+                    disabled={!form.address && !form.city}
+                  >
+                    {showMap ? "Hide Map" : "Show Map"}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* PDF Generation */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Export
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={handleGeneratePDF}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Generate PDF
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center">
+                    Download a letterhead PDF with property details
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Water & Power Data Resources */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Zap className="h-4 w-4" />
+                    Infrastructure Research
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Research water availability and power grid data for this location:
+                  </p>
+                  <a
+                    href="https://api.waterdata.usgs.gov/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
+                  >
+                    <Droplets className="h-3.5 w-3.5" />
+                    USGS Water Data API
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                  <a
+                    href="https://www.eia.gov/opendata/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
+                  >
+                    <Zap className="h-3.5 w-3.5" />
+                    EIA Energy Data API
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                  <a
+                    href="https://www.electricitymaps.com/docs"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
+                  >
+                    <Network className="h-3.5 w-3.5" />
+                    Electricity Maps API
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </CardContent>
+              </Card>
+
               {/* Direct Contact */}
               <Card>
                 <CardHeader>
