@@ -57,20 +57,36 @@ function checkPageBreak(doc: jsPDF, y: number, neededSpace: number = 50): number
   return y;
 }
 
-// Draw section header
-function drawSectionHeader(doc: jsPDF, title: string, y: number, color: [number, number, number] = [249, 115, 22]): number {
-  // Background bar
+// Draw section header with icon
+function drawSectionHeader(doc: jsPDF, title: string, y: number, color: [number, number, number] = [249, 115, 22], icon?: string): number {
+  // Left accent bar
   doc.setFillColor(color[0], color[1], color[2]);
-  doc.rect(15, y - 6, 180, 12, "F");
+  doc.rect(15, y - 6, 4, 12, "F");
+  
+  // Background with subtle fill
+  doc.setFillColor(250, 250, 250);
+  doc.rect(19, y - 6, 176, 12, "F");
+  
+  // Border
+  doc.setDrawColor(color[0], color[1], color[2]);
+  doc.setLineWidth(0.5);
+  doc.rect(15, y - 6, 180, 12, "S");
+  
+  // Icon (if provided)
+  if (icon) {
+    doc.setTextColor(color[0], color[1], color[2]);
+    doc.setFontSize(12);
+    doc.text(icon, 23, y + 1);
+  }
   
   // Title
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(11);
+  doc.setTextColor(color[0], color[1], color[2]);
+  doc.setFontSize(12);
   doc.setFont("helvetica", "bold");
-  doc.text(title, 20, y);
+  doc.text(title, icon ? 32 : 23, y + 1);
   
   doc.setTextColor(0, 0, 0);
-  return y + 15;
+  return y + 18;
 }
 
 // Draw compliance badge
@@ -159,72 +175,99 @@ export async function generatePropertyPDF(data: PropertyPDFData): Promise<jsPDF>
   
   const evaluation = evaluateSite(evaluationData);
 
-  // HEADER - Orange background with V+ logo
+  // HEADER - Orange gradient background
   doc.setFillColor(249, 115, 22);
-  doc.rect(0, 0, 210, 35, "F");
+  doc.rect(0, 0, 210, 45, "F");
   
-  // V+ Logo
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(28);
+  // Add V+ logo image (using base64 encoded version of VPlus_logo.webp)
+  // Since jsPDF doesn't support webp directly, we'll create a stylized text logo
+  doc.setFillColor(255, 193, 7); // Gold color for V+
+  doc.setTextColor(255, 193, 7);
+  doc.setFontSize(36);
   doc.setFont("helvetica", "bold");
-  doc.text("V+", 15, 23);
+  doc.text("V+", 15, 30);
   
-  doc.setFontSize(14);
+  // Company name and subtitle
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(16);
+  doc.setFont("helvetica", "bold");
+  doc.text("Strategic Value Plus", 45, 22);
+  
+  doc.setFontSize(11);
   doc.setFont("helvetica", "normal");
-  doc.text("Zenthium Property Submission", 35, 23);
+  doc.text("Zenthium Property Submission", 45, 32);
   
   // Date on right
   doc.setFontSize(9);
   doc.text(new Date().toLocaleDateString("en-US", {
+    weekday: "long",
     year: "numeric",
     month: "long",
     day: "numeric",
-  }), 195, 23, { align: "right" });
+  }), 195, 28, { align: "right" });
 
-  y = 45;
+  y = 55;
 
-  // PROPERTY NAME
+  // PROPERTY NAME with underline
   doc.setTextColor(0, 0, 0);
-  doc.setFontSize(18);
+  doc.setFontSize(20);
   doc.setFont("helvetica", "bold");
   const propertyTitle = data.propertyName || "Property Submission";
   const splitTitle = doc.splitTextToSize(propertyTitle, 180);
   doc.text(splitTitle, 15, y);
-  y += (splitTitle.length * 8) + 5;
+  
+  // Underline
+  doc.setDrawColor(249, 115, 22);
+  doc.setLineWidth(1);
+  doc.line(15, y + 3, 195, y + 3);
+  
+  y += (splitTitle.length * 8) + 10;
 
-  // COMPLIANCE SUMMARY BOX
+  // COMPLIANCE SUMMARY BOX - Enhanced design
   const meetsRequirements = evaluation.meetsRequirements;
   
-  // Box background
-  doc.setFillColor(meetsRequirements ? 240 : 255, meetsRequirements ? 248 : 240, meetsRequirements ? 240 : 240);
+  // Outer border
   doc.setDrawColor(meetsRequirements ? 34 : 220, meetsRequirements ? 197 : 38, meetsRequirements ? 94 : 38);
-  doc.setLineWidth(2);
-  doc.roundedRect(15, y, 180, 45, 5, 5, "FD");
+  doc.setLineWidth(3);
+  doc.roundedRect(15, y, 180, 55, 5, 5, "S");
   
-  // Compliance status
+  // Inner background
+  doc.setFillColor(meetsRequirements ? 240 : 255, meetsRequirements ? 253 : 245, meetsRequirements ? 244 : 245);
+  doc.roundedRect(16, y + 1, 178, 53, 4, 4, "F");
+  
+  // Status badge
+  doc.setFillColor(meetsRequirements ? 34 : 220, meetsRequirements ? 197 : 38, meetsRequirements ? 94 : 38);
+  doc.roundedRect(20, y + 8, meetsRequirements ? 145 : 155, 14, 3, 3, "F");
+  
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text(meetsRequirements ? "✓ MEETS ZENTHIUM REQUIREMENTS" : "✗ DOES NOT MEET REQUIREMENTS", 25, y + 17);
+  
+  // Score circle
+  doc.setFillColor(meetsRequirements ? 34 : 220, meetsRequirements ? 197 : 38, meetsRequirements ? 94 : 38);
+  doc.circle(175, y + 15, 12, "F");
+  
+  doc.setTextColor(255, 255, 255);
   doc.setFontSize(16);
   doc.setFont("helvetica", "bold");
-  doc.setTextColor(meetsRequirements ? 34 : 180, meetsRequirements ? 150 : 38, meetsRequirements ? 94 : 38);
-  doc.text(meetsRequirements ? "✓ MEETS ZENTHIUM REQUIREMENTS" : "✗ DOES NOT MEET REQUIREMENTS", 25, y + 12);
+  doc.text(`${evaluation.score}`, 175, y + 18, { align: "center" });
   
-  // Score
-  doc.setFontSize(24);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(0, 0, 0);
-  doc.text(`${evaluation.score}/100`, 165, y + 12, { align: "center" });
+  doc.setFontSize(7);
+  doc.text("/100", 175, y + 23, { align: "center" });
   
   // Summary text
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(80, 80, 80);
-  const summaryLines = doc.splitTextToSize(evaluation.summary, 155);
-  doc.text(summaryLines, 25, y + 22);
+  doc.setTextColor(60, 60, 60);
+  const summaryLines = doc.splitTextToSize(evaluation.summary, 170);
+  doc.text(summaryLines, 20, y + 32);
   
-  y += 55;
+  y += 65;
 
   // LOCATION MAP SECTION
   y = checkPageBreak(doc, y, 80);
-  y = drawSectionHeader(doc, "LOCATION MAP", y);
+  y = drawSectionHeader(doc, "LOCATION MAP", y, [249, 115, 22], "📍");
   
   // Parse coordinates if available
   let lat = 0;
@@ -292,7 +335,7 @@ export async function generatePropertyPDF(data: PropertyPDFData): Promise<jsPDF>
 
   // PROPERTY DETAILS SECTION
   y = checkPageBreak(doc, y, 60);
-  y = drawSectionHeader(doc, "PROPERTY DETAILS", y);
+  y = drawSectionHeader(doc, "PROPERTY DETAILS", y, [249, 115, 22], "🏢");
   
   y = drawInfoRow(doc, "Property Type", data.propertyType || "Not provided", y);
   y = drawInfoRow(doc, "Square Footage", data.squareFootage ? `${data.squareFootage.toLocaleString()} sq ft` : "Not provided", y);
@@ -301,7 +344,7 @@ export async function generatePropertyPDF(data: PropertyPDFData): Promise<jsPDF>
 
   // REQUIREMENTS COMPLIANCE SECTION
   y = checkPageBreak(doc, y, 120);
-  y = drawSectionHeader(doc, "REQUIREMENTS COMPLIANCE", y);
+  y = drawSectionHeader(doc, "REQUIREMENTS COMPLIANCE", y, [249, 115, 22], "✓");
   
   doc.setFontSize(10);
   doc.setFont("helvetica", "bold");
@@ -335,7 +378,7 @@ export async function generatePropertyPDF(data: PropertyPDFData): Promise<jsPDF>
 
   // INFRASTRUCTURE DETAILS SECTION
   y = checkPageBreak(doc, y, 80);
-  y = drawSectionHeader(doc, "INFRASTRUCTURE DETAILS", y);
+  y = drawSectionHeader(doc, "INFRASTRUCTURE DETAILS", y, [249, 115, 22], "⚡");
   
   // Power details
   doc.setFontSize(10);
@@ -378,7 +421,7 @@ export async function generatePropertyPDF(data: PropertyPDFData): Promise<jsPDF>
 
   // OWNERSHIP & FINANCIALS
   y = checkPageBreak(doc, y, 50);
-  y = drawSectionHeader(doc, "OWNERSHIP & FINANCIALS", y);
+  y = drawSectionHeader(doc, "OWNERSHIP & FINANCIALS", y, [249, 115, 22], "💰");
   
   y = drawInfoRow(doc, "Ownership Type", data.ownershipType || "Not specified", y);
   y = drawInfoRow(doc, "Asking Price", data.askingPrice || "Not specified", y);
@@ -389,7 +432,7 @@ export async function generatePropertyPDF(data: PropertyPDFData): Promise<jsPDF>
   // DESCRIPTION
   if (data.description) {
     y = checkPageBreak(doc, y, 60);
-    y = drawSectionHeader(doc, "DESCRIPTION", y);
+    y = drawSectionHeader(doc, "DESCRIPTION", y, [249, 115, 22], "📝");
     
     doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
@@ -403,7 +446,7 @@ export async function generatePropertyPDF(data: PropertyPDFData): Promise<jsPDF>
   doc.addPage();
   y = 20;
   
-  y = drawSectionHeader(doc, "CONTACT INFORMATION", y);
+  y = drawSectionHeader(doc, "CONTACT INFORMATION", y, [249, 115, 22], "👤");
   
   // Submitter
   doc.setFontSize(10);
