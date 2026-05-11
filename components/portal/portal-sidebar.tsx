@@ -75,6 +75,7 @@ import {
   Eye,
   EyeOff,
   UserCheck,
+  Database,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -232,6 +233,12 @@ const adminItems = [
     title: "Events",
     href: "/portal/admin/events",
     icon: CalendarClock,
+  },
+  {
+    title: "Zenthium Referrals",
+    href: "/portal/admin/zenthium-referrals",
+    icon: Database,
+    badge: "NEW",
   },
 ];
 
