@@ -97,216 +97,242 @@ function generateLetterheadPDF(
   const doc = new jsPDF('p', 'pt', 'letter');
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 50;
+  const marginL = 60;
+  const marginR = pageWidth - 60;
+  const contentWidth = marginR - marginL;
   let y = 0;
 
-  // Colors
-  const darkColor = [40, 40, 40];
-  const grayColor = [100, 100, 100];
-  const lightGrayColor = [150, 150, 150];
+  // ── Helper: safe string ──
+  const safe = (val: any, fallback = '—'): string => {
+    if (val === undefined || val === null || val === '') return fallback;
+    return String(val);
+  };
 
-  // === HEADER (Minimal Light Theme) ===
-  // White background (default)
-  
-  // Thin top border
-  doc.setDrawColor(230, 230, 230);
+  // ── Helper: draw a table row ──
+  const drawRow = (label: string, value: string, yPos: number, options?: { bold?: boolean }) => {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(90, 90, 90);
+    doc.text(label, marginL + 16, yPos);
+    doc.setFont('helvetica', options?.bold ? 'bold' : 'normal');
+    doc.setTextColor(30, 30, 30);
+    doc.text(value, marginL + 130, yPos);
+  };
+
+  // ── Helper: footer on a page ──
+  const drawFooter = () => {
+    // Thin rule
+    doc.setDrawColor(210, 210, 210);
+    doc.setLineWidth(0.5);
+    doc.line(marginL, pageHeight - 60, marginR, pageHeight - 60);
+
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(140, 140, 140);
+    doc.text('Strategic Value Plus, Inc.  |  Zenthium Data Center Division  |  zenthium@strategicvalueplus.com', pageWidth / 2, pageHeight - 44, { align: 'center' });
+    doc.text('www.strategicvalueplus.com/zenthium', pageWidth / 2, pageHeight - 34, { align: 'center' });
+  };
+
+  // ══════════════════════════════════════
+  // PAGE 1 — LETTERHEAD
+  // ══════════════════════════════════════
+
+  // ── Header ──
+  y = 48;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(22);
+  doc.setTextColor(30, 30, 30);
+  doc.text('V+', marginL, y);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(50, 50, 50);
+  doc.text('Strategic Value Plus', marginL + 40, y - 4);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(130, 130, 130);
+  doc.text('Zenthium Data Center Division', marginL + 40, y + 10);
+
+  // Separator under header
+  y += 22;
+  doc.setDrawColor(210, 210, 210);
   doc.setLineWidth(0.5);
-  doc.line(0, 0, pageWidth, 0);
-  
-  // V+ Logo (minimal, dark gray)
-  doc.setTextColor(60, 60, 60);
-  doc.setFontSize(20);
-  doc.setFont('helvetica', 'bold');
-  doc.text('V+', margin, 35);
+  doc.line(marginL, y, marginR, y);
 
-  // Company Name (light gray, smaller)
-  doc.setTextColor(120, 120, 120);
+  // ── Date ──
+  y += 28;
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.text('Strategic Value Plus', margin + 35, 30);
+  doc.setTextColor(100, 100, 100);
+  doc.text(new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }), marginR, y, { align: 'right' });
 
-  // Subtitle
-  doc.setFontSize(8);
-  doc.setTextColor(150, 150, 150);
-  doc.text('Zenthium Data Center Division', margin + 35, 40);
-
-  y = 60;
-
-  // Date
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
-  doc.text(new Date().toLocaleDateString('en-US', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  }), pageWidth - margin, y, { align: 'right' });
-
-  y += 30;
-
-  // Recipient
+  // ── Recipient ──
+  y += 8;
   doc.setFontSize(10);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-  doc.text('TO:', margin, y);
-  
   doc.setFont('helvetica', 'normal');
-  const recipientText = recipientName || 'Prospective Partner';
-  doc.text(recipientText, margin + 30, y);
-  y += 14;
-  
+  doc.setTextColor(30, 30, 30);
+  const displayName = recipientName || 'Prospective Partner';
+  doc.text(displayName, marginL, y);
   if (recipientCompany) {
-    doc.text(recipientCompany, margin + 30, y);
     y += 14;
+    doc.text(recipientCompany, marginL, y);
   }
-  
-  y += 20;
 
-  // Subject Line
+  // ── Subject ──
+  y += 32;
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-  doc.text('RE: Data Center Development Opportunity', margin, y);
-  
-  y += 25;
+  doc.setFontSize(12);
+  doc.setTextColor(30, 30, 30);
+  doc.text('RE: Data Center Development Opportunity', marginL, y);
 
-  // Salutation
+  // ── Salutation ──
+  y += 30;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
-  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-  const salutation = recipientName ? `Dear ${recipientName.split(' ')[0]},` : 'Dear Partner,';
-  doc.text(salutation, margin, y);
+  const firstName = recipientName ? recipientName.split(' ')[0] : 'Partner';
+  doc.text(`Dear ${firstName},`, marginL, y);
 
-  y += 25;
+  // ── Body ──
+  y += 24;
+  doc.setFontSize(10);
+  doc.setTextColor(50, 50, 50);
+  const introText = customMessage ||
+    'We are pleased to present an exceptional property opportunity for data center development. This location offers significant strategic advantages for infrastructure expansion.';
+  const introLines = doc.splitTextToSize(introText, contentWidth);
+  doc.text(introLines, marginL, y);
+  y += introLines.length * 14 + 24;
 
-  // Body - Introduction
-  doc.setFontSize(9);
-  const introText = customMessage || 
-    `We are pleased to present an exceptional property opportunity for data center development. This location offers significant strategic advantages for infrastructure expansion.`;
-  
-  const introLines = doc.splitTextToSize(introText, pageWidth - (margin * 2));
-  doc.text(introLines, margin, y);
-  y += (introLines.length * 12) + 20;
+  // ── Property Details Table ──
+  // Build clean values
+  const locationParts = [submission.city, submission.state].filter(Boolean);
+  const locationStr = locationParts.length > 0 ? locationParts.join(', ') : 'Available upon request';
+  const sizeVal = submission.squareFootage
+    ? `${Number(submission.squareFootage).toLocaleString()} sq ft`
+    : submission.acreage
+      ? `${submission.acreage} acres`
+      : 'Contact for details';
+  const powerVal = Number(submission.powerCapacityMW || submission.powerAvailableMW || 0);
+  const powerStr = powerVal > 0 ? `${powerVal} MW` : 'Contact for details';
+  const zoningVal = safe(submission.zoning || submission.zoningClassification, 'Industrial');
+  const typeVal = safe(submission.propertyType, 'Data Center Site');
 
-  // Property Details Box
-  doc.setFillColor(250, 250, 250);
-  doc.setDrawColor(220, 220, 220);
+  // Box
+  const boxY = y;
+  const boxH = 170;
+  doc.setFillColor(248, 249, 250);
+  doc.setDrawColor(215, 215, 215);
+  doc.setLineWidth(0.75);
+  doc.roundedRect(marginL, boxY, contentWidth, boxH, 4, 4, 'FD');
+
+  // Title bar inside box
+  doc.setFillColor(240, 240, 240);
+  doc.roundedRect(marginL, boxY, contentWidth, 28, 4, 4, 'F');
+  // Patch bottom corners of title bar so they're straight
+  doc.setFillColor(240, 240, 240);
+  doc.rect(marginL, boxY + 20, contentWidth, 8, 'F');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9.5);
+  doc.setTextColor(60, 60, 60);
+  doc.text('PROPERTY DETAILS', marginL + 16, boxY + 18);
+
+  // Rows
+  let rowY = boxY + 46;
+  const rowSpacing = 20;
+
+  drawRow('Property', safe(submission.propertyName, 'Property Opportunity'), rowY, { bold: true });
+  rowY += rowSpacing;
+  drawRow('Location', locationStr, rowY);
+  rowY += rowSpacing;
+  drawRow('Size', sizeVal, rowY);
+  rowY += rowSpacing;
+  drawRow('Power', powerStr, rowY);
+  rowY += rowSpacing;
+  drawRow('Zoning', zoningVal, rowY);
+  rowY += rowSpacing;
+  drawRow('Type', typeVal, rowY);
+
+  y = boxY + boxH + 28;
+
+  // ── Next Steps ──
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(30, 30, 30);
+  doc.text('Next Steps', marginL, y);
+
+  y += 18;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(50, 50, 50);
+  const nextStepsText = 'If you are interested in this opportunity, please contact us using the information below. Our team is ready to provide additional details, arrange site visits, and discuss next steps.';
+  const nextLines = doc.splitTextToSize(nextStepsText, contentWidth);
+  doc.text(nextLines, marginL, y);
+  y += nextLines.length * 14 + 20;
+
+  doc.setFontSize(10);
+  doc.text('We appreciate your consideration of this opportunity.', marginL, y);
+
+  // ── Signature ──
+  y += 36;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10.5);
+  doc.setTextColor(30, 30, 30);
+  doc.text('Nelinia Varenas', marginL, y);
+  y += 14;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9.5);
+  doc.setTextColor(80, 80, 80);
+  doc.text('Chief Executive Officer', marginL, y);
+  y += 13;
+  doc.text('Strategic Value Plus, Inc.', marginL, y);
+
+  drawFooter();
+
+  // ══════════════════════════════════════
+  // PAGE 2 — REQUIREMENTS ANALYSIS
+  // ══════════════════════════════════════
+  doc.addPage();
+
+  // ── Page 2 header ──
+  y = 48;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(22);
+  doc.setTextColor(30, 30, 30);
+  doc.text('V+', marginL, y);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(50, 50, 50);
+  doc.text('Strategic Value Plus', marginL + 40, y - 4);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(130, 130, 130);
+  doc.text('Zenthium Data Center Division', marginL + 40, y + 10);
+  y += 22;
+  doc.setDrawColor(210, 210, 210);
   doc.setLineWidth(0.5);
-  doc.roundedRect(margin, y, pageWidth - (margin * 2), 160, 3, 3, 'FD');
-  
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-  doc.text('PROPERTY DETAILS', margin + 10, y + 20);
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-
-  let detailY = y + 40;
-  const labelX = margin + 10;
-  const valueX = margin + 100;
-  
-  // Property Name
-  doc.setFont('helvetica', 'bold');
-  doc.text('Property:', labelX, detailY);
-  doc.setFont('helvetica', 'normal');
-  const propertyName = submission.propertyName || 'Property Opportunity';
-  doc.text(propertyName, valueX, detailY);
-  detailY += 15;
-
-  // Address
-  doc.setFont('helvetica', 'bold');
-  doc.text('Location:', labelX, detailY);
-  doc.setFont('helvetica', 'normal');
-  const address = submission.address ? 
-    `${submission.city || ''}, ${submission.state || ''}` : 
-    'Available upon request';
-  doc.text(address, valueX, detailY);
-  detailY += 15;
-
-  // Size
-  doc.setFont('helvetica', 'bold');
-  doc.text('Size:', labelX, detailY);
-  doc.setFont('helvetica', 'normal');
-  const size = submission.squareFootage ? 
-    `${Number(submission.squareFootage).toLocaleString()} sq ft` : 
-    (submission.acreage ? `${submission.acreage} acres` : 'Contact for details');
-  doc.text(size, valueX, detailY);
-  detailY += 15;
-
-  // Power
-  doc.setFont('helvetica', 'bold');
-  doc.text('Power:', labelX, detailY);
-  doc.setFont('helvetica', 'normal');
-  const power = submission.powerCapacityMW || submission.powerAvailableMW || 'Available';
-  doc.text(`${power} MW`, valueX, detailY);
-  detailY += 15;
-
-  // Zoning
-  doc.setFont('helvetica', 'bold');
-  doc.text('Zoning:', labelX, detailY);
-  doc.setFont('helvetica', 'normal');
-  const zoning = submission.zoning || submission.zoningClassification || 'Industrial';
-  doc.text(zoning, valueX, detailY);
-  detailY += 15;
-
-  // Property Type
-  doc.setFont('helvetica', 'bold');
-  doc.text('Type:', labelX, detailY);
-  doc.setFont('helvetica', 'normal');
-  const propType = submission.propertyType || 'Data Center Site';
-  doc.text(propType, valueX, detailY);
-
-  y += 170;
-
-  // Next Steps
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-  doc.text('NEXT STEPS', margin, y);
-
-  y += 20;
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-  const responseText = 'If you are interested in this opportunity, please contact us using the information below. Our team is ready to provide additional details, arrange site visits, and discuss next steps.';
-  const responseLines = doc.splitTextToSize(responseText, pageWidth - (margin * 2));
-  doc.text(responseLines, margin, y);
-  y += (responseLines.length * 12) + 20;
-
-  // Closing
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.text('We appreciate your consideration of this opportunity.', margin, y);
+  doc.line(marginL, y, marginR, y);
 
   y += 30;
 
-  // Signature
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.text('Nelinia Varenas', margin, y);
-  y += 16;
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10);
-  doc.text('Chief Executive Officer', margin, y);
-  y += 14;
-  doc.text('Strategic Value Plus, Inc.', margin, y);
-
-  // === PAGE 2: DETAILED ANALYSIS ===
-  doc.addPage();
-  y = margin;
-
-  // Requirements Analysis Section
+  // ── Title ──
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
-  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-  doc.text('ZENTHIUM REQUIREMENTS ANALYSIS', margin, y);
-  y += 25;
+  doc.setTextColor(30, 30, 30);
+  doc.text('Zenthium Requirements Analysis', marginL, y);
+  y += 12;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(120, 120, 120);
+  doc.text(`Property: ${safe(submission.propertyName, 'Unnamed Property')}`, marginL, y);
+  y += 28;
 
-  // Calculate compliance
+  // ── Compliance data ──
   const powerMW = Number(submission.powerCapacityMW || submission.powerAvailableMW || 0);
   const sqft = Number(submission.squareFootage || 0);
   const ceilingFt = Number(submission.ceilingHeightFt || 0);
@@ -314,166 +340,165 @@ function generateLetterheadPDF(
   const isSingleStory = submission.isSingleStory || false;
   const isFloor = submission.isFloor || false;
 
-  const powerPass = powerMW >= 20;
-  const sizePass = sqft >= 10000;
-  const ceilingPass = ceilingFt >= 18;
-  const waterPass = waterAvail;
-  const storyPass = isSingleStory;
-  const floorPass = isFloor;
+  const checks = [
+    { label: 'Power Capacity', value: powerMW > 0 ? `${powerMW} MW` : 'Not specified', requirement: '20+ MW', pass: powerMW >= 20 },
+    { label: 'Property Size', value: sqft > 0 ? `${sqft.toLocaleString()} sq ft` : 'Not specified', requirement: '10,000+ sq ft', pass: sqft >= 10000 },
+    { label: 'Ceiling Height', value: ceilingFt > 0 ? `${ceilingFt} ft` : 'Not specified', requirement: '18+ ft', pass: ceilingFt >= 18 },
+    { label: 'Water Access', value: waterAvail ? 'Available' : 'Not confirmed', requirement: 'Required', pass: waterAvail },
+    { label: 'Single Story', value: isSingleStory ? 'Yes' : 'No', requirement: 'Required', pass: isSingleStory },
+    { label: 'Flat Floor', value: isFloor ? 'Yes' : 'No', requirement: 'Required', pass: isFloor },
+  ];
 
-  const totalChecks = 6;
-  const passedChecks = [powerPass, sizePass, ceilingPass, waterPass, storyPass, floorPass].filter(Boolean).length;
-  const score = Math.round((passedChecks / totalChecks) * 100);
-  const meetsRequirements = passedChecks >= 4; // Need at least 4 of 6
+  const passedChecks = checks.filter(c => c.pass).length;
+  const score = Math.round((passedChecks / checks.length) * 100);
+  const meetsRequirements = passedChecks >= 4;
 
-  // Compliance Summary Box
-  doc.setFillColor(meetsRequirements ? 240 : 255, meetsRequirements ? 253 : 245, meetsRequirements ? 244 : 245);
+  // ── Summary banner ──
+  const bannerH = 44;
+  doc.setFillColor(meetsRequirements ? 243 : 254, meetsRequirements ? 250 : 242, meetsRequirements ? 244 : 242);
   doc.setDrawColor(meetsRequirements ? 34 : 220, meetsRequirements ? 197 : 38, meetsRequirements ? 94 : 38);
-  doc.setLineWidth(2);
-  doc.roundedRect(margin, y, pageWidth - (margin * 2), 50, 5, 5, 'FD');
+  doc.setLineWidth(1);
+  doc.roundedRect(marginL, y, contentWidth, bannerH, 4, 4, 'FD');
 
-  doc.setTextColor(meetsRequirements ? 34 : 180, meetsRequirements ? 150 : 38, meetsRequirements ? 94 : 38);
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.text(meetsRequirements ? '✓ MEETS ZENTHIUM REQUIREMENTS' : '✗ DOES NOT MEET REQUIREMENTS', margin + 15, y + 20);
-
-  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-  doc.setFontSize(20);
-  doc.text(`${score}/100`, pageWidth - margin - 50, y + 25, { align: 'center' });
-
-  y += 60;
-
-  // Requirements Checklist
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-  doc.text('REQUIRED CRITERIA', margin, y);
-  y += 20;
+  doc.setTextColor(meetsRequirements ? 22 : 180, meetsRequirements ? 130 : 30, meetsRequirements ? 60 : 30);
+  const statusText = meetsRequirements ? 'MEETS ZENTHIUM REQUIREMENTS' : 'DOES NOT MEET REQUIREMENTS';
+  doc.text(statusText, marginL + 16, y + 27);
 
-  const drawRequirement = (label: string, value: string, pass: boolean, yPos: number) => {
-    // Badge
-    doc.setFillColor(pass ? 34 : 220, pass ? 197 : 38, pass ? 94 : 38);
-    doc.roundedRect(margin, yPos - 8, 30, 12, 2, 2, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.text(pass ? 'PASS' : 'FAIL', margin + 15, yPos, { align: 'center' });
-
-    // Label and value
-    doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.text(label, margin + 40, yPos);
-    doc.setFont('helvetica', 'normal');
-    doc.text(value, margin + 150, yPos);
-  };
-
-  drawRequirement('Power Capacity', powerMW > 0 ? `${powerMW} MW (Need 20+)` : 'Not specified', powerPass, y);
-  y += 18;
-  drawRequirement('Property Size', sqft > 0 ? `${sqft.toLocaleString()} sq ft (Need 10,000+)` : 'Not specified', sizePass, y);
-  y += 18;
-  drawRequirement('Ceiling Height', ceilingFt > 0 ? `${ceilingFt} ft (Need 18+)` : 'Not specified', ceilingPass, y);
-  y += 18;
-  drawRequirement('Water Access', waterAvail ? 'Available' : 'Not confirmed', waterPass, y);
-  y += 18;
-  drawRequirement('Single Story', isSingleStory ? 'Yes' : 'No', storyPass, y);
-  y += 18;
-  drawRequirement('Flat Floor', isFloor ? 'Yes' : 'No', floorPass, y);
-  y += 30;
-
-  // Location Map Section
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-  doc.text('PROPERTY LOCATION', margin, y);
-  y += 20;
-
-  // Map placeholder
-  doc.setFillColor(240, 248, 255);
-  doc.setDrawColor(100, 149, 237);
-  doc.roundedRect(margin, y, pageWidth - (margin * 2), 80, 5, 5, 'FD');
-
+  doc.setFontSize(18);
+  doc.setTextColor(30, 30, 30);
+  doc.text(`${score}`, marginR - 50, y + 24);
   doc.setFontSize(10);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-  doc.text('📍 Location Map', margin + 10, y + 20);
+  doc.setTextColor(130, 130, 130);
+  doc.text('/ 100', marginR - 30, y + 24);
 
-  doc.setFontSize(9);
+  y += bannerH + 28;
+
+  // ── Requirements table ──
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(30, 30, 30);
+  doc.text('Critical Requirements', marginL, y);
+  y += 20;
+
+  // Table header
+  doc.setFillColor(245, 245, 245);
+  doc.rect(marginL, y - 10, contentWidth, 16, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7.5);
+  doc.setTextColor(100, 100, 100);
+  doc.text('STATUS', marginL + 10, y);
+  doc.text('REQUIREMENT', marginL + 55, y);
+  doc.text('CURRENT VALUE', marginL + 200, y);
+  doc.text('MINIMUM', marginL + 330, y);
+  y += 16;
+
+  // Table rows
+  checks.forEach((check, index) => {
+    // Alternate row background
+    if (index % 2 === 0) {
+      doc.setFillColor(251, 251, 251);
+      doc.rect(marginL, y - 10, contentWidth, 22, 'F');
+    }
+
+    // Status badge
+    const badgeW = 32;
+    const badgeH = 13;
+    doc.setFillColor(check.pass ? 34 : 220, check.pass ? 197 : 38, check.pass ? 94 : 38);
+    doc.roundedRect(marginL + 4, y - 8, badgeW, badgeH, 2, 2, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7);
+    doc.setTextColor(255, 255, 255);
+    doc.text(check.pass ? 'PASS' : 'FAIL', marginL + 4 + badgeW / 2, y + 1, { align: 'center' });
+
+    // Requirement name
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(40, 40, 40);
+    doc.text(check.label, marginL + 55, y + 1);
+
+    // Current value
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(check.pass ? 40 : 180, check.pass ? 40 : 30, check.pass ? 40 : 30);
+    doc.text(check.value, marginL + 200, y + 1);
+
+    // Minimum required
+    doc.setTextColor(100, 100, 100);
+    doc.text(check.requirement, marginL + 330, y + 1);
+
+    y += 22;
+  });
+
+  y += 16;
+
+  // ── Location ──
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(30, 30, 30);
+  doc.text('Property Location', marginL, y);
+  y += 18;
+
+  doc.setFillColor(248, 249, 250);
+  doc.setDrawColor(215, 215, 215);
+  doc.setLineWidth(0.5);
+  doc.roundedRect(marginL, y, contentWidth, 70, 4, 4, 'FD');
+
   doc.setFont('helvetica', 'normal');
-  const fullAddress = submission.address ? 
-    `${submission.address}, ${submission.city || ''}, ${submission.state || ''} ${submission.zip || ''}` : 
-    `${submission.city || ''}, ${submission.state || ''}`;
-  doc.text(fullAddress, margin + 10, y + 40);
+  doc.setFontSize(9);
+  doc.setTextColor(50, 50, 50);
+
+  const addrParts = [submission.address, submission.city, submission.state, submission.zip].filter(Boolean);
+  const fullAddress = addrParts.length > 0 ? addrParts.join(', ') : 'Address available upon request';
+  doc.text(fullAddress, marginL + 14, y + 22);
 
   if (submission.coordinates) {
-    doc.text(`Coordinates: ${submission.coordinates}`, margin + 10, y + 55);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Coordinates: ${submission.coordinates}`, marginL + 14, y + 38);
   }
 
   doc.setFontSize(8);
-  doc.setTextColor(100, 100, 100);
-  doc.text('View on OpenStreetMap: openstreetmap.org', margin + 10, y + 70);
+  doc.setTextColor(80, 130, 180);
+  doc.text('View on OpenStreetMap', marginL + 14, y + 56);
 
   y += 90;
 
-  // Infrastructure Details
+  // ── Infrastructure ──
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-  doc.text('INFRASTRUCTURE DETAILS', margin, y);
-  y += 20;
+  doc.setFontSize(10);
+  doc.setTextColor(30, 30, 30);
+  doc.text('Infrastructure Details', marginL, y);
+  y += 18;
 
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-
-  const infraDetails = [
+  const infraItems = [
     { label: 'Ceiling Height', value: ceilingFt > 0 ? `${ceilingFt} ft` : 'Not specified' },
-    { label: 'Fiber Connectivity', value: submission.fiberAvailable ? (submission.fiberProviders || 'Yes') : 'No' },
+    { label: 'Fiber Connectivity', value: submission.fiberAvailable ? safe(submission.fiberProviders, 'Available') : 'Not available' },
     { label: 'Backup Power', value: submission.hasBackupPower ? 'Yes' : 'No' },
     { label: 'HVAC Installed', value: submission.hvacInstalled ? 'Yes' : 'No' },
-    { label: 'Flood Zone', value: submission.floodZone ? 'Yes' : 'No' },
-    { label: 'Environmental', value: submission.environmentalClearance || 'Not specified' },
+    { label: 'Flood Zone', value: submission.floodZone ? 'Yes — Risk' : 'No' },
+    { label: 'Environmental Clearance', value: safe(submission.environmentalClearance, 'Pending review') },
   ];
 
-  infraDetails.forEach(detail => {
+  // Two-column layout
+  const colWidth = contentWidth / 2;
+  infraItems.forEach((item, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    const xPos = marginL + col * colWidth;
+    const yPos = y + row * 20;
+
     doc.setFont('helvetica', 'bold');
-    doc.text(`${detail.label}:`, margin, y);
+    doc.setFontSize(8.5);
+    doc.setTextColor(100, 100, 100);
+    doc.text(item.label + ':', xPos, yPos);
+
     doc.setFont('helvetica', 'normal');
-    doc.text(detail.value, margin + 120, y);
-    y += 14;
+    doc.setTextColor(40, 40, 40);
+    doc.text(item.value, xPos + 110, yPos);
   });
 
-  // === FOOTER ===
-  const footerY = pageHeight - 80;
-  
-  // Separator
-  doc.setDrawColor(200, 200, 200);
-  doc.setLineWidth(0.5);
-  doc.line(margin, footerY, pageWidth - margin, footerY);
-
-  // Contact Info
-  doc.setFontSize(9);
-  doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
-  doc.setFont('helvetica', 'normal');
-  
-  const contactInfo = [
-    'Strategic Value Plus, Inc.',
-    'Zenthium Data Center Division',
-    'zenthium@strategicvalueplus.com',
-    '1-800-555-0199',
-    'www.strategicvalueplus.com/zenthium'
-  ];
-
-  let contactY = footerY + 20;
-  contactInfo.forEach((line, index) => {
-    if (index === 0) {
-      doc.setFont('helvetica', 'bold');
-    } else {
-      doc.setFont('helvetica', 'normal');
-    }
-    doc.text(line, pageWidth / 2, contactY, { align: 'center' });
-    contactY += 12;
-  });
+  drawFooter();
 
   return doc;
 }
