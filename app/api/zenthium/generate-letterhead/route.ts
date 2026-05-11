@@ -101,33 +101,36 @@ function generateLetterheadPDF(
   let y = 0;
 
   // Colors
-  const orangeColor = [249, 115, 22];
-  const goldColor = [255, 193, 7];
   const darkColor = [40, 40, 40];
   const grayColor = [100, 100, 100];
+  const lightGrayColor = [150, 150, 150];
 
-  // === HEADER ===
-  doc.setFillColor(orangeColor[0], orangeColor[1], orangeColor[2]);
-  doc.rect(0, 0, pageWidth, 70, 'F');
+  // === HEADER (Minimal Light Theme) ===
+  // White background (default)
   
-  // V+ Logo
-  doc.setTextColor(goldColor[0], goldColor[1], goldColor[2]);
-  doc.setFontSize(32);
+  // Thin top border
+  doc.setDrawColor(230, 230, 230);
+  doc.setLineWidth(0.5);
+  doc.line(0, 0, pageWidth, 0);
+  
+  // V+ Logo (minimal, dark gray)
+  doc.setTextColor(60, 60, 60);
+  doc.setFontSize(20);
   doc.setFont('helvetica', 'bold');
-  doc.text('V+', margin, 45);
+  doc.text('V+', margin, 35);
 
-  // Company Name
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Strategic Value Plus', margin + 60, 35);
+  // Company Name (light gray, smaller)
+  doc.setTextColor(120, 120, 120);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Strategic Value Plus', margin + 35, 30);
 
   // Subtitle
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Zenthium Data Center Division', margin + 60, 50);
+  doc.setFontSize(8);
+  doc.setTextColor(150, 150, 150);
+  doc.text('Zenthium Data Center Division', margin + 35, 40);
 
-  y = 90;
+  y = 60;
 
   // Date
   doc.setFontSize(9);
@@ -163,7 +166,7 @@ function generateLetterheadPDF(
   // Subject Line
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.setTextColor(orangeColor[0], orangeColor[1], orangeColor[2]);
+  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
   doc.text('RE: Data Center Development Opportunity', margin, y);
   
   y += 25;
@@ -188,13 +191,13 @@ function generateLetterheadPDF(
 
   // Property Details Box
   doc.setFillColor(250, 250, 250);
-  doc.setDrawColor(orangeColor[0], orangeColor[1], orangeColor[2]);
-  doc.setLineWidth(1);
-  doc.roundedRect(margin, y, pageWidth - (margin * 2), 160, 5, 5, 'FD');
+  doc.setDrawColor(220, 220, 220);
+  doc.setLineWidth(0.5);
+  doc.roundedRect(margin, y, pageWidth - (margin * 2), 160, 3, 3, 'FD');
   
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.setTextColor(orangeColor[0], orangeColor[1], orangeColor[2]);
+  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
   doc.text('PROPERTY DETAILS', margin + 10, y + 20);
 
   doc.setFont('helvetica', 'normal');
@@ -261,7 +264,7 @@ function generateLetterheadPDF(
   // Next Steps
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.setTextColor(orangeColor[0], orangeColor[1], orangeColor[2]);
+  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
   doc.text('NEXT STEPS', margin, y);
 
   y += 20;
@@ -299,7 +302,7 @@ function generateLetterheadPDF(
   // Requirements Analysis Section
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
-  doc.setTextColor(orangeColor[0], orangeColor[1], orangeColor[2]);
+  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
   doc.text('ZENTHIUM REQUIREMENTS ANALYSIS', margin, y);
   y += 25;
 
@@ -343,7 +346,7 @@ function generateLetterheadPDF(
   // Requirements Checklist
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.setTextColor(orangeColor[0], orangeColor[1], orangeColor[2]);
+  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
   doc.text('REQUIRED CRITERIA', margin, y);
   y += 20;
 
@@ -381,7 +384,7 @@ function generateLetterheadPDF(
   // Location Map Section
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.setTextColor(orangeColor[0], orangeColor[1], orangeColor[2]);
+  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
   doc.text('PROPERTY LOCATION', margin, y);
   y += 20;
 
@@ -415,7 +418,7 @@ function generateLetterheadPDF(
   // Infrastructure Details
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.setTextColor(orangeColor[0], orangeColor[1], orangeColor[2]);
+  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
   doc.text('INFRASTRUCTURE DETAILS', margin, y);
   y += 20;
 
