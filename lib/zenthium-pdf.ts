@@ -102,7 +102,7 @@ function drawComplianceBadge(doc: jsPDF, label: string, value: string, pass: boo
 }
 
 // Draw info row
-function drawInfoRow(doc: jsPDF, label: string, value: string, y: number, indent: number = 20): number {
+function drawInfoRow(doc: jsPDF, label: string, value: unknown, y: number, indent: number = 20): number {
   doc.setFontSize(9);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(80, 80, 80);
@@ -110,7 +110,27 @@ function drawInfoRow(doc: jsPDF, label: string, value: string, y: number, indent
   
   doc.setFont("helvetica", "normal");
   doc.setTextColor(0, 0, 0);
-  const splitValue = doc.splitTextToSize(value || "N/A", 120);
+  
+  // Convert value to string safely
+  let stringValue: string;
+  if (value === null || value === undefined) {
+    stringValue = "N/A";
+  } else if (typeof value === "object") {
+    // If it's an object with a label or name property, use that
+    if (value && typeof value === "object" && "label" in value) {
+      stringValue = String((value as { label: unknown }).label);
+    } else if (value && typeof value === "object" && "name" in value) {
+      stringValue = String((value as { name: unknown }).name);
+    } else if (value && typeof value === "object" && "value" in value) {
+      stringValue = String((value as { value: unknown }).value);
+    } else {
+      stringValue = "[Invalid Data]";
+    }
+  } else {
+    stringValue = String(value);
+  }
+  
+  const splitValue = doc.splitTextToSize(stringValue || "N/A", 120);
   doc.text(splitValue, indent + 50, y);
   
   return y + (splitValue.length * 5) + 3;

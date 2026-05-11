@@ -177,41 +177,56 @@ export default function ZenthiumSubmitPage() {
     form.floodZone,
   ]);
 
+  // Helper to safely extract string value from potentially object data
+  const safeString = (value: unknown): string => {
+    if (value === null || value === undefined) return "";
+    if (typeof value === "string") return value;
+    if (typeof value === "object") {
+      // Try to extract label, name, or value from object
+      const obj = value as Record<string, unknown>;
+      if (obj.label && typeof obj.label === "string") return obj.label;
+      if (obj.name && typeof obj.name === "string") return obj.name;
+      if (obj.value && typeof obj.value === "string") return obj.value;
+      return "";
+    }
+    return String(value);
+  };
+
   const handleGeneratePDF = async () => {
     const pdfData = {
-      propertyName: form.propertyName,
-      propertyType: form.propertyType,
-      address: form.address,
-      city: form.city,
-      state: form.state,
-      zip: form.zip,
-      country: form.country,
-      coordinates: form.coordinates,
+      propertyName: safeString(form.propertyName),
+      propertyType: safeString(form.propertyType),
+      address: safeString(form.address),
+      city: safeString(form.city),
+      state: safeString(form.state),
+      zip: safeString(form.zip),
+      country: safeString(form.country),
+      coordinates: safeString(form.coordinates),
       squareFootage: form.squareFootage ? Number(form.squareFootage) : undefined,
       acreage: form.acreage ? Number(form.acreage) : undefined,
-      zoningClassification: form.zoningClassification,
+      zoningClassification: safeString(form.zoningClassification),
       powerAvailableMW: form.powerAvailableMW ? Number(form.powerAvailableMW) : undefined,
-      powerType: form.powerType,
+      powerType: safeString(form.powerType),
       ceilingHeightFt: form.ceilingHeightFt ? Number(form.ceilingHeightFt) : undefined,
       fiberAvailable: form.fiberAvailable,
-      fiberProviders: form.fiberProviders,
+      fiberProviders: safeString(form.fiberProviders),
       waterAvailable: form.waterAvailable,
-      waterSource: form.waterSource,
-      coolingCapacity: form.coolingCapacity,
-      environmentalClearance: form.environmentalClearance,
-      ownershipType: form.ownershipType,
-      askingPrice: form.askingPrice,
-      leaseRate: form.leaseRate,
-      timeline: form.timeline,
-      description: form.additionalNotes,
-      submitterName: form.submitterName,
-      submitterEmail: form.submitterEmail,
-      submitterPhone: form.submitterPhone,
-      submitterCompany: form.submitterCompany,
-      directContactName: form.directContactName,
-      directContactEmail: form.directContactEmail,
-      directContactPhone: form.directContactPhone,
-      directContactCompany: form.directContactCompany,
+      waterSource: safeString(form.waterSource),
+      coolingCapacity: safeString(form.coolingCapacity),
+      environmentalClearance: safeString(form.environmentalClearance),
+      ownershipType: safeString(form.ownershipType),
+      askingPrice: safeString(form.askingPrice),
+      leaseRate: safeString(form.leaseRate),
+      timeline: safeString(form.timeline),
+      description: safeString(form.additionalNotes),
+      submitterName: safeString(form.submitterName),
+      submitterEmail: safeString(form.submitterEmail),
+      submitterPhone: safeString(form.submitterPhone),
+      submitterCompany: safeString(form.submitterCompany),
+      directContactName: safeString(form.directContactName),
+      directContactEmail: safeString(form.directContactEmail),
+      directContactPhone: safeString(form.directContactPhone),
+      directContactCompany: safeString(form.directContactCompany),
       // Additional fields
       isSingleStory: form.isSingleStory,
       isFloor: form.isFloor,
