@@ -43,10 +43,41 @@ export async function POST(request: NextRequest) {
 
         const submission = submissionDoc.data();
 
+        // Geocode address if coordinates not available
+        let coordinates = submission?.coordinates;
+        if (!coordinates && submission?.address && submission?.city && submission?.state) {
+          try {
+            const baseUrl = request.headers.get("host")?.includes("localhost")
+              ? `http://${request.headers.get("host")}`
+              : `https://${request.headers.get("host")}`;
+            const geocodeResponse = await fetch(`${baseUrl}/api/zenthium/integrations/geocode`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                address: submission.address,
+                city: submission.city,
+                state: submission.state,
+                zip: submission.zip,
+                mock: true,
+              }),
+            });
+            if (geocodeResponse.ok) {
+              const geocodeData = await geocodeResponse.json();
+              if (geocodeData.success && geocodeData.data) {
+                coordinates = `${geocodeData.data.lat},${geocodeData.data.lon}`;
+                // Update submission with coordinates
+                await submissionRef.update({ coordinates });
+              }
+            }
+          } catch (error) {
+            console.error(`Geocoding error for ${id}:`, error);
+          }
+        }
+
         // Query OpenGridWorks for power plant data if coordinates available
         let powerFromOpenGrid = 0;
         try {
-          const [lat, lon] = submission?.coordinates?.split(',').map((c: string) => parseFloat(c.trim())) || [0, 0];
+          const [lat, lon] = coordinates?.split(',').map((c: string) => parseFloat(c.trim())) || [0, 0];
           if (lat && lon) {
             const baseUrl = request.headers.get("host")?.includes("localhost")
               ? `http://${request.headers.get("host")}`
@@ -122,6 +153,8 @@ export async function POST(request: NextRequest) {
           validationPassedCount: passedRequirements.length,
           validationFailedCount: requirements.length - passedRequirements.length,
           validationLastRun: new Date().toISOString(),
+          // Update power capacity from OpenGridWorks if available
+          ...(powerFromOpenGrid > 0 && { powerCapacityMW: powerFromOpenGrid }),
         });
 
         results.push({
@@ -207,10 +240,41 @@ export async function GET(request: NextRequest) {
 
       const submission = submissionDoc.data();
 
+      // Geocode address if coordinates not available
+      let coordinates = submission?.coordinates;
+      if (!coordinates && submission?.address && submission?.city && submission?.state) {
+        try {
+          const baseUrl = request.headers.get("host")?.includes("localhost")
+            ? `http://${request.headers.get("host")}`
+            : `https://${request.headers.get("host")}`;
+          const geocodeResponse = await fetch(`${baseUrl}/api/zenthium/integrations/geocode`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              address: submission.address,
+              city: submission.city,
+              state: submission.state,
+              zip: submission.zip,
+              mock: true,
+            }),
+          });
+          if (geocodeResponse.ok) {
+            const geocodeData = await geocodeResponse.json();
+            if (geocodeData.success && geocodeData.data) {
+              coordinates = `${geocodeData.data.lat},${geocodeData.data.lon}`;
+              // Update submission with coordinates
+              await submissionDoc.ref.update({ coordinates });
+            }
+          }
+        } catch (error) {
+          console.error(`Geocoding error for ${id}:`, error);
+        }
+      }
+
       // Query OpenGridWorks for power plant data if coordinates available
       let powerFromOpenGrid = 0;
       try {
-        const [lat, lon] = submission?.coordinates?.split(',').map((c: string) => parseFloat(c.trim())) || [0, 0];
+        const [lat, lon] = coordinates?.split(',').map((c: string) => parseFloat(c.trim())) || [0, 0];
         if (lat && lon) {
           const baseUrl = request.headers.get("host")?.includes("localhost")
             ? `http://${request.headers.get("host")}`
@@ -259,6 +323,8 @@ export async function GET(request: NextRequest) {
         validationPassedCount: passedRequirements.length,
         validationFailedCount: requirements.length - passedRequirements.length,
         validationLastRun: new Date().toISOString(),
+        // Update power capacity from OpenGridWorks if available
+        ...(powerFromOpenGrid > 0 && { powerCapacityMW: powerFromOpenGrid }),
       });
 
       results.push({
