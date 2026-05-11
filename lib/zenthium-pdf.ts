@@ -206,50 +206,66 @@ export async function generatePropertyPDF(data: PropertyPDFData): Promise<jsPDF>
   y = checkPageBreak(doc, y, 80);
   y = drawSectionHeader(doc, "LOCATION MAP", y);
   
-  // Try to add map image using Google Static Maps API
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-  const mapQuery = data.coordinates 
-    ? data.coordinates 
-    : `${data.address}, ${data.city}, ${data.state} ${data.zip}`;
+  // Parse coordinates if available
+  let lat = 0;
+  let lon = 0;
+  let hasCoords = false;
   
-  if (apiKey && mapQuery) {
-    try {
-      const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(mapQuery)}&zoom=14&size=400x200&maptype=roadmap&markers=color:red%7C${encodeURIComponent(mapQuery)}&key=${apiKey}`;
-      
-      // Add placeholder rectangle for map
-      doc.setFillColor(240, 240, 240);
-      doc.setDrawColor(200, 200, 200);
-      doc.roundedRect(15, y, 180, 60, 3, 3, "FD");
-      
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "italic");
-      doc.setTextColor(150, 150, 150);
-      doc.text("Map visualization available with Google Maps API key", 105, y + 30, { align: "center" });
-      
-      // Map link below
-      y += 68;
-      doc.setFontSize(8);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(0, 0, 255);
-      const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
-      doc.text("View on Google Maps: " + mapUrl, 15, y, { maxWidth: 180 });
-      doc.setTextColor(0, 0, 0);
-      y += 8;
-    } catch (e) {
-      y += 70;
+  if (data.coordinates) {
+    const coords = data.coordinates.split(',').map(c => parseFloat(c.trim()));
+    if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+      lat = coords[0];
+      lon = coords[1];
+      hasCoords = true;
     }
+  }
+  
+  // Use OpenStreetMap static tiles (no API key required)
+  if (hasCoords) {
+    // Add placeholder for map with OpenStreetMap reference
+    doc.setFillColor(240, 248, 255);
+    doc.setDrawColor(100, 149, 237);
+    doc.roundedRect(15, y, 180, 60, 3, 3, "FD");
+    
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(0, 0, 0);
+    doc.text("📍 Location Map", 25, y + 15);
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(50, 50, 50);
+    doc.text(`Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`, 25, y + 30);
+    
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "italic");
+    doc.setTextColor(100, 100, 100);
+    doc.text("OpenStreetMap integration", 25, y + 45);
+    
+    // OpenStreetMap link
+    y += 68;
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(0, 0, 255);
+    const osmUrl = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}&zoom=15`;
+    doc.text("View on OpenStreetMap: " + osmUrl, 15, y, { maxWidth: 180 });
+    doc.setTextColor(0, 0, 0);
+    y += 10;
   } else {
-    // No API key - show text-based location info
+    // No coordinates - show text-based location info
     y = drawInfoRow(doc, "Full Address", `${data.address || ""}, ${data.city || ""}, ${data.state || ""} ${data.zip || ""}`, y, 20);
     if (data.coordinates) {
       y = drawInfoRow(doc, "Coordinates", data.coordinates, y, 20);
     }
     
-    // Google Maps link
+    // OpenStreetMap search link
+    const searchQuery = `${data.address || ""} ${data.city || ""} ${data.state || ""} ${data.zip || ""}`.trim();
     doc.setFontSize(8);
     doc.setTextColor(0, 0, 255);
-    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${data.city}, ${data.state}`)}`;
-    doc.text("View on Google Maps: " + mapUrl, 20, y, { maxWidth: 170 });
+    const osmSearchUrl = searchQuery 
+      ? `https://www.openstreetmap.org/search?query=${encodeURIComponent(searchQuery)}`
+      : `https://www.openstreetmap.org`;
+    doc.text("View on OpenStreetMap: " + osmSearchUrl, 20, y, { maxWidth: 170 });
     doc.setTextColor(0, 0, 0);
     y += 10;
   }

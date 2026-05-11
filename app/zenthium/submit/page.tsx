@@ -19,7 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { MapPin, Zap, Network, Droplets, User, Building2, Mail, Phone, Loader2, CheckCircle, FileText, AlertTriangle, CheckCircle2, ExternalLink } from "lucide-react";
-import { GoogleMap } from "@/components/zenthium/google-map";
+import { GoogleMap } from "@/components/zenthium/openstreetmap-map";
 import { downloadPropertyPDF } from "@/lib/zenthium-pdf";
 import { evaluateSite, SiteEvaluationResult } from "@/lib/zenthium-evaluation";
 
@@ -779,7 +779,7 @@ export default function ZenthiumSubmitPage() {
                 </CardContent>
               </Card>
 
-              {/* Water & Power Data Resources */}
+              {/* Infrastructure Research */}
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2">
@@ -819,6 +819,16 @@ export default function ZenthiumSubmitPage() {
                   >
                     <Network className="h-3.5 w-3.5" />
                     Electricity Maps API
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                  <a
+                    href="https://www.openstreetmap.org"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
+                  >
+                    <MapPin className="h-3.5 w-3.5" />
+                    OpenStreetMap
                     <ExternalLink className="h-3 w-3" />
                   </a>
                 </CardContent>
