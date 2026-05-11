@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import db from "@/lib/firebase-admin";
+import { adminDb } from "@/lib/firebase-admin";
 import { COLLECTIONS } from "@/lib/schema";
 
 /**
@@ -13,7 +13,7 @@ export async function GET(
   try {
     const { id } = params;
 
-    if (!db) {
+    if (!adminDb) {
       return NextResponse.json(
         { error: "Database not initialized" },
         { status: 500 }
@@ -21,7 +21,7 @@ export async function GET(
     }
 
     // Fetch submission
-    const submissionRef = db.collection(COLLECTIONS.ZENTHIUM_LOCATION_SUBMISSIONS).doc(id);
+    const submissionRef = adminDb.collection(COLLECTIONS.ZENTHIUM_LOCATION_SUBMISSIONS).doc(id);
     const submissionDoc = await submissionRef.get();
 
     if (!submissionDoc.exists) {

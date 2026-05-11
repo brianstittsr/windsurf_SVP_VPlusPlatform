@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import db from "@/lib/firebase-admin";
+import { adminDb } from "@/lib/firebase-admin";
 import { COLLECTIONS } from "@/lib/schema";
 
 /**
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!db) {
+    if (!adminDb) {
       return NextResponse.json(
         { error: "Database not initialized" },
         { status: 500 }
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     for (const id of submissionIds) {
       try {
-        const submissionRef = db.collection(COLLECTIONS.ZENTHIUM_LOCATION_SUBMISSIONS).doc(id);
+        const submissionRef = adminDb.collection(COLLECTIONS.ZENTHIUM_LOCATION_SUBMISSIONS).doc(id);
         const submissionDoc = await submissionRef.get();
 
         if (!submissionDoc.exists) {
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
  */
 export async function GET() {
   try {
-    if (!db) {
+    if (!adminDb) {
       return NextResponse.json(
         { error: "Database not initialized" },
         { status: 500 }
@@ -159,8 +159,8 @@ export async function GET() {
     }
 
     // Get all submissions
-    const snapshot = await db.collection(COLLECTIONS.ZENTHIUM_LOCATION_SUBMISSIONS).get();
-    const submissionIds = snapshot.docs.map((doc) => doc.id);
+    const snapshot = await adminDb.collection(COLLECTIONS.ZENTHIUM_LOCATION_SUBMISSIONS).get();
+    const submissionIds = snapshot.docs.map((d: any) => d.id);
 
     if (submissionIds.length === 0) {
       return NextResponse.json({
@@ -180,7 +180,7 @@ export async function GET() {
     const results = [];
 
     for (const id of submissionIds) {
-      const submissionDoc = snapshot.docs.find((doc) => doc.id === id);
+      const submissionDoc = snapshot.docs.find((d: any) => d.id === id);
       if (!submissionDoc) continue;
 
       const submission = submissionDoc.data();
