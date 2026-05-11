@@ -215,7 +215,7 @@ export default function ZenthiumPage() {
                 Submit a Location <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 px-8 text-base" asChild>
+            <Button size="lg" variant="outline" className="bg-transparent border-white/30 text-white hover:bg-white/10 hover:text-white px-8 text-base" asChild>
               <a href="https://zenthium.ai" target="_blank" rel="noopener noreferrer">
                 Visit Zenthium.ai <ExternalLink className="ml-2 h-4 w-4" />
               </a>
