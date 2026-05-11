@@ -306,8 +306,13 @@ export default function ZenthiumSubmitPage() {
         throw new Error(error.error || "Failed to submit");
       }
 
-      setIsSuccess(true);
+      const result = await res.json();
+      const submissionId = result.id;
+
       toast.success("Location submitted successfully!");
+      
+      // Redirect to dashboard
+      router.push(`/zenthium/dashboard?id=${submissionId}`);
     } catch (error) {
       console.error("Submission error:", error);
       toast.error(error instanceof Error ? error.message : "Failed to submit location");

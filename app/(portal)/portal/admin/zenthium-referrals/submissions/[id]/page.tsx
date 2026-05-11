@@ -35,6 +35,7 @@ import {
   Edit,
   Calendar,
   FileText,
+  ExternalLink,
 } from "lucide-react";
 import {
   Dialog,
@@ -343,6 +344,16 @@ export default function SubmissionDetailPage({ params }: PageProps) {
                 Unsaved Changes
               </Badge>
             )}
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+            >
+              <Link href={`/zenthium/dashboard?id=${id}`} target="_blank">
+                <ExternalLink className="h-4 w-4 mr-1" />
+                View Dashboard
+              </Link>
+            </Button>
             <Button
               variant="outline"
               size="sm"
