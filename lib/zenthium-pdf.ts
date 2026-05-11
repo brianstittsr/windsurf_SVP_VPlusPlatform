@@ -1,9 +1,10 @@
 /**
  * PDF Generation for Zenthium Property Submissions
- * Generates a letterhead PDF with property details
+ * Professional layout with compliance summary and visual indicators
  */
 
 import { jsPDF } from "jspdf";
+import { evaluateSite, PropertyEvaluationData } from "./zenthium-evaluation";
 
 export interface PropertyPDFData {
   propertyName: string;
@@ -47,285 +48,378 @@ export interface PropertyPDFData {
   hvacInstalled?: boolean;
 }
 
-export function generatePropertyPDF(data: PropertyPDFData): jsPDF {
-  const doc = new jsPDF();
-  let y = 20;
+// Helper function to check page break
+function checkPageBreak(doc: jsPDF, y: number, neededSpace: number = 50): number {
+  if (y + neededSpace > 270) {
+    doc.addPage();
+    return 20;
+  }
+  return y;
+}
 
-  // Letterhead - Orange background
-  doc.setFillColor(249, 115, 22);
-  doc.rect(0, 0, 210, 50, "F");
-
-  // Add V+ Logo (using text representation for now - can be replaced with image)
+// Draw section header
+function drawSectionHeader(doc: jsPDF, title: string, y: number, color: [number, number, number] = [249, 115, 22]): number {
+  // Background bar
+  doc.setFillColor(color[0], color[1], color[2]);
+  doc.rect(15, y - 6, 180, 12, "F");
+  
+  // Title
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(32);
+  doc.setFontSize(11);
   doc.setFont("helvetica", "bold");
-  doc.text("V+", 20, 32);
+  doc.text(title, 20, y);
+  
+  doc.setTextColor(0, 0, 0);
+  return y + 15;
+}
 
-  doc.setFontSize(16);
+// Draw compliance badge
+function drawComplianceBadge(doc: jsPDF, label: string, value: string, pass: boolean, y: number): number {
+  // Label
+  doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
-  doc.text("| Zenthium Property Submission", 40, 32);
+  doc.setTextColor(80, 80, 80);
+  doc.text(label, 20, y);
+  
+  // Badge background
+  const badgeWidth = pass ? 35 : 40;
+  doc.setFillColor(pass ? 34 : 220, pass ? 197 : 38, pass ? 94 : 38);
+  doc.roundedRect(130, y - 5, badgeWidth, 10, 2, 2, "F");
+  
+  // Badge text
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(8);
+  doc.setFont("helvetica", "bold");
+  doc.text(pass ? "PASS" : "FAIL", 135, y);
+  
+  // Value
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "normal");
+  doc.text(value, 60, y);
+  
+  return y + 12;
+}
 
-  // Date
-  doc.setFontSize(10);
+// Draw info row
+function drawInfoRow(doc: jsPDF, label: string, value: string, y: number, indent: number = 20): number {
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(80, 80, 80);
+  doc.text(label, indent, y);
+  
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(0, 0, 0);
+  const splitValue = doc.splitTextToSize(value || "N/A", 120);
+  doc.text(splitValue, indent + 50, y);
+  
+  return y + (splitValue.length * 5) + 3;
+}
+
+export async function generatePropertyPDF(data: PropertyPDFData): Promise<jsPDF> {
+  const doc = new jsPDF();
+  let y = 15;
+
+  // Evaluate site compliance
+  const evaluationData: PropertyEvaluationData = {
+    squareFootage: data.squareFootage,
+    powerAvailableMW: data.powerAvailableMW,
+    ceilingHeightFt: data.ceilingHeightFt,
+    isSingleStory: data.isSingleStory ?? false,
+    isFloor: data.isFloor ?? false,
+    propertyType: data.propertyType,
+    waterAvailable: data.waterAvailable,
+    waterSource: data.waterSource,
+    fiberAvailable: data.fiberAvailable,
+    fiberProviders: data.fiberProviders,
+    zoningClassification: data.zoningClassification,
+    environmentalClearance: data.environmentalClearance,
+    floodZone: data.floodZone ?? false,
+  };
+  
+  const evaluation = evaluateSite(evaluationData);
+
+  // HEADER - Orange background with V+ logo
+  doc.setFillColor(249, 115, 22);
+  doc.rect(0, 0, 210, 35, "F");
+  
+  // V+ Logo
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(28);
+  doc.setFont("helvetica", "bold");
+  doc.text("V+", 15, 23);
+  
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "normal");
+  doc.text("Zenthium Property Submission", 35, 23);
+  
+  // Date on right
+  doc.setFontSize(9);
   doc.text(new Date().toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
-  }), 150, 25);
+  }), 195, 23, { align: "right" });
 
-  y = 60;
+  y = 45;
 
-  // Property Name
-  doc.setFontSize(20);
+  // PROPERTY NAME
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(18);
+  doc.setFont("helvetica", "bold");
+  const propertyTitle = data.propertyName || "Property Submission";
+  const splitTitle = doc.splitTextToSize(propertyTitle, 180);
+  doc.text(splitTitle, 15, y);
+  y += (splitTitle.length * 8) + 5;
+
+  // COMPLIANCE SUMMARY BOX
+  const meetsRequirements = evaluation.meetsRequirements;
+  
+  // Box background
+  doc.setFillColor(meetsRequirements ? 240 : 255, meetsRequirements ? 248 : 240, meetsRequirements ? 240 : 240);
+  doc.setDrawColor(meetsRequirements ? 34 : 220, meetsRequirements ? 197 : 38, meetsRequirements ? 94 : 38);
+  doc.setLineWidth(2);
+  doc.roundedRect(15, y, 180, 45, 5, 5, "FD");
+  
+  // Compliance status
+  doc.setFontSize(16);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(meetsRequirements ? 34 : 180, meetsRequirements ? 150 : 38, meetsRequirements ? 94 : 38);
+  doc.text(meetsRequirements ? "✓ MEETS ZENTHIUM REQUIREMENTS" : "✗ DOES NOT MEET REQUIREMENTS", 25, y + 12);
+  
+  // Score
+  doc.setFontSize(24);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(0, 0, 0);
-  doc.text(data.propertyName || "Property Submission", 20, y);
-  y += 15;
-
-  // Property Details Section
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text("Property Details", 20, y);
-  y += 10;
-
-  doc.setFontSize(10);
+  doc.text(`${evaluation.score}/100`, 165, y + 12, { align: "center" });
+  
+  // Summary text
+  doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
+  doc.setTextColor(80, 80, 80);
+  const summaryLines = doc.splitTextToSize(evaluation.summary, 155);
+  doc.text(summaryLines, 25, y + 22);
+  
+  y += 55;
 
-  const propertyFields = [
-    { label: "Property Type", value: data.propertyType || "Not provided" },
-    { label: "Address", value: data.address || "Not provided" },
-    { label: "City", value: data.city || "Not provided" },
-    { label: "State", value: data.state || "Not provided" },
-    { label: "ZIP", value: data.zip || "Not provided" },
-    { label: "Country", value: data.country || "Not provided" },
-    { label: "Coordinates", value: data.coordinates || "Not provided" },
-    { label: "Square Footage", value: data.squareFootage ? `${data.squareFootage.toLocaleString()} sq ft` : "Not provided" },
-    { label: "Acreage", value: data.acreage ? `${data.acreage} acres` : "Not provided" },
-    { label: "Zoning Classification", value: data.zoningClassification || "Not provided" },
-    { label: "Single Story", value: data.isSingleStory !== undefined ? (data.isSingleStory ? "Yes" : "No") : "Not provided" },
-    { label: "Flat Floor", value: data.isFloor !== undefined ? (data.isFloor ? "Yes" : "No") : "Not provided" },
-    { label: "Flood Zone", value: data.floodZone !== undefined ? (data.floodZone ? "Yes" : "No") : "Not provided" },
-  ];
-
-  for (const field of propertyFields) {
-    doc.text(`${field.label}:`, 20, y);
-    doc.text(field.value, 70, y);
-    y += 7;
-  }
-
-  y += 5;
-
-  // Location Map Section
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text("Location Map", 20, y);
-  y += 10;
-
-  // Map placeholder with Google Maps URL
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-  const mapUrl = data.address && data.city
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${data.address}, ${data.city}, ${data.state} ${data.zip}`)}`
-    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${data.city}, ${data.state}`)}`;
-
-  doc.text("View location on Google Maps:", 20, y);
-  y += 5;
-  doc.setTextColor(0, 0, 255);
-  doc.text(mapUrl, 20, y, { maxWidth: 170 });
-  doc.setTextColor(0, 0, 0);
-  y += 10;
-
-  // Power Requirements Section
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text("Power Requirements", 20, y);
-  y += 10;
-
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-
-  const powerFields = [
-    { label: "Power Available", value: data.powerAvailableMW ? `${data.powerAvailableMW} MW` : "Not provided" },
-    { label: "Power Type", value: data.powerType || "Not provided" },
-    { label: "Backup Power", value: data.hasBackupPower !== undefined ? (data.hasBackupPower ? "Yes" : "No") : "Not provided" },
-    { label: "Zenthium Requirement", value: "20+ MW (Required)" },
-  ];
-
-  for (const field of powerFields) {
-    doc.text(`${field.label}:`, 20, y);
-    doc.text(field.value, 70, y);
-    y += 7;
-  }
-
-  y += 5;
-
-  // Water Requirements Section
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text("Water Requirements", 20, y);
-  y += 10;
-
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-
-  const waterFields = [
-    { label: "Water Access", value: data.waterAvailable ? (data.waterSource || "Yes") : "No" },
-    { label: "Water Source", value: data.waterSource || "Not provided" },
-    { label: "Cooling Capacity", value: data.coolingCapacity || "Not provided" },
-    { label: "HVAC Installed", value: data.hvacInstalled !== undefined ? (data.hvacInstalled ? "Yes" : "No") : "Not provided" },
-    { label: "Zenthium Requirement", value: "Water access for cooling (Required)" },
-  ];
-
-  for (const field of waterFields) {
-    doc.text(`${field.label}:`, 20, y);
-    doc.text(field.value, 70, y);
-    y += 7;
-  }
-
-  y += 5;
-
-  // Infrastructure Section
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text("Infrastructure", 20, y);
-  y += 10;
-
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-
-  const infrastructureFields = [
-    { label: "Ceiling Height", value: data.ceilingHeightFt ? `${data.ceilingHeightFt} ft` : "Not provided" },
-    { label: "Zenthium Requirement", value: "18+ ft clear height (Required)" },
-    { label: "Fiber Connectivity", value: data.fiberAvailable ? (data.fiberProviders || "Yes") : "No" },
-    { label: "Fiber Providers", value: data.fiberProviders || "Not provided" },
-    { label: "Environmental Clearance", value: data.environmentalClearance || "Not provided" },
-  ];
-
-  for (const field of infrastructureFields) {
-    doc.text(`${field.label}:`, 20, y);
-    doc.text(field.value, 70, y);
-    y += 7;
-  }
-
-  // Check if we need a new page
-  if (y > 250) {
-    doc.addPage();
-    y = 20;
-  }
-
-  y += 5;
-
-  // Ownership & Financials Section
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text("Ownership & Financials", 20, y);
-  y += 10;
-
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-
-  const financialFields = [
-    { label: "Ownership Type", value: data.ownershipType || "Not provided" },
-    { label: "Asking Price", value: data.askingPrice || "Not provided" },
-    { label: "Lease Rate", value: data.leaseRate || "Not provided" },
-    { label: "Timeline", value: data.timeline || "Not provided" },
-  ];
-
-  for (const field of financialFields) {
-    doc.text(`${field.label}:`, 20, y);
-    doc.text(field.value, 70, y);
-    y += 7;
-  }
-
-  y += 5;
-
-  // Description Section
-  if (data.description) {
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("Description", 20, y);
+  // LOCATION MAP SECTION
+  y = checkPageBreak(doc, y, 80);
+  y = drawSectionHeader(doc, "LOCATION MAP", y);
+  
+  // Try to add map image using Google Static Maps API
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const mapQuery = data.coordinates 
+    ? data.coordinates 
+    : `${data.address}, ${data.city}, ${data.state} ${data.zip}`;
+  
+  if (apiKey && mapQuery) {
+    try {
+      const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(mapQuery)}&zoom=14&size=400x200&maptype=roadmap&markers=color:red%7C${encodeURIComponent(mapQuery)}&key=${apiKey}`;
+      
+      // Add placeholder rectangle for map
+      doc.setFillColor(240, 240, 240);
+      doc.setDrawColor(200, 200, 200);
+      doc.roundedRect(15, y, 180, 60, 3, 3, "FD");
+      
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "italic");
+      doc.setTextColor(150, 150, 150);
+      doc.text("Map visualization available with Google Maps API key", 105, y + 30, { align: "center" });
+      
+      // Map link below
+      y += 68;
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(0, 0, 255);
+      const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
+      doc.text("View on Google Maps: " + mapUrl, 15, y, { maxWidth: 180 });
+      doc.setTextColor(0, 0, 0);
+      y += 8;
+    } catch (e) {
+      y += 70;
+    }
+  } else {
+    // No API key - show text-based location info
+    y = drawInfoRow(doc, "Full Address", `${data.address || ""}, ${data.city || ""}, ${data.state || ""} ${data.zip || ""}`, y, 20);
+    if (data.coordinates) {
+      y = drawInfoRow(doc, "Coordinates", data.coordinates, y, 20);
+    }
+    
+    // Google Maps link
+    doc.setFontSize(8);
+    doc.setTextColor(0, 0, 255);
+    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${data.city}, ${data.state}`)}`;
+    doc.text("View on Google Maps: " + mapUrl, 20, y, { maxWidth: 170 });
+    doc.setTextColor(0, 0, 0);
     y += 10;
-
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    const splitDescription = doc.splitTextToSize(data.description, 170);
-    doc.text(splitDescription, 20, y);
-    y += splitDescription.length * 7 + 5;
   }
 
-  // New page for contacts
+  // PROPERTY DETAILS SECTION
+  y = checkPageBreak(doc, y, 60);
+  y = drawSectionHeader(doc, "PROPERTY DETAILS", y);
+  
+  y = drawInfoRow(doc, "Property Type", data.propertyType || "Not provided", y);
+  y = drawInfoRow(doc, "Square Footage", data.squareFootage ? `${data.squareFootage.toLocaleString()} sq ft` : "Not provided", y);
+  y = drawInfoRow(doc, "Acreage", data.acreage ? `${data.acreage} acres` : "Not provided", y);
+  y = drawInfoRow(doc, "Zoning", data.zoningClassification || "Not provided", y);
+
+  // REQUIREMENTS COMPLIANCE SECTION
+  y = checkPageBreak(doc, y, 120);
+  y = drawSectionHeader(doc, "REQUIREMENTS COMPLIANCE", y);
+  
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(249, 115, 22);
+  doc.text("REQUIRED CRITERIA", 20, y);
+  y += 8;
+  
+  // Required requirements with pass/fail
+  const reqSqft = evaluationData.squareFootage || 0;
+  const reqPower = evaluationData.powerAvailableMW || 0;
+  const reqHeight = evaluationData.ceilingHeightFt || 0;
+  
+  y = drawComplianceBadge(doc, "Square Footage", reqSqft >= 10000 ? `${reqSqft.toLocaleString()} sq ft` : `${reqSqft.toLocaleString()} sq ft (Need 10,000+)`, reqSqft >= 10000, y);
+  y = drawComplianceBadge(doc, "Power Capacity", reqPower >= 20 ? `${reqPower} MW` : `${reqPower} MW (Need 20+)`, reqPower >= 20, y);
+  y = drawComplianceBadge(doc, "Ceiling Height", reqHeight >= 18 ? `${reqHeight} ft` : `${reqHeight} ft (Need 18+)`, reqHeight >= 18, y);
+  y = drawComplianceBadge(doc, "Single Story", data.isSingleStory ? "Yes" : "No", data.isSingleStory ?? false, y);
+  y = drawComplianceBadge(doc, "Flat Floor", data.isFloor ? "Yes" : "No", data.isFloor ?? false, y);
+  y = drawComplianceBadge(doc, "Water Access", data.waterAvailable ? (data.waterSource || "Yes") : "No", data.waterAvailable, y);
+  
+  y += 5;
+  
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(100, 100, 100);
+  doc.text("PREFERRED CRITERIA", 20, y);
+  y += 8;
+  
+  // Preferred requirements
+  y = drawComplianceBadge(doc, "Fiber Connectivity", data.fiberAvailable ? (data.fiberProviders || "Yes") : "No", data.fiberAvailable, y);
+  y = drawComplianceBadge(doc, "Not in Flood Zone", data.floodZone ? "In flood zone" : "Not in flood zone", !data.floodZone, y);
+
+  // INFRASTRUCTURE DETAILS SECTION
+  y = checkPageBreak(doc, y, 80);
+  y = drawSectionHeader(doc, "INFRASTRUCTURE DETAILS", y);
+  
+  // Power details
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(249, 115, 22);
+  doc.text("POWER", 20, y);
+  y += 8;
+  
+  y = drawInfoRow(doc, "Available Power", data.powerAvailableMW ? `${data.powerAvailableMW} MW` : "Not specified", y);
+  y = drawInfoRow(doc, "Power Type", data.powerType || "Not specified", y);
+  y = drawInfoRow(doc, "Backup Power", data.hasBackupPower ? "Yes" : "No", y);
+  y = drawInfoRow(doc, "Zenthium Minimum", "20+ MW (Required)", y);
+  
+  y += 5;
+  
+  // Water details
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(249, 115, 22);
+  doc.text("WATER & COOLING", 20, y);
+  y += 8;
+  
+  y = drawInfoRow(doc, "Water Access", data.waterAvailable ? (data.waterSource || "Yes") : "No", y);
+  y = drawInfoRow(doc, "Water Source", data.waterSource || "Not specified", y);
+  y = drawInfoRow(doc, "Cooling Capacity", data.coolingCapacity || "Not specified", y);
+  y = drawInfoRow(doc, "HVAC Installed", data.hvacInstalled ? "Yes" : "No", y);
+  y = drawInfoRow(doc, "Zenthium Requirement", "Water access for cooling (Required)", y);
+  
+  y += 5;
+  
+  // Connectivity
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(249, 115, 22);
+  doc.text("CONNECTIVITY", 20, y);
+  y += 8;
+  
+  y = drawInfoRow(doc, "Fiber Available", data.fiberAvailable ? "Yes" : "No", y);
+  y = drawInfoRow(doc, "Fiber Providers", data.fiberProviders || "Not specified", y);
+
+  // OWNERSHIP & FINANCIALS
+  y = checkPageBreak(doc, y, 50);
+  y = drawSectionHeader(doc, "OWNERSHIP & FINANCIALS", y);
+  
+  y = drawInfoRow(doc, "Ownership Type", data.ownershipType || "Not specified", y);
+  y = drawInfoRow(doc, "Asking Price", data.askingPrice || "Not specified", y);
+  y = drawInfoRow(doc, "Lease Rate", data.leaseRate || "Not specified", y);
+  y = drawInfoRow(doc, "Timeline", data.timeline || "Not specified", y);
+  y = drawInfoRow(doc, "Environmental", data.environmentalClearance || "Not specified", y);
+
+  // DESCRIPTION
+  if (data.description) {
+    y = checkPageBreak(doc, y, 60);
+    y = drawSectionHeader(doc, "DESCRIPTION", y);
+    
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(0, 0, 0);
+    const splitDesc = doc.splitTextToSize(data.description, 170);
+    doc.text(splitDesc, 20, y);
+    y += (splitDesc.length * 5) + 10;
+  }
+
+  // CONTACTS ON NEW PAGE
   doc.addPage();
   y = 20;
-
-  // Submitter Information
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text("Submitter Information", 20, y);
-  y += 10;
-
+  
+  y = drawSectionHeader(doc, "CONTACT INFORMATION", y);
+  
+  // Submitter
   doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-
-  const submitterFields = [
-    { label: "Name", value: data.submitterName },
-    { label: "Company", value: data.submitterCompany },
-    { label: "Email", value: data.submitterEmail },
-    { label: "Phone", value: data.submitterPhone },
-  ];
-
-  for (const field of submitterFields) {
-    doc.text(`${field.label}:`, 20, y);
-    doc.text(field.value || "N/A", 70, y);
-    y += 7;
-  }
-
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(249, 115, 22);
+  doc.text("SUBMITTER", 20, y);
   y += 10;
-
-  // Direct Contact Information
+  
+  y = drawInfoRow(doc, "Name", data.submitterName, y);
+  y = drawInfoRow(doc, "Company", data.submitterCompany, y);
+  y = drawInfoRow(doc, "Email", data.submitterEmail, y);
+  y = drawInfoRow(doc, "Phone", data.submitterPhone, y);
+  
+  y += 10;
+  
+  // Direct Contact
   if (data.directContactName) {
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("Direct Contact Information", 20, y);
-    y += 10;
-
     doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-
-    const contactFields = [
-      { label: "Name", value: data.directContactName },
-      { label: "Company", value: data.directContactCompany },
-      { label: "Email", value: data.directContactEmail },
-      { label: "Phone", value: data.directContactPhone },
-    ];
-
-    for (const field of contactFields) {
-      doc.text(`${field.label}:`, 20, y);
-      doc.text(field.value || "N/A", 70, y);
-      y += 7;
-    }
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(249, 115, 22);
+    doc.text("DIRECT CONTACT", 20, y);
+    y += 10;
+    
+    y = drawInfoRow(doc, "Name", data.directContactName, y);
+    y = drawInfoRow(doc, "Company", data.directContactCompany || "", y);
+    y = drawInfoRow(doc, "Email", data.directContactEmail || "", y);
+    y = drawInfoRow(doc, "Phone", data.directContactPhone || "", y);
   }
 
-  // Footer
+  // FOOTER on all pages
   const pageCount = doc.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
+    
+    // Footer line
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.5);
+    doc.line(15, 280, 195, 280);
+    
+    // Footer text
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(128, 128, 128);
-    doc.text(
-      "V+ | Strategic Value+ | Zenthium Property Submission",
-      105,
-      290,
-      { align: "center" }
-    );
-    doc.text(`Page ${i} of ${pageCount}`, 105, 295, { align: "center" });
+    doc.text("V+ | Strategic Value+ | Zenthium Property Submission", 105, 288, { align: "center" });
+    doc.text(`Page ${i} of ${pageCount}`, 105, 293, { align: "center" });
   }
 
   return doc;
 }
 
-export function downloadPropertyPDF(data: PropertyPDFData, filename?: string) {
-  const doc = generatePropertyPDF(data);
-  const defaultFilename = `zenthium-${data.propertyName || "property"}-${Date.now()}.pdf`;
+export async function downloadPropertyPDF(data: PropertyPDFData, filename?: string) {
+  const doc = await generatePropertyPDF(data);
+  const defaultFilename = `zenthium-${data.propertyName?.replace(/[^a-z0-9]/gi, "_").toLowerCase() || "property"}-${Date.now()}.pdf`;
   doc.save(filename || defaultFilename);
 }

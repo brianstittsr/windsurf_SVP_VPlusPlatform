@@ -177,7 +177,7 @@ export default function ZenthiumSubmitPage() {
     form.floodZone,
   ]);
 
-  const handleGeneratePDF = () => {
+  const handleGeneratePDF = async () => {
     const pdfData = {
       propertyName: form.propertyName,
       propertyType: form.propertyType,
@@ -219,7 +219,7 @@ export default function ZenthiumSubmitPage() {
       hasBackupPower: form.hasBackupPower,
       hvacInstalled: form.hvacInstalled,
     };
-    downloadPropertyPDF(pdfData);
+    await downloadPropertyPDF(pdfData);
     toast.success("PDF generated successfully!");
   };
 
