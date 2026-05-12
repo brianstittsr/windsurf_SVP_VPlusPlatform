@@ -78,26 +78,37 @@ const submissionSchema = z.object({
 // Transform nested submission data to flat format for list view
 function flattenSubmission(doc: any, id: string) {
   const raw = doc;
-  const address = raw.address ?? {};
+  // Handle both nested and flat address structures
+  let address: any = {};
+  if (typeof raw.address === 'string') {
+    // Flat address - store as is
+    address = { street: raw.address, city: raw.city || '', state: raw.state || '', zip: raw.zip || '', country: raw.country || 'US' };
+  } else if (typeof raw.address === 'object' && raw.address !== null) {
+    // Nested address object
+    address = raw.address;
+  } else {
+    // No address data
+    address = { street: '', city: raw.city || '', state: raw.state || '', zip: raw.zip || '', country: raw.country || 'US' };
+  }
   const poc = raw.poc ?? {};
 
   return {
     id,
     title: raw.title ?? `${raw.propertyName ?? "Property"} — ${address.city ?? "Unknown Location"}`,
     // Submitter info (from POC)
-    submitterName: poc.name ?? "",
-    submitterEmail: poc.email ?? "",
-    submitterPhone: poc.phone ?? "",
-    submitterCompany: poc.company ?? "",
+    submitterName: poc.name ?? raw.submitterName ?? "",
+    submitterEmail: poc.email ?? raw.submitterEmail ?? "",
+    submitterPhone: poc.phone ?? raw.submitterPhone ?? "",
+    submitterCompany: poc.company ?? raw.submitterCompany ?? "",
     // Property
     propertyName: raw.propertyName ?? "",
-    propertyType: raw.propertyType ?? "",
+    propertyType: typeof raw.propertyType === 'object' ? (raw.propertyType as any).label || (raw.propertyType as any).value || '' : raw.propertyType ?? "",
     // Address (flat)
-    address: address.street ?? "",
-    city: address.city ?? "",
-    state: address.state ?? "",
-    zip: address.zip ?? "",
-    country: address.country ?? "US",
+    address: typeof raw.address === 'string' ? raw.address : address.street ?? "",
+    city: typeof raw.city === 'string' ? raw.city : address.city ?? "",
+    state: typeof raw.state === 'string' ? raw.state : address.state ?? "",
+    zip: typeof raw.zip === 'string' ? raw.zip : address.zip ?? "",
+    country: typeof raw.country === 'string' ? raw.country : address.country ?? "US",
     coordinates: raw.coordinates ?? "",
     // Size
     squareFootage: raw.squareFootage ?? undefined,

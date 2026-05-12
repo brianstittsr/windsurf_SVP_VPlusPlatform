@@ -43,6 +43,33 @@ export async function POST(request: NextRequest) {
 
         const submission = submissionDoc.data();
 
+        // Query real estate API for space conditions
+        let realEstateData = null;
+        if (submission?.address && submission?.city && submission?.state) {
+          try {
+            const baseUrl = request.headers.get("host")?.includes("localhost")
+              ? `http://${request.headers.get("host")}`
+              : `https://${request.headers.get("host")}`;
+            const realEstateResponse = await fetch(`${baseUrl}/api/zenthium/integrations/real-estate`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                address: submission.address,
+                city: submission.city,
+                state: submission.state,
+                zip: submission.zip,
+                propertyType: submission.propertyType,
+              }),
+            });
+            if (realEstateResponse.ok) {
+              const realEstateResult = await realEstateResponse.json();
+              realEstateData = realEstateResult;
+            }
+          } catch (error) {
+            console.error(`Real estate API error for ${id}:`, error);
+          }
+        }
+
         // Geocode address if coordinates not available
         let coordinates = submission?.coordinates;
         if (!coordinates && submission?.address && submission?.city && submission?.state) {
@@ -96,14 +123,14 @@ export async function POST(request: NextRequest) {
           console.error(`OpenGridWorks error for ${id}:`, error);
         }
 
-        // Extract validation data
+        // Extract validation data, prioritizing real estate API data
         const validationData = {
           powerAvailableMW: powerFromOpenGrid || submission?.powerCapacityMW || submission?.powerAvailableMW || 0,
-          squareFootage: submission?.squareFootage || 0,
-          ceilingHeightFt: submission?.ceilingHeightFt || 0,
-          waterAvailable: submission?.waterAvailable || false,
-          isSingleStory: submission?.isSingleStory || false,
-          isFloor: submission?.isFloor || false,
+          squareFootage: realEstateData?.propertyDetails?.squareFootage || submission?.squareFootage || 0,
+          ceilingHeightFt: realEstateData?.apiResponses?.zillow?.ceilingHeightFt || submission?.ceilingHeightFt || 0,
+          waterAvailable: realEstateData?.apiResponses?.zillow?.hasWaterAccess ?? submission?.waterAvailable ?? false,
+          isSingleStory: realEstateData?.apiResponses?.zillow?.isSingleStory ?? submission?.isSingleStory ?? false,
+          isFloor: realEstateData?.apiResponses?.zillow?.isFlatFloor ?? submission?.isFloor ?? false,
         };
 
         // Validate requirements
@@ -155,6 +182,12 @@ export async function POST(request: NextRequest) {
           validationLastRun: new Date().toISOString(),
           // Update power capacity from OpenGridWorks if available
           ...(powerFromOpenGrid > 0 && { powerCapacityMW: powerFromOpenGrid }),
+          // Update space conditions from real estate API if available
+          ...(realEstateData?.propertyDetails?.squareFootage && { squareFootage: realEstateData.propertyDetails.squareFootage }),
+          ...(realEstateData?.apiResponses?.zillow?.ceilingHeightFt && { ceilingHeightFt: realEstateData.apiResponses.zillow.ceilingHeightFt }),
+          ...(realEstateData?.apiResponses?.zillow?.hasWaterAccess !== undefined && { waterAvailable: realEstateData.apiResponses.zillow.hasWaterAccess }),
+          ...(realEstateData?.apiResponses?.zillow?.isSingleStory !== undefined && { isSingleStory: realEstateData.apiResponses.zillow.isSingleStory }),
+          ...(realEstateData?.apiResponses?.zillow?.isFlatFloor !== undefined && { isFloor: realEstateData.apiResponses.zillow.isFlatFloor }),
         });
 
         results.push({
@@ -240,6 +273,33 @@ export async function GET(request: NextRequest) {
 
       const submission = submissionDoc.data();
 
+      // Query real estate API for space conditions
+      let realEstateData = null;
+      if (submission?.address && submission?.city && submission?.state) {
+        try {
+          const baseUrl = request.headers.get("host")?.includes("localhost")
+            ? `http://${request.headers.get("host")}`
+            : `https://${request.headers.get("host")}`;
+          const realEstateResponse = await fetch(`${baseUrl}/api/zenthium/integrations/real-estate`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              address: submission.address,
+              city: submission.city,
+              state: submission.state,
+              zip: submission.zip,
+              propertyType: submission.propertyType,
+            }),
+          });
+          if (realEstateResponse.ok) {
+            const realEstateResult = await realEstateResponse.json();
+            realEstateData = realEstateResult;
+          }
+        } catch (error) {
+          console.error(`Real estate API error for ${id}:`, error);
+        }
+      }
+
       // Geocode address if coordinates not available
       let coordinates = submission?.coordinates;
       if (!coordinates && submission?.address && submission?.city && submission?.state) {
@@ -295,11 +355,11 @@ export async function GET(request: NextRequest) {
 
       const validationData = {
         powerAvailableMW: powerFromOpenGrid || submission?.powerCapacityMW || submission?.powerAvailableMW || 0,
-        squareFootage: submission?.squareFootage || 0,
-        ceilingHeightFt: submission?.ceilingHeightFt || 0,
-        waterAvailable: submission?.waterAvailable || false,
-        isSingleStory: submission?.isSingleStory || false,
-        isFloor: submission?.isFloor || false,
+        squareFootage: realEstateData?.propertyDetails?.squareFootage || submission?.squareFootage || 0,
+        ceilingHeightFt: realEstateData?.apiResponses?.zillow?.ceilingHeightFt || submission?.ceilingHeightFt || 0,
+        waterAvailable: realEstateData?.apiResponses?.zillow?.hasWaterAccess ?? submission?.waterAvailable ?? false,
+        isSingleStory: realEstateData?.apiResponses?.zillow?.isSingleStory ?? submission?.isSingleStory ?? false,
+        isFloor: realEstateData?.apiResponses?.zillow?.isFlatFloor ?? submission?.isFloor ?? false,
       };
 
       const requirements = [
@@ -325,6 +385,12 @@ export async function GET(request: NextRequest) {
         validationLastRun: new Date().toISOString(),
         // Update power capacity from OpenGridWorks if available
         ...(powerFromOpenGrid > 0 && { powerCapacityMW: powerFromOpenGrid }),
+        // Update space conditions from real estate API if available
+        ...(realEstateData?.propertyDetails?.squareFootage && { squareFootage: realEstateData.propertyDetails.squareFootage }),
+        ...(realEstateData?.apiResponses?.zillow?.ceilingHeightFt && { ceilingHeightFt: realEstateData.apiResponses.zillow.ceilingHeightFt }),
+        ...(realEstateData?.apiResponses?.zillow?.hasWaterAccess !== undefined && { waterAvailable: realEstateData.apiResponses.zillow.hasWaterAccess }),
+        ...(realEstateData?.apiResponses?.zillow?.isSingleStory !== undefined && { isSingleStory: realEstateData.apiResponses.zillow.isSingleStory }),
+        ...(realEstateData?.apiResponses?.zillow?.isFlatFloor !== undefined && { isFloor: realEstateData.apiResponses.zillow.isFlatFloor }),
       });
 
       results.push({

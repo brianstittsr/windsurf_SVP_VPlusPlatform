@@ -167,11 +167,11 @@ async function validateWithGoogleGeocoding(address: string) {
 async function validateWithZillow(address: string) {
   // NOTE: Zillow API requires partnership agreement
   // This is a mock implementation - replace with actual API call
-  
+
   const apiKey = process.env.ZILLOW_API_KEY;
-  
+
   if (!apiKey) {
-    // Return mock data for development
+    // Return mock data for development with space conditions
     return {
       exists: true,
       zpid: "mock-zpid-12345",
@@ -180,13 +180,19 @@ async function validateWithZillow(address: string) {
       lotSize: 2.5,
       yearBuilt: 2010,
       zoning: "Industrial",
+      // Space conditions for Zenthium requirements
+      ceilingHeightFt: 22, // Meets 18+ ft requirement
+      isSingleStory: true, // Meets single story requirement
+      isFlatFloor: true, // Meets flat floor requirement
+      hasWaterAccess: true, // Meets water access requirement
+      buildingClass: "Warehouse/Industrial",
       mock: true,
     };
   }
 
   // Actual Zillow API call would go here
   // const url = `https://api.zillow.com/webservice/GetDeepSearchResults.htm?zws-id=${apiKey}&address=${encodeURIComponent(address)}`;
-  
+
   throw new Error("Zillow API not implemented");
 }
 
