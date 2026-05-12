@@ -155,12 +155,12 @@ function generateLetterheadPDF(
 
   // ── 6 Critical Requirements ──
   const checks = [
-    { label: 'Power Capacity', value: powerMW > 0 ? `${powerMW} MW` : 'Not specified', requirement: '20+ MW', pass: powerMW >= 20 },
-    { label: 'Property Size', value: sqft > 0 ? `${sqft.toLocaleString()} sq ft` : 'Not specified', requirement: '10,000+ sq ft', pass: sqft >= 10000 },
-    { label: 'Ceiling Height', value: ceilingFt > 0 ? `${ceilingFt} ft` : 'Not specified', requirement: '18+ ft', pass: ceilingFt >= 18 },
-    { label: 'Water Access', value: waterAvail ? 'Available' : 'Not confirmed', requirement: 'Required', pass: waterAvail },
-    { label: 'Single Story', value: isSingleStory ? 'Yes' : 'No', requirement: 'Required', pass: isSingleStory },
-    { label: 'Flat Floor', value: isFloor ? 'Yes' : 'No', requirement: 'Required', pass: isFloor },
+    { label: 'Power Capacity', value: powerMW > 0 ? `${powerMW} MW` : 'Not specified', requirement: '20+ MW', pass: powerMW >= 20, source: powerMW >= 20 ? 'OpenGridWorks' : 'Submitted' },
+    { label: 'Property Size', value: sqft > 0 ? `${sqft.toLocaleString()} sq ft` : 'Not specified', requirement: '10,000+ sq ft', pass: sqft >= 10000, source: 'Submitted' },
+    { label: 'Ceiling Height', value: ceilingFt > 0 ? `${ceilingFt} ft` : 'Not specified', requirement: '18+ ft', pass: ceilingFt >= 18, source: 'Submitted' },
+    { label: 'Water Access', value: waterAvail ? 'Available' : 'Not confirmed', requirement: 'Required', pass: waterAvail, source: 'Submitted' },
+    { label: 'Single Story', value: isSingleStory ? 'Yes' : 'No', requirement: 'Required', pass: isSingleStory, source: 'Submitted' },
+    { label: 'Flat Floor', value: isFloor ? 'Yes' : 'No', requirement: 'Required', pass: isFloor, source: 'Submitted' },
   ];
   const passedChecks = checks.filter(c => c.pass).length;
   const score = Math.round((passedChecks / checks.length) * 100);
@@ -297,6 +297,50 @@ function generateLetterheadPDF(
   doc.line(marginL, y - 11, marginR, y - 11);
 
   y += 16;
+
+  // ── Data Sources Section ──
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(60, 60, 60);
+  doc.text('Data Sources & Validation', marginL, y);
+  y += 14;
+
+  // Determine data sources
+  const powerFromOpenGrid = powerMW >= 20 && powerMW > 0;
+  const coordinatesFromGeocoding = submission.coordinates && submission.coordinates.length > 0;
+  const validationTimestamp = submission.validationLastRun ? new Date(submission.validationLastRun).toLocaleDateString() : 'Not validated';
+
+  // Data sources grid
+  const dataSources = [
+    { label: 'Power Capacity', source: powerFromOpenGrid ? 'OpenGridWorks API' : 'Submitted Data', status: powerFromOpenGrid ? 'verified' : 'submitted' },
+    { label: 'Coordinates', source: coordinatesFromGeocoding ? 'Geocoding API' : 'Not specified', status: coordinatesFromGeocoding ? 'verified' : 'none' },
+    { label: 'Validation Date', source: validationTimestamp, status: validationTimestamp !== 'Not validated' ? 'verified' : 'none' },
+  ];
+
+  // Draw data sources in 3-column grid
+  const colWidth = contentWidth / 3;
+  dataSources.forEach((ds, index) => {
+    const colX = marginL + (index * colWidth);
+    const badgeColor = ds.status === 'verified' ? [34, 197, 94] : ds.status === 'submitted' ? [59, 130, 246] : [156, 163, 175];
+
+    // Label
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(100, 100, 100);
+    doc.text(ds.label, colX, y);
+
+    // Source
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(40, 40, 40);
+    doc.text(ds.source, colX, y + 10);
+
+    // Status dot
+    doc.setFillColor(badgeColor[0], badgeColor[1], badgeColor[2]);
+    doc.circle(colX + 3, y + 17, 2.5, 'F');
+  });
+
+  y += 30;
 
   // ── Property Summary (compact) ──
   doc.setFont('helvetica', 'bold');
