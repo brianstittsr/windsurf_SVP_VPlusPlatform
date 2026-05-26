@@ -4,20 +4,20 @@ import { getFirestore, Firestore } from "firebase-admin/firestore";
 let app: App | undefined;
 let adminDb: Firestore | null = null;
 
-// Check for required environment variables
+// Check for required environment variables (support both FIREBASE_* and FIREBASE_ADMIN_* prefixes)
 const hasServiceAccount = !!(
-  process.env.FIREBASE_ADMIN_PROJECT_ID &&
-  process.env.FIREBASE_ADMIN_CLIENT_EMAIL &&
-  process.env.FIREBASE_ADMIN_PRIVATE_KEY
+  (process.env.FIREBASE_PROJECT_ID || process.env.FIREBASE_ADMIN_PROJECT_ID) &&
+  (process.env.FIREBASE_CLIENT_EMAIL || process.env.FIREBASE_ADMIN_CLIENT_EMAIL) &&
+  (process.env.FIREBASE_PRIVATE_KEY || process.env.FIREBASE_ADMIN_PRIVATE_KEY)
 );
 
 if (hasServiceAccount) {
   try {
     // Initialize with service account credentials
     const serviceAccount = {
-      projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+      projectId: process.env.FIREBASE_PROJECT_ID || process.env.FIREBASE_ADMIN_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL || process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
+      privateKey: (process.env.FIREBASE_PRIVATE_KEY || process.env.FIREBASE_ADMIN_PRIVATE_KEY)?.replace(/\\n/g, "\n"),
     };
 
     if (getApps().length === 0) {
