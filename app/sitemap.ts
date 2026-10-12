@@ -28,6 +28,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/careers",
     "/privacy",
     "/terms",
+    "/eula",
     "/cookies",
     "/accessibility",
   ];
