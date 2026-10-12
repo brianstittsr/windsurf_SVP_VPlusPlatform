@@ -1685,6 +1685,8 @@ export interface CaptureAlertLogDoc {
     | "deadline-1d"
     | "overdue"
     | "task-due"
+    | "task-assigned"
+    | "due-date-changed"
     | "cert-expiry"
     | "sam-expiry";
   entityType: "capture-opportunity" | "capture-task" | "capture-client";

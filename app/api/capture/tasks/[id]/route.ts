@@ -5,6 +5,7 @@ import { COLLECTIONS } from "@/lib/schema";
 import { requireUser, canWriteOpportunity } from "@/lib/capture/server-auth";
 import { taskPatchSchema } from "@/lib/capture/validation";
 import { serializeDoc } from "@/lib/capture/serialize";
+import { captureAlert } from "@/lib/capture/notify";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -33,6 +34,20 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   }
 
   await ref.update({ ...parsed.data, updatedAt: FieldValue.serverTimestamp() });
+
+  // Reassignment alert
+  if (parsed.data.assigneeId && parsed.data.assigneeId !== task.assigneeId) {
+    captureAlert({
+      type: "task-assigned",
+      entityType: "capture-task",
+      entityId: id,
+      entityName: parsed.data.title || task.title,
+      recipientId: parsed.data.assigneeId,
+      message: `Task "${parsed.data.title || task.title}" was reassigned to you on "${(oppSnap.data()?.title as string) || ""}"`,
+      subject: `Task reassigned: ${parsed.data.title || task.title}`,
+    }).catch((e) => console.error("[capture] reassignment alert failed:", e));
+  }
+
   const updated = await ref.get();
   return NextResponse.json({ task: serializeDoc({ id: updated.id, ...updated.data() }) });
 }

@@ -6,6 +6,7 @@ import { requireUser, canWriteOpportunity } from "@/lib/capture/server-auth";
 import { taskCreateSchema } from "@/lib/capture/validation";
 import { serializeDoc } from "@/lib/capture/serialize";
 import { captureAudit } from "@/lib/capture/audit";
+import { captureAlert } from "@/lib/capture/notify";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -59,6 +60,19 @@ export async function POST(req: NextRequest, { params }: Params) {
     userId: user.uid,
     metadata: { opportunityId: id },
   });
+
+  // Task-assigned alert: email the assignee + log it
+  if (parsed.data.assigneeId) {
+    captureAlert({
+      type: "task-assigned",
+      entityType: "capture-task",
+      entityId: docRef.id,
+      entityName: parsed.data.title,
+      recipientId: parsed.data.assigneeId,
+      message: `You were assigned task "${parsed.data.title}" on "${(oppSnap.data()?.title as string) || ""}"${parsed.data.dueDate ? ` — due ${new Date(parsed.data.dueDate).toLocaleDateString("en-US")}` : ""}`,
+      subject: `New task assigned: ${parsed.data.title}`,
+    }).catch((e) => console.error("[capture] task-assigned alert failed:", e));
+  }
 
   const created = await docRef.get();
   return NextResponse.json({ task: serializeDoc({ id: created.id, ...created.data() }) }, { status: 201 });

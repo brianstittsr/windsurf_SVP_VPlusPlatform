@@ -6,6 +6,7 @@ import { requireUser, canWriteOpportunity } from "@/lib/capture/server-auth";
 import { opportunityPatchSchema } from "@/lib/capture/validation";
 import { serializeDoc } from "@/lib/capture/serialize";
 import { captureAudit } from "@/lib/capture/audit";
+import { captureAlert } from "@/lib/capture/notify";
 import { computeWarnings } from "@/lib/capture/warnings";
 import { getCaptureSettings } from "@/lib/capture/settings";
 
@@ -68,6 +69,27 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   }
   delete updates.stage; // stage changes go through the gated /stage route
   delete updates.deletedAt;
+
+  // Due-date-changed alert: notify the owner when a deadline moves
+  const prev = snap.data()!;
+  const moved = (["responseDue", "questionsDue"] as const).filter((k) => {
+    const next = updates[k] as { at?: string } | null | undefined;
+    if (!next?.at) return false;
+    const prevAt = (prev[k] as { at?: string } | null | undefined)?.at;
+    return prevAt !== next.at;
+  });
+  if (moved.length > 0 && prev.ownerId) {
+    const labels = moved.map((k) => (k === "responseDue" ? "Response due" : "Questions due"));
+    captureAlert({
+      type: "due-date-changed",
+      entityType: "capture-opportunity",
+      entityId: id,
+      entityName: (prev.title as string) || "",
+      recipientId: prev.ownerId as string,
+      message: `${labels.join(" and ")} changed on "${(prev.title as string) || id}"`,
+      subject: `Deadline changed: ${(prev.title as string) || "opportunity"}`,
+    }).catch((e) => console.error("[capture] due-date alert failed:", e));
+  }
 
   await ref.update({ ...updates, updatedAt: FieldValue.serverTimestamp() });
 
