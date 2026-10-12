@@ -291,11 +291,13 @@ const captureItems = [
     title: "Trash",
     href: "/portal/capture/trash",
     icon: Trash2,
+    adminOnly: true,
   },
   {
     title: "Capture Settings",
     href: "/portal/capture/settings",
     icon: Settings,
+    adminOnly: true,
   },
 ];
 
@@ -546,7 +548,9 @@ export function PortalSidebar() {
               <CollapsibleContent>
                 <SidebarGroupContent>
                   <SidebarMenu>
-                    {filterNavItems(captureItems).map((item) => {
+                    {filterNavItems(captureItems)
+                      .filter((item) => !("adminOnly" in item && item.adminOnly) || effectiveRole === "admin")
+                      .map((item) => {
                       const hidden = isItemHidden(item.href);
                       return (
                         <SidebarMenuItem key={item.href} className={cn(hidden && isAdmin && !previewRole && "opacity-50")}>

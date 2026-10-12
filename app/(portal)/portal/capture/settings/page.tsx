@@ -6,11 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { captureJson } from "@/lib/capture/api-client";
+import { useUserProfile } from "@/contexts/user-profile-context";
 import type { CaptureSettingsDoc } from "@/lib/schema";
 import { Save } from "lucide-react";
 import { toast } from "sonner";
 
 export default function CaptureSettingsPage() {
+  const { profile } = useUserProfile();
+  const isAdmin = profile.role === "admin";
   const [settings, setSettings] = useState<CaptureSettingsDoc | null>(null);
   const [forbidden, setForbidden] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -56,11 +59,13 @@ export default function CaptureSettingsPage() {
 
   if (!settings) return <div className="p-6 text-muted-foreground">Loading settings...</div>;
 
+  const disabled = !isAdmin || forbidden;
+
   return (
     <div className="p-6 space-y-6 max-w-2xl">
       <h1 className="text-2xl font-bold">Capture Settings</h1>
-      {forbidden && (
-        <p className="text-sm text-destructive">Admin access is required to change settings.</p>
+      {disabled && (
+        <p className="text-sm text-muted-foreground">Admin access is required to change settings.</p>
       )}
 
       <Card>
@@ -71,15 +76,15 @@ export default function CaptureSettingsPage() {
         <CardContent className="grid grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="yellow">Yellow (days)</Label>
-            <Input id="yellow" type="number" min={1} value={form.deadlineYellowDays} onChange={(e) => setForm({ ...form, deadlineYellowDays: e.target.value })} />
+            <Input id="yellow" type="number" min={1} value={form.deadlineYellowDays} onChange={(e) => setForm({ ...form, deadlineYellowDays: e.target.value })} disabled={disabled} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="red">Red (days)</Label>
-            <Input id="red" type="number" min={1} value={form.deadlineRedDays} onChange={(e) => setForm({ ...form, deadlineRedDays: e.target.value })} />
+            <Input id="red" type="number" min={1} value={form.deadlineRedDays} onChange={(e) => setForm({ ...form, deadlineRedDays: e.target.value })} disabled={disabled} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="expiry">Expiry warning (days)</Label>
-            <Input id="expiry" type="number" min={1} value={form.expiryWarningDays} onChange={(e) => setForm({ ...form, expiryWarningDays: e.target.value })} />
+            <Input id="expiry" type="number" min={1} value={form.expiryWarningDays} onChange={(e) => setForm({ ...form, expiryWarningDays: e.target.value })} disabled={disabled} />
           </div>
         </CardContent>
       </Card>
@@ -90,7 +95,7 @@ export default function CaptureSettingsPage() {
           <CardDescription>Allowed tags for uploaded opportunity files (comma-separated).</CardDescription>
         </CardHeader>
         <CardContent>
-          <Input value={form.fileTags} onChange={(e) => setForm({ ...form, fileTags: e.target.value })} />
+          <Input value={form.fileTags} onChange={(e) => setForm({ ...form, fileTags: e.target.value })} disabled={disabled} />
         </CardContent>
       </Card>
 
@@ -108,10 +113,12 @@ export default function CaptureSettingsPage() {
         </CardContent>
       </Card>
 
-      <Button onClick={save} disabled={saving || forbidden}>
-        <Save className="h-4 w-4 mr-2" />
-        {saving ? "Saving..." : "Save Settings"}
-      </Button>
+      {!disabled && (
+        <Button onClick={save} disabled={saving}>
+          <Save className="h-4 w-4 mr-2" />
+          {saving ? "Saving..." : "Save Settings"}
+        </Button>
+      )}
     </div>
   );
 }

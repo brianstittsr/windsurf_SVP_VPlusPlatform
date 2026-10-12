@@ -27,6 +27,7 @@ import { TasksPanel } from "@/components/capture/tasks-panel";
 import { BidNoBidDialog } from "@/components/capture/bid-no-bid-dialog";
 import { SubmitDialog } from "@/components/capture/submit-dialog";
 import { captureJson } from "@/lib/capture/api-client";
+import { useUserProfile } from "@/contexts/user-profile-context";
 import type { CaptureFileRef, CaptureNote, CaptureOpportunity, CaptureSettingsDoc, CaptureTask } from "@/lib/schema";
 import { stagesForBoard, passesBidNoBidGate, isValidTransition } from "@/lib/capture/stages";
 import { formatDualTimezone } from "@/lib/capture/dates";
@@ -41,6 +42,8 @@ interface DetailResponse {
 
 export default function OpportunityDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const { profile } = useUserProfile();
+  const isAdmin = profile.role === "admin";
   const [opp, setOpp] = useState<CaptureOpportunity | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [canWrite, setCanWrite] = useState(false);
@@ -152,6 +155,7 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
               </SelectContent>
             </Select>
           )}
+          {isAdmin && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="outline" size="icon" aria-label="Delete opportunity">
@@ -171,6 +175,7 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          )}
         </div>
       </div>
 

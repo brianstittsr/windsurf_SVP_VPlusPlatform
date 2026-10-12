@@ -24,11 +24,14 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { captureJson } from "@/lib/capture/api-client";
+import { useUserProfile } from "@/contexts/user-profile-context";
 import type { CustomerDoc } from "@/lib/schema";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
 export default function CaptureClientsPage() {
+  const { profile } = useUserProfile();
+  const isAdmin = profile.role === "admin";
   const [clients, setClients] = useState<CustomerDoc[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -77,6 +80,7 @@ export default function CaptureClientsPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Capture Clients</h1>
+        {isAdmin && (
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button>
@@ -126,6 +130,7 @@ export default function CaptureClientsPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        )}
       </div>
 
       <Card>

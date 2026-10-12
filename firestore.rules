@@ -554,6 +554,41 @@ service cloud.firestore {
     }
 
     // =========================================================================
+    // Capture Management Collections
+    // All access goes through /api/capture routes (Firebase Admin SDK).
+    // Business rules are enforced server-side; client SDK access is denied.
+    // =========================================================================
+
+    match /captureOpportunities/{docId} {
+      allow read, write: if false;
+    }
+
+    match /captureTasks/{docId} {
+      allow read, write: if false;
+    }
+
+    match /captureSettings/{docId} {
+      allow read, write: if false;
+    }
+
+    match /captureMatches/{docId} {
+      allow read, write: if false;
+    }
+
+    match /captureSavedSearches/{docId} {
+      allow read, write: if false;
+    }
+
+    match /captureAlertLog/{docId} {
+      allow read, write: if false;
+    }
+
+    // Customers (capture clients live here) — API/Admin SDK only
+    match /customers/{docId} {
+      allow read, write: if false;
+    }
+
+    // =========================================================================
     // Mattermost Playbooks Collections
     // TODO: Restrict to authenticated users in production
     // =========================================================================
