@@ -33,7 +33,10 @@ export type EntityType =
   | "team-member"
   | "proposal"
   | "calendar"
-  | "settings";
+  | "settings"
+  | "capture-client"
+  | "capture-opportunity"
+  | "capture-task";
 
 export interface LogActivityParams {
   type: ActivityType;

@@ -76,6 +76,7 @@ import {
   EyeOff,
   UserCheck,
   Database,
+  Trash2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -255,6 +256,49 @@ const initiativeItems = [
   },
 ];
 
+const captureItems = [
+  {
+    title: "Dashboard",
+    href: "/portal/capture",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Pipeline Board",
+    href: "/portal/capture/board",
+    icon: FolderKanban,
+  },
+  {
+    title: "Opportunities",
+    href: "/portal/capture/table",
+    icon: FileText,
+  },
+  {
+    title: "Clients",
+    href: "/portal/capture/clients",
+    icon: Building2,
+  },
+  {
+    title: "Calendar",
+    href: "/portal/capture/calendar",
+    icon: CalendarDays,
+  },
+  {
+    title: "My Tasks",
+    href: "/portal/capture/tasks",
+    icon: CheckSquare,
+  },
+  {
+    title: "Trash",
+    href: "/portal/capture/trash",
+    icon: Trash2,
+  },
+  {
+    title: "Capture Settings",
+    href: "/portal/capture/settings",
+    icon: Settings,
+  },
+];
+
 const aiItems = [
   {
     title: "Ask IntellEDGE",
@@ -276,6 +320,7 @@ const AVAILABLE_ROLES = [
 export const ALL_NAV_ITEMS = [
   ...mainNavItems.map(item => ({ ...item, section: "Navigation" })),
   ...workItems.map(item => ({ ...item, section: "Work" })),
+  ...captureItems.map(item => ({ ...item, section: "Capture Management" })),
   ...aiItems.map(item => ({ ...item, section: "Intelligence" })),
   ...adminItems.map(item => ({ ...item, section: "Admin" })),
   ...initiativeItems.map(item => ({ ...item, section: "Initiatives" })),
@@ -292,6 +337,8 @@ export function PortalSidebar() {
   
   // The effective role for filtering (either preview role or actual role)
   const effectiveRole = previewRole || profile.role;
+  // Capture Management is restricted to admin + team roles (per requirements doc)
+  const canSeeCapture = ["admin", "team", "team_member"].includes(effectiveRole || "");
 
   // Subscribe to BookCallLeads count (new leads only)
   useEffect(() => {
@@ -366,6 +413,7 @@ export function PortalSidebar() {
   const [openSections, setOpenSections] = useState({
     navigation: true,
     work: true,
+    capture: true,
     intelligence: true,
     admin: false,
     initiatives: false,
@@ -480,6 +528,50 @@ export function PortalSidebar() {
             </CollapsibleContent>
           </SidebarGroup>
         </Collapsible>
+
+        {/* Capture Management — admin + team only */}
+        {canSeeCapture && (
+          <Collapsible open={openSections.capture} onOpenChange={() => toggleSection("capture")}>
+            <SidebarGroup>
+              <CollapsibleTrigger asChild>
+                <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50 rounded-md flex items-center justify-between pr-2">
+                  <span>Capture Management</span>
+                  {openSections.capture ? (
+                    <ChevronDown className="h-4 w-4 text-sidebar-foreground/60" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 text-sidebar-foreground/60" />
+                  )}
+                </SidebarGroupLabel>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {filterNavItems(captureItems).map((item) => {
+                      const hidden = isItemHidden(item.href);
+                      return (
+                        <SidebarMenuItem key={item.href} className={cn(hidden && isAdmin && !previewRole && "opacity-50")}>
+                          <SidebarMenuButton
+                            asChild
+                            isActive={pathname === item.href}
+                            tooltip={item.title}
+                          >
+                            <Link href={item.href}>
+                              <item.icon className="h-4 w-4" />
+                              <span>{item.title}</span>
+                              {hidden && isAdmin && !previewRole && (
+                                <EyeOff className="h-3 w-3 ml-auto text-muted-foreground" />
+                              )}
+                            </Link>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      );
+                    })}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </CollapsibleContent>
+            </SidebarGroup>
+          </Collapsible>
+        )}
 
         {/* AI */}
         <Collapsible open={openSections.intelligence} onOpenChange={() => toggleSection("intelligence")}>

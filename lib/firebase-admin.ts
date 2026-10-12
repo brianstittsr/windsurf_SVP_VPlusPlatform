@@ -1,8 +1,10 @@
 import { initializeApp, getApps, cert, App } from "firebase-admin/app";
 import { getFirestore, Firestore } from "firebase-admin/firestore";
+import { getAuth, Auth } from "firebase-admin/auth";
 
 let app: App | undefined;
 let adminDb: Firestore | null = null;
+let adminAuth: Auth | null = null;
 
 // Check for required environment variables (support both FIREBASE_* and FIREBASE_ADMIN_* prefixes)
 const hasServiceAccount = !!(
@@ -29,6 +31,7 @@ if (hasServiceAccount) {
     }
 
     adminDb = getFirestore(app);
+    adminAuth = getAuth(app);
   } catch (error) {
     console.error("[Firebase Admin] Failed to initialize:", error);
   }
@@ -41,6 +44,7 @@ if (hasServiceAccount) {
       app = getApps()[0];
     }
     adminDb = getFirestore(app);
+    adminAuth = getAuth(app);
   } catch (error) {
     console.error("[Firebase Admin] Failed to initialize with default credentials:", error);
   }
@@ -48,5 +52,5 @@ if (hasServiceAccount) {
   console.warn("[Firebase Admin] Not initialized - missing service account credentials");
 }
 
-export { adminDb };
+export { adminDb, adminAuth };
 export default app;
