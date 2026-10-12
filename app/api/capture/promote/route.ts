@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/capture/server-auth";
 import { promoteSchema } from "@/lib/capture/validation";
 import { serializeDoc } from "@/lib/capture/serialize";
 import { captureAudit } from "@/lib/capture/audit";
+import { searchSamOpportunities } from "@/lib/capture/sam-search";
 
 /**
  * POST /api/capture/promote — turn a saved SAM notice into a capture
@@ -35,6 +36,24 @@ export async function POST(req: NextRequest) {
     if (savedSnap.exists) {
       notice = savedSnap.data()!;
       resolvedNoticeId = resolvedNoticeId || (notice.noticeId as string) || (notice.notice_id as string);
+    }
+  }
+
+  // Only a notice ID? Fetch it live from SAM.gov to populate fields
+  if (resolvedNoticeId && !Object.keys(notice).length) {
+    const { notices } = await searchSamOpportunities({ noticeId: resolvedNoticeId, limit: 1 });
+    if (notices[0]) {
+      const n = notices[0];
+      notice = {
+        title: n.title,
+        solicitationNumber: n.solicitationNumber,
+        agency: n.department || n.subTier,
+        office: n.office,
+        setAside: n.setAside,
+        naicsCode: n.naicsCode,
+        description: n.description,
+        responseDeadLine: n.responseDeadLine,
+      };
     }
   }
 
@@ -77,6 +96,9 @@ export async function POST(req: NextRequest) {
     naicsCode: (notice.naicsCode as string) || null,
     setAside: (notice.typeOfSetAside as string) || (notice.setAside as string) || null,
     description: (notice.description as string) || null,
+    responseDue: notice.responseDeadLine
+      ? { at: new Date(notice.responseDeadLine as string).toISOString(), timezone: "America/New_York" }
+      : null,
     stage: "found",
     ownerId: ownerId || null,
     ownerName: ownerName || null,

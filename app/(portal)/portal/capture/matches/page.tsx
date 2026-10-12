@@ -9,6 +9,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { MemberPicker, type CaptureMember } from "@/components/capture/member-picker";
 import { captureJson } from "@/lib/capture/api-client";
 import { useUserProfile } from "@/contexts/user-profile-context";
 import type { CaptureMatch, CaptureSavedSearch } from "@/lib/schema";
@@ -26,6 +35,8 @@ export default function MatchesPage() {
   const [running, setRunning] = useState(false);
   const [actioning, setActioning] = useState<string | null>(null);
   const [newSearch, setNewSearch] = useState({ name: "", query: "", naicsCode: "", setAside: "" });
+  const [accepting, setAccepting] = useState<MatchRow | null>(null);
+  const [acceptOwner, setAcceptOwner] = useState<{ id: string; name: string }>({ id: "", name: "" });
 
   const load = useCallback(() => {
     captureJson<{ matches: MatchRow[] }>(`/api/capture/match?status=${status}`)
@@ -38,14 +49,23 @@ export default function MatchesPage() {
 
   useEffect(load, [load]);
 
-  const act = async (m: MatchRow, action: "accept" | "dismiss") => {
+  const act = async (m: MatchRow, action: "accept" | "dismiss", owner?: { id: string; name: string }) => {
     setActioning(m.id);
     try {
       const res = await captureJson<{ status: string; opportunityId?: string }>(
         `/api/capture/match/${m.id}`,
-        { method: "POST", body: JSON.stringify({ action }) }
+        {
+          method: "POST",
+          body: JSON.stringify({
+            action,
+            ownerId: owner?.id || undefined,
+            ownerName: owner?.name || undefined,
+          }),
+        }
       );
       toast.success(action === "accept" ? "Accepted — opportunity created" : "Dismissed");
+      setAccepting(null);
+      setAcceptOwner({ id: "", name: "" });
       if (res.opportunityId) {
         window.location.href = `/portal/capture/opportunities/${res.opportunityId}`;
         return;
@@ -225,7 +245,7 @@ export default function MatchesPage() {
                 </div>
                 {status === "pending" && (
                   <div className="flex gap-2 shrink-0">
-                    <Button size="sm" onClick={() => act(m, "accept")} disabled={actioning === m.id}>
+                    <Button size="sm" onClick={() => setAccepting(m)} disabled={actioning === m.id}>
                       <Check className="h-4 w-4 mr-1" /> Accept
                     </Button>
                     <Button size="sm" variant="outline" onClick={() => act(m, "dismiss")} disabled={actioning === m.id}>
@@ -245,6 +265,35 @@ export default function MatchesPage() {
           ))}
         </TabsContent>
       </Tabs>
+
+      <Dialog open={!!accepting} onOpenChange={(o) => !o && setAccepting(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Accept Match</DialogTitle>
+            <DialogDescription>
+              Create an opportunity for &quot;{accepting?.title}&quot; at the Found stage.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 py-2">
+            <Label>Owner (optional)</Label>
+            <MemberPicker
+              value={acceptOwner.id}
+              onChange={(id, m?: CaptureMember) => setAcceptOwner({ id, name: m?.name || "" })}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAccepting(null)} disabled={!!actioning}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => accepting && act(accepting, "accept", acceptOwner)}
+              disabled={!!actioning}
+            >
+              {actioning ? "Creating..." : "Create Opportunity"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

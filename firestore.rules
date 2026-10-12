@@ -583,6 +583,11 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Saved SAM notices inbox — API/Admin SDK only
+    match /samSavedOpportunities/{docId} {
+      allow read, write: if false;
+    }
+
     // Customers (capture clients live here) — API/Admin SDK only
     match /customers/{docId} {
       allow read, write: if false;

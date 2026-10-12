@@ -39,6 +39,7 @@ import {
   Factory,
   LayoutDashboard,
   Target,
+  Inbox,
   FolderKanban,
   Users,
   Building,
@@ -276,6 +277,11 @@ const captureItems = [
     title: "Clients",
     href: "/portal/capture/clients",
     icon: Building2,
+  },
+  {
+    title: "SAM Notices",
+    href: "/portal/capture/solicitations",
+    icon: Inbox,
   },
   {
     title: "Match Queue",
