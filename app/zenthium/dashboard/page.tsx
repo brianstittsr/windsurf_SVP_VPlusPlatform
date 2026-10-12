@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +9,7 @@ import { MapPin, Zap, Droplets, Network, Building2, CheckCircle2, XCircle, Alert
 import { GoogleMap } from "@/components/zenthium/openstreetmap-map";
 import { evaluateSite, SiteEvaluationResult } from "@/lib/zenthium-evaluation";
 
-export default function ZenthiumDashboard() {
+function ZenthiumDashboardInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const submissionId = searchParams.get("id");
@@ -483,5 +483,13 @@ export default function ZenthiumDashboard() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function ZenthiumDashboard() {
+  return (
+    <Suspense fallback={null}>
+      <ZenthiumDashboardInner />
+    </Suspense>
   );
 }
