@@ -16,7 +16,7 @@ import type { CaptureOpportunity } from "@/lib/schema";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
-const SET_ASIDES = ["", "8a", "hubzone", "sdvosb", "wosb", "mbe", "dbw", "unrestricted"];
+const SET_ASIDES = ["none", "8a", "hubzone", "sdvosb", "wosb", "mbe", "dbw", "unrestricted"];
 const TYPES = ["rfi", "sources-sought", "rfp", "rfq", "grant"];
 
 export default function NewOpportunityPage() {
@@ -219,11 +219,11 @@ export default function NewOpportunityPage() {
             </div>
             <div className="space-y-2">
               <Label>Set-Aside</Label>
-              <Select value={form.setAside} onValueChange={(v) => set("setAside", v)}>
+              <Select value={form.setAside || "none"} onValueChange={(v) => set("setAside", v === "none" ? "" : v)}>
                 <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
                 <SelectContent>
                   {SET_ASIDES.map((s) => (
-                    <SelectItem key={s || "none"} value={s}>{s || "None"}</SelectItem>
+                    <SelectItem key={s} value={s}>{s === "none" ? "None" : s}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
