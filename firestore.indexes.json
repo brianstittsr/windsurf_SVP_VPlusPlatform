@@ -233,6 +233,22 @@
       ]
     },
     {
+      "collectionGroup": "captureMatches",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "score", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "captureMatches",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "samNoticeId", "order": "ASCENDING" },
+        { "fieldPath": "clientId", "order": "ASCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "captureTasks",
       "queryScope": "COLLECTION",
       "fields": [

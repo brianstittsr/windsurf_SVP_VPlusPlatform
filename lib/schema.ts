@@ -1559,6 +1559,10 @@ export interface CaptureBidNoBid {
   reason?: string;
   score?: number;
   suggestedDecision?: "bid" | "no-bid";
+  scorecard?: {
+    mustHaveAnswers: Record<string, boolean>;
+    weightedAnswers: Record<string, number>;
+  };
   decidedById?: string;
   decidedByName?: string;
   decidedAt?: string;
@@ -1599,6 +1603,10 @@ export interface CaptureOpportunityDoc {
   submittedAt?: string;
   finalSubmissionFileId?: string;
   matchScore?: number;
+  matchBreakdown?: { factor: string; points: number; max: number }[];
+  convertedAt?: string;
+  aiSummary?: string;
+  aiSummaryAt?: string;
   deletedAt?: Timestamp | null;
   deletedBy?: string;
   createdById?: string;
@@ -1628,6 +1636,79 @@ export interface CaptureStageDef {
 export type CaptureOpportunity = CaptureOpportunityDoc;
 export type CaptureTask = CaptureTaskDoc;
 
+/** A SAM.gov notice scored against a capture client (Phase 3 match queue). */
+export interface CaptureMatchDoc {
+  id: string;
+  samNoticeId: string;
+  title: string;
+  solicitationNumber?: string;
+  agency?: string;
+  office?: string;
+  type?: string;
+  setAside?: string;
+  naicsCode?: string;
+  pscCode?: string;
+  responseDeadline?: string;
+  description?: string;
+  samUrl?: string;
+  clientId: string;
+  clientName: string;
+  score: number;
+  scoreBreakdown: { factor: string; points: number; max: number }[];
+  status: "pending" | "accepted" | "dismissed";
+  aiSummary?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+export type CaptureMatch = CaptureMatchDoc;
+
+/** A saved SAM search used by the match/run cron (Phase 3). */
+export interface CaptureSavedSearchDoc {
+  id: string;
+  name: string;
+  query?: string;
+  naicsCode?: string;
+  setAside?: string;
+  ownerId: string;
+  isActive: boolean;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+export type CaptureSavedSearch = CaptureSavedSearchDoc;
+
+/** Record of an alert sent by the alerts cron (dedupe + audit). */
+export interface CaptureAlertLogDoc {
+  id: string;
+  type:
+    | "deadline-7d"
+    | "deadline-3d"
+    | "deadline-1d"
+    | "overdue"
+    | "task-due"
+    | "cert-expiry"
+    | "sam-expiry";
+  entityType: "capture-opportunity" | "capture-task" | "capture-client";
+  entityId: string;
+  entityName: string;
+  recipientId?: string;
+  recipientEmail?: string;
+  message: string;
+  sentAt: Timestamp;
+}
+export type CaptureAlertLog = CaptureAlertLogDoc;
+
+/** Scorecard question config for the bid/no-bid decision. */
+export interface CaptureScorecardConfig {
+  /** Yes/No must-haves — any "no" forces a no-bid suggestion. */
+  mustHaves: string[];
+  /** Weighted questions scored 1–5; weights should sum to 100. */
+  weighted: { question: string; weight: number }[];
+  /** Score % at or above which "bid" is suggested. */
+  bidCutoff: number;
+  /** Score % at or below which "no-bid" is suggested. */
+  noBidCutoff: number;
+}
+
 export interface CaptureSettingsDoc {
   id: string;
   standardStages: CaptureStageDef[];
@@ -1639,6 +1720,21 @@ export interface CaptureSettingsDoc {
   deadlineYellowDays: number;
   deadlineRedDays: number;
   expiryWarningDays: number;
+  /** Days before a deadline to fire alerts (7/3/1). */
+  alertDays: number[];
+  /** Days before cert/SAM expiry to warn (90/60/30). */
+  expiryAlertDays: number[];
+  /** Match scoring weights (should sum to 100) + minimum score to queue a match. */
+  matchWeights: {
+    naics: number;
+    setAside: number;
+    keywords: number;
+    psc: number;
+    agency: number;
+    value: number;
+  };
+  matchScoreCutoff: number;
+  scorecard: CaptureScorecardConfig;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -1725,6 +1821,9 @@ export const COLLECTIONS = {
   CAPTURE_OPPORTUNITIES: "captureOpportunities",
   CAPTURE_TASKS: "captureTasks",
   CAPTURE_SETTINGS: "captureSettings",
+  CAPTURE_MATCHES: "captureMatches",
+  CAPTURE_SAVED_SEARCHES: "captureSavedSearches",
+  CAPTURE_ALERT_LOG: "captureAlertLog",
   // Events
   EVENTS: "events",
   // NDA Management

@@ -155,12 +155,12 @@ export function CaptureBoard({ opportunities, settings, boardType = "standard", 
         onOpenChange={(o) => !o && setPendingGate(null)}
         opportunityTitle={pendingGate?.opp.title}
         submitting={submitting}
-        onConfirm={(decision, reason) => {
+        onConfirm={(payload) => {
           if (!pendingGate) return;
-          if (decision === "no-bid") {
-            moveCard(pendingGate.opp, "closed", { bidNoBid: { decision, reason } });
+          if (payload.decision === "no-bid") {
+            moveCard(pendingGate.opp, "closed", { bidNoBid: payload });
           } else {
-            moveCard(pendingGate.opp, pendingGate.toStage, { bidNoBid: { decision, reason } });
+            moveCard(pendingGate.opp, pendingGate.toStage, { bidNoBid: payload });
           }
         }}
       />

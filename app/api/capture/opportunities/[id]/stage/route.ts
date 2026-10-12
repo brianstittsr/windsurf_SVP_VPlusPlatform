@@ -66,6 +66,9 @@ export async function POST(req: NextRequest, { params }: Params) {
         decidedById: user.uid,
         decidedByName: user.displayName,
         decidedAt: new Date().toISOString(),
+        ...(bidNoBid.score !== undefined && { score: bidNoBid.score }),
+        ...(bidNoBid.suggestedDecision && { suggestedDecision: bidNoBid.suggestedDecision }),
+        ...(bidNoBid.scorecard && { scorecard: bidNoBid.scorecard }),
       };
     }
     if ((updates.bidNoBid as typeof existing | undefined)?.decision === "no-bid" || existing.decision === "no-bid") {

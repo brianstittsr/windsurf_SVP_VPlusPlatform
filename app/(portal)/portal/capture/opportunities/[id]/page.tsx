@@ -34,7 +34,7 @@ import { useUserProfile } from "@/contexts/user-profile-context";
 import type { CaptureFileRef, CaptureNote, CaptureOpportunity, CaptureSettingsDoc, CaptureTask } from "@/lib/schema";
 import { stagesForBoard, passesBidNoBidGate, isValidTransition } from "@/lib/capture/stages";
 import { formatDualTimezone } from "@/lib/capture/dates";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, Sparkles, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface DetailResponse {
@@ -62,6 +62,7 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
   const [gate, setGate] = useState<{ toStage: string; kind: "bid-no-bid" | "submit" } | null>(null);
   const [saving, setSaving] = useState(false);
   const [activities, setActivities] = useState<ActivityRow[]>([]);
+  const [summarizing, setSummarizing] = useState(false);
 
   const load = useCallback(() => {
     Promise.all([
@@ -142,6 +143,38 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
     moveStage(toStage);
   };
 
+  const convertToRfp = async () => {
+    setSaving(true);
+    try {
+      const { opportunity } = await captureJson<{ opportunity: CaptureOpportunity }>(
+        `/api/capture/opportunities/${id}/convert`,
+        { method: "POST" }
+      );
+      setOpp(opportunity);
+      toast.success("Converted to RFP pursuit — moved to start of standard pipeline");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Conversion failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const summarize = async () => {
+    setSummarizing(true);
+    try {
+      const { summary } = await captureJson<{ summary: string }>("/api/capture/summarize", {
+        method: "POST",
+        body: JSON.stringify({ opportunityId: id }),
+      });
+      setOpp((o) => (o ? { ...o, aiSummary: summary } : o));
+      toast.success("Summary generated");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Summarize failed");
+    } finally {
+      setSummarizing(false);
+    }
+  };
+
   const softDelete = async () => {
     try {
       await captureJson(`/api/capture/opportunities/${id}`, { method: "DELETE" });
@@ -191,6 +224,11 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
                   ))}
               </SelectContent>
             </Select>
+          )}
+          {canWrite && opp.boardType === "rfi" && !["won", "lost", "closed"].includes(opp.stage) && (
+            <Button variant="outline" onClick={convertToRfp} disabled={saving}>
+              Convert to RFP
+            </Button>
           )}
           {isAdmin && (
           <AlertDialog>
@@ -274,7 +312,17 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
             {opp.bidNoBid?.decision && (
               <p>
                 Decision: <Badge variant={opp.bidNoBid.decision === "bid" ? "default" : "destructive"}>{opp.bidNoBid.decision}</Badge>
+                {opp.bidNoBid.score !== undefined && (
+                  <span className="text-xs text-muted-foreground ml-1">score {opp.bidNoBid.score}%</span>
+                )}
                 {opp.bidNoBid.reason && <span className="text-xs text-muted-foreground ml-1">({opp.bidNoBid.reason})</span>}
+              </p>
+            )}
+            {opp.links?.samUrl && (
+              <p>
+                <a href={opp.links.samUrl} target="_blank" rel="noreferrer" className="text-primary underline text-xs">
+                  View on SAM.gov
+                </a>
               </p>
             )}
           </CardContent>
@@ -288,6 +336,23 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
           </CardContent>
         </Card>
       )}
+
+      <Card>
+        <CardHeader className="pb-2 flex flex-row items-center justify-between">
+          <CardTitle className="text-sm text-muted-foreground">AI Summary</CardTitle>
+          <Button variant="outline" size="sm" onClick={summarize} disabled={summarizing}>
+            <Sparkles className="h-3.5 w-3.5 mr-1" />
+            {summarizing ? "Summarizing..." : opp.aiSummary ? "Regenerate" : "Summarize"}
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {opp.aiSummary ? (
+            <p className="text-sm whitespace-pre-wrap">{opp.aiSummary}</p>
+          ) : (
+            <p className="text-sm text-muted-foreground">No summary yet — generate a capture brief from the opportunity fields.</p>
+          )}
+        </CardContent>
+      </Card>
 
       <Tabs defaultValue="notes">
         <TabsList>
@@ -340,10 +405,10 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
         onOpenChange={(o) => !o && setGate(null)}
         opportunityTitle={opp.title}
         submitting={saving}
-        onConfirm={(decision, reason) => {
+        onConfirm={(payload) => {
           if (!gate) return;
-          const target = decision === "no-bid" ? "closed" : gate.toStage;
-          moveStage(target, { bidNoBid: { decision, reason } });
+          const target = payload.decision === "no-bid" ? "closed" : gate.toStage;
+          moveStage(target, { bidNoBid: payload });
         }}
       />
       <SubmitDialog

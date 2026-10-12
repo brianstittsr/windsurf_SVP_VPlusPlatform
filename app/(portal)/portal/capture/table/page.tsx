@@ -79,6 +79,7 @@ export default function CaptureTablePage() {
             </Button>
           )}
           <ExportButton filters={filters} />
+          <ExportButton filters={filters} format="pdf" />
         </div>
       </div>
 

@@ -8,12 +8,13 @@ import { toast } from "sonner";
 
 interface Props {
   filters?: { clientId?: string; stage?: string; ownerId?: string; type?: string };
+  format?: "xlsx" | "pdf";
   variant?: "default" | "outline";
   size?: "default" | "sm";
 }
 
-/** Export filtered opportunities to an xlsx workbook via /api/capture/export. */
-export function ExportButton({ filters = {}, variant = "outline", size = "sm" }: Props) {
+/** Export filtered opportunities — xlsx via /api/capture/export, pdf via /api/capture/export/pdf. */
+export function ExportButton({ filters = {}, format = "xlsx", variant = "outline", size = "sm" }: Props) {
   const [exporting, setExporting] = useState(false);
 
   const doExport = async () => {
@@ -24,11 +25,21 @@ export function ExportButton({ filters = {}, variant = "outline", size = "sm" }:
     setExporting(true);
     try {
       const token = await auth.currentUser.getIdToken();
-      const res = await fetch("/api/capture/export", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify(filters),
-      });
+      let res: Response;
+      if (format === "pdf") {
+        const params = new URLSearchParams(
+          Object.entries(filters).filter(([, v]) => !!v) as [string, string][]
+        );
+        res = await fetch(`/api/capture/export/pdf?${params}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } else {
+        res = await fetch("/api/capture/export", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify(filters),
+        });
+      }
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body.error || "Export failed");
@@ -37,7 +48,7 @@ export function ExportButton({ filters = {}, variant = "outline", size = "sm" }:
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `capture-opportunities-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      a.download = `capture-opportunities-${new Date().toISOString().slice(0, 10)}.${format}`;
       a.click();
       URL.revokeObjectURL(url);
       toast.success("Export downloaded");
@@ -51,7 +62,7 @@ export function ExportButton({ filters = {}, variant = "outline", size = "sm" }:
   return (
     <Button variant={variant} size={size} onClick={doExport} disabled={exporting}>
       <Download className="h-4 w-4 mr-2" />
-      {exporting ? "Exporting..." : "Export Excel"}
+      {exporting ? "Exporting..." : format === "pdf" ? "Export PDF" : "Export Excel"}
     </Button>
   );
 }

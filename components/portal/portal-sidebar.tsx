@@ -278,6 +278,11 @@ const captureItems = [
     icon: Building2,
   },
   {
+    title: "Match Queue",
+    href: "/portal/capture/matches",
+    icon: Target,
+  },
+  {
     title: "Calendar",
     href: "/portal/capture/calendar",
     icon: CalendarDays,

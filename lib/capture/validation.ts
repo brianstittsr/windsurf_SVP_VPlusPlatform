@@ -127,7 +127,18 @@ export const opportunityPatchSchema = opportunityCreateSchema.partial().superRef
 export const stageTransitionSchema = z.object({
   toStage: z.string().min(1),
   bidNoBid: z
-    .object({ decision: z.enum(["bid", "no-bid"]), reason: z.string().optional() })
+    .object({
+      decision: z.enum(["bid", "no-bid"]),
+      reason: z.string().optional(),
+      score: z.number().optional(),
+      suggestedDecision: z.enum(["bid", "no-bid"]).optional(),
+      scorecard: z
+        .object({
+          mustHaveAnswers: z.record(z.string(), z.boolean()).optional(),
+          weightedAnswers: z.record(z.string(), z.number().min(1).max(5)).optional(),
+        })
+        .optional(),
+    })
     .optional(),
   submittedAt: z.string().optional(),
   finalSubmissionFileId: z.string().optional(),
@@ -181,6 +192,27 @@ export const settingsPatchSchema = z
     deadlineYellowDays: z.number().int().positive().optional(),
     deadlineRedDays: z.number().int().positive().optional(),
     expiryWarningDays: z.number().int().positive().optional(),
+    alertDays: z.array(z.number().int().nonnegative()).optional(),
+    expiryAlertDays: z.array(z.number().int().positive()).optional(),
+    matchWeights: z
+      .object({
+        naics: z.number().int().nonnegative(),
+        setAside: z.number().int().nonnegative(),
+        keywords: z.number().int().nonnegative(),
+        psc: z.number().int().nonnegative(),
+        agency: z.number().int().nonnegative(),
+        value: z.number().int().nonnegative(),
+      })
+      .optional(),
+    matchScoreCutoff: z.number().int().min(0).max(100).optional(),
+    scorecard: z
+      .object({
+        mustHaves: z.array(z.string()).optional(),
+        weighted: z.array(z.object({ question: z.string().min(1), weight: z.number() })).optional(),
+        bidCutoff: z.number().min(0).max(100).optional(),
+        noBidCutoff: z.number().min(0).max(100).optional(),
+      })
+      .optional(),
   })
   .superRefine((val, ctx) => {
     if (
@@ -194,4 +226,41 @@ export const settingsPatchSchema = z
         path: ["deadlineRedDays"],
       });
     }
+    if (val.matchWeights) {
+      const sum = Object.values(val.matchWeights).reduce((s, n) => s + n, 0);
+      if (sum !== 100) {
+        ctx.addIssue({ code: "custom", message: "Match weights must sum to 100", path: ["matchWeights"] });
+      }
+    }
   });
+
+export const matchActionSchema = z.object({
+  action: z.enum(["accept", "dismiss"]),
+  ownerId: z.string().optional(),
+  ownerName: z.string().optional(),
+});
+
+export const summarizeSchema = z.object({
+  opportunityId: z.string().optional(),
+  matchId: z.string().optional(),
+}).refine((v) => v.opportunityId || v.matchId, { message: "opportunityId or matchId is required" });
+
+export const savedSearchSchema = z.object({
+  name: z.string().min(1),
+  query: z.string().optional(),
+  naicsCode: z.string().optional(),
+  setAside: z.string().optional(),
+  isActive: z.boolean().default(true),
+});
+
+export const samLinkSchema = z.object({
+  url: z.string().min(1, "A SAM.gov URL or notice ID is required"),
+});
+
+export const promoteSchema = z.object({
+  samSavedOpportunityId: z.string().optional(),
+  samNoticeId: z.string().optional(),
+  clientId: z.string().min(1, "A client is required"),
+  ownerId: z.string().optional(),
+  ownerName: z.string().optional(),
+});

@@ -39,7 +39,52 @@ export default function NewOpportunityPage() {
     estValueText: "",
   });
 
+  const [samLink, setSamLink] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [imported, setImported] = useState<{ samNoticeId: string; samUrl?: string } | null>(null);
+
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
+
+  const importFromSam = async () => {
+    if (!samLink.trim()) return;
+    setImporting(true);
+    try {
+      const { draft } = await captureJson<{
+        draft: {
+          samNoticeId: string;
+          title?: string;
+          solicitationNumber?: string;
+          agency?: string;
+          office?: string;
+          type?: string;
+          setAside?: string;
+          naicsCode?: string;
+          description?: string;
+          responseDue?: { at: string; timezone: string };
+          links?: { samUrl?: string };
+        };
+      }>("/api/capture/import/sam-link", {
+        method: "POST",
+        body: JSON.stringify({ url: samLink }),
+      });
+      setForm((f) => ({
+        ...f,
+        title: draft.title || f.title,
+        solicitationNumber: draft.solicitationNumber || f.solicitationNumber,
+        agency: draft.agency || f.agency,
+        naicsCode: draft.naicsCode || f.naicsCode,
+        setAside: draft.setAside || f.setAside,
+        description: draft.description || f.description,
+        responseDue: draft.responseDue?.at ? draft.responseDue.at.slice(0, 16) : f.responseDue,
+      }));
+      setImported({ samNoticeId: draft.samNoticeId, samUrl: draft.links?.samUrl });
+      toast.success("Prefilled from SAM.gov — pick a client and review");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Import failed");
+    } finally {
+      setImporting(false);
+    }
+  };
 
   const create = async () => {
     if (!form.clientId || !form.title.trim() || !form.solicitationNumber.trim() || !form.agency.trim()) {
@@ -54,6 +99,9 @@ export default function NewOpportunityPage() {
           clientId: form.clientId,
           title: form.title.trim(),
           solicitationNumber: form.solicitationNumber.trim(),
+          samNoticeId: imported?.samNoticeId || undefined,
+          source: imported ? "imported" : "manual",
+          links: imported?.samUrl ? { samUrl: imported.samUrl } : undefined,
           type: form.type,
           boardType: form.boardType,
           agency: form.agency.trim(),
@@ -90,6 +138,37 @@ export default function NewOpportunityPage() {
         </Button>
         <h1 className="text-2xl font-bold">New Capture Opportunity</h1>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Import from SAM.gov</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex gap-2">
+            <Input
+              value={samLink}
+              onChange={(e) => setSamLink(e.target.value)}
+              placeholder="Paste a SAM.gov notice URL or notice ID"
+            />
+            <Button variant="outline" onClick={importFromSam} disabled={importing || !samLink.trim()}>
+              {importing ? "Fetching..." : "Import"}
+            </Button>
+          </div>
+          {imported && (
+            <p className="text-xs text-muted-foreground">
+              Linked to notice {imported.samNoticeId}
+              {imported.samUrl && (
+                <>
+                  {" — "}
+                  <a href={imported.samUrl} target="_blank" rel="noreferrer" className="underline text-primary">
+                    view on SAM.gov
+                  </a>
+                </>
+              )}
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
