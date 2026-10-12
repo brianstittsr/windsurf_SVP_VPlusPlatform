@@ -9,12 +9,13 @@ import { StageBadge } from "@/components/capture/stage-badge";
 import { captureJson } from "@/lib/capture/api-client";
 import type { CaptureOpportunity, CaptureSettingsDoc, CustomerDoc } from "@/lib/schema";
 import { daysUntilDeadline, deadlineStatus } from "@/lib/capture/deadline-status";
-import { Briefcase, Users, Clock, AlertTriangle, Trophy, Plus } from "lucide-react";
+import { Briefcase, Users, Clock, AlertTriangle, Trophy, Plus, Target } from "lucide-react";
 
 export default function CaptureDashboardPage() {
   const [opps, setOpps] = useState<CaptureOpportunity[]>([]);
   const [clients, setClients] = useState<CustomerDoc[]>([]);
   const [settings, setSettings] = useState<CaptureSettingsDoc | null>(null);
+  const [pendingMatches, setPendingMatches] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,11 +23,13 @@ export default function CaptureDashboardPage() {
       captureJson<{ opportunities: CaptureOpportunity[] }>("/api/capture/opportunities"),
       captureJson<{ clients: CustomerDoc[] }>("/api/capture/clients"),
       captureJson<{ settings: CaptureSettingsDoc }>("/api/capture/settings"),
+      captureJson<{ matches: unknown[] }>("/api/capture/match?status=pending"),
     ])
-      .then(([o, c, s]) => {
+      .then(([o, c, s, m]) => {
         setOpps(o.opportunities);
         setClients(c.clients);
         setSettings(s.settings);
+        setPendingMatches(m.matches.length);
       })
       .catch((e) => console.error("Dashboard load failed:", e))
       .finally(() => setLoading(false));
@@ -81,24 +84,28 @@ export default function CaptureDashboardPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
         {[
           { label: "Clients", value: stats.clients, icon: Users },
           { label: "Open Opportunities", value: stats.open, icon: Briefcase },
           { label: "Due in 7 Days", value: stats.dueSoon, icon: Clock },
           { label: "Overdue", value: stats.overdue, icon: AlertTriangle, red: true },
           { label: "Won", value: stats.won, icon: Trophy },
-        ].map((s) => (
-          <Card key={s.label}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{s.label}</CardTitle>
-              <s.icon className={`h-4 w-4 ${s.red ? "text-red-600" : "text-muted-foreground"}`} />
-            </CardHeader>
-            <CardContent>
-              <p className={`text-2xl font-bold ${s.red && s.value > 0 ? "text-red-600" : ""}`}>{s.value}</p>
-            </CardContent>
-          </Card>
-        ))}
+          { label: "Pending Matches", value: pendingMatches, icon: Target, href: "/portal/capture/matches" },
+        ].map((s) => {
+          const card = (
+            <Card key={s.label}>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">{s.label}</CardTitle>
+                <s.icon className={`h-4 w-4 ${s.red ? "text-red-600" : "text-muted-foreground"}`} />
+              </CardHeader>
+              <CardContent>
+                <p className={`text-2xl font-bold ${s.red && s.value > 0 ? "text-red-600" : ""}`}>{s.value}</p>
+              </CardContent>
+            </Card>
+          );
+          return s.href ? <Link key={s.label} href={s.href}>{card}</Link> : card;
+        })}
       </div>
 
       <Card>

@@ -29,6 +29,7 @@ import { FilesPanel } from "@/components/capture/files-panel";
 import { TasksPanel } from "@/components/capture/tasks-panel";
 import { BidNoBidDialog } from "@/components/capture/bid-no-bid-dialog";
 import { SubmitDialog } from "@/components/capture/submit-dialog";
+import { IncumbentLookupDialog } from "@/components/capture/incumbent-lookup-dialog";
 import { captureJson } from "@/lib/capture/api-client";
 import { useUserProfile } from "@/contexts/user-profile-context";
 import type { CaptureFileRef, CaptureNote, CaptureOpportunity, CaptureSettingsDoc, CaptureTask } from "@/lib/schema";
@@ -63,6 +64,7 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
   const [saving, setSaving] = useState(false);
   const [activities, setActivities] = useState<ActivityRow[]>([]);
   const [summarizing, setSummarizing] = useState(false);
+  const [incumbentLookupOpen, setIncumbentLookupOpen] = useState(false);
 
   const load = useCallback(() => {
     Promise.all([
@@ -172,6 +174,19 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
       toast.error(e instanceof Error ? e.message : "Summarize failed");
     } finally {
       setSummarizing(false);
+    }
+  };
+
+  const saveIncumbent = async (incumbent: string) => {
+    try {
+      const { opportunity } = await captureJson<{ opportunity: CaptureOpportunity }>(
+        `/api/capture/opportunities/${id}`,
+        { method: "PATCH", body: JSON.stringify({ incumbent }) }
+      );
+      setOpp(opportunity);
+      toast.success(`Incumbent set: ${incumbent}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Save failed");
     }
   };
 
@@ -308,6 +323,14 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
             <p>Owner: <span className="font-medium">{opp.ownerName || "Unassigned"}</span></p>
             {opp.setAside && <p>Set-aside: <Badge variant="secondary">{opp.setAside}</Badge></p>}
             {opp.naicsCode && <p>NAICS: {opp.naicsCode}</p>}
+            <p className="flex items-center gap-2">
+              Incumbent: <span className="font-medium">{opp.incumbent || "Unknown"}</span>
+              {canWrite && (
+                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => setIncumbentLookupOpen(true)}>
+                  Lookup
+                </Button>
+              )}
+            </p>
             {opp.estimatedValue?.text && <p>Est. value: {opp.estimatedValue.text}</p>}
             {opp.bidNoBid?.decision && (
               <p>
@@ -410,6 +433,14 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
           const target = payload.decision === "no-bid" ? "closed" : gate.toStage;
           moveStage(target, { bidNoBid: payload });
         }}
+      />
+      <IncumbentLookupDialog
+        open={incumbentLookupOpen}
+        onOpenChange={setIncumbentLookupOpen}
+        solicitationNumber={opp.solicitationNumber}
+        agency={opp.agency}
+        naicsCode={opp.naicsCode}
+        onSelect={saveIncumbent}
       />
       <SubmitDialog
         open={gate?.kind === "submit"}

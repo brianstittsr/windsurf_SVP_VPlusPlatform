@@ -2,15 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase-admin";
 import { COLLECTIONS } from "@/lib/schema";
 import { captureAudit } from "@/lib/capture/audit";
+import { requireUser } from "@/lib/capture/server-auth";
 
 const CRON_SECRET = process.env.CRON_SECRET;
 const PURGE_AFTER_DAYS = 30;
 const DAY_MS = 86_400_000;
 
-function checkCronAuth(req: NextRequest): NextResponse | null {
+/** Cron Bearer OR an authenticated admin user. */
+async function checkCronAuth(req: NextRequest): Promise<NextResponse | null> {
   const authHeader = req.headers.get("authorization");
-  if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (CRON_SECRET && authHeader === `Bearer ${CRON_SECRET}`) return null;
+  const user = await requireUser(req);
+  if (user instanceof NextResponse) return user;
+  if (user.role !== "admin") {
+    return NextResponse.json({ error: "Forbidden: admin only" }, { status: 403 });
   }
   return null;
 }
@@ -78,13 +83,13 @@ async function run(): Promise<NextResponse> {
 }
 
 export async function GET(req: NextRequest) {
-  const authErr = checkCronAuth(req);
+  const authErr = await checkCronAuth(req);
   if (authErr) return authErr;
   return run();
 }
 
 export async function POST(req: NextRequest) {
-  const authErr = checkCronAuth(req);
+  const authErr = await checkCronAuth(req);
   if (authErr) return authErr;
   return run();
 }
