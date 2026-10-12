@@ -47,3 +47,5 @@ __pycache__/
 
 # stray Windows artifact
 nul
+
+.vercel
