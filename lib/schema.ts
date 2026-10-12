@@ -1520,6 +1520,7 @@ export interface CustomerDoc {
     pastContracts?: { agency: string; contractNumber: string; value?: number; startDate?: string; endDate?: string }[];
   };
   deletedAt?: Timestamp | null;
+  deletedBy?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

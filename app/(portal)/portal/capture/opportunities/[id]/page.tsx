@@ -2,6 +2,9 @@
 
 import { use, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { db } from "@/lib/firebase";
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
+import { COLLECTIONS } from "@/lib/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -40,6 +43,13 @@ interface DetailResponse {
   canWrite: boolean;
 }
 
+interface ActivityRow {
+  id: string;
+  description: string;
+  userId?: string;
+  createdAt?: string;
+}
+
 export default function OpportunityDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { profile } = useUserProfile();
@@ -51,6 +61,7 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
   const [settings, setSettings] = useState<CaptureSettingsDoc | null>(null);
   const [gate, setGate] = useState<{ toStage: string; kind: "bid-no-bid" | "submit" } | null>(null);
   const [saving, setSaving] = useState(false);
+  const [activities, setActivities] = useState<ActivityRow[]>([]);
 
   const load = useCallback(() => {
     Promise.all([
@@ -66,6 +77,32 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
         setSettings(s.settings);
       })
       .catch((e) => toast.error(e.message));
+
+    // Audit trail (rule 11) — readable by any authenticated user per rules
+    if (db) {
+      getDocs(
+        query(
+          collection(db, COLLECTIONS.ACTIVITIES),
+          where("entityType", "==", "capture-opportunity"),
+          where("entityId", "==", id),
+          orderBy("createdAt", "desc")
+        )
+      )
+        .then((snap) =>
+          setActivities(
+            snap.docs.map((d) => {
+              const data = d.data();
+              return {
+                id: d.id,
+                description: (data.description as string) || "",
+                userId: data.userId as string | undefined,
+                createdAt: data.createdAt?.toDate?.()?.toISOString?.() as string | undefined,
+              };
+            })
+          )
+        )
+        .catch((e) => console.error("Activity load failed:", e));
+    }
   }, [id]);
 
   useEffect(load, [load]);
@@ -257,6 +294,7 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
           <TabsTrigger value="notes">Notes ({opp.notes?.length || 0})</TabsTrigger>
           <TabsTrigger value="files">Files ({opp.files?.length || 0})</TabsTrigger>
           <TabsTrigger value="tasks">Tasks ({tasks.filter((t) => t.status === "open").length})</TabsTrigger>
+          <TabsTrigger value="activity">Activity</TabsTrigger>
         </TabsList>
         <TabsContent value="notes" className="pt-4">
           <NotesThread
@@ -277,6 +315,23 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
         </TabsContent>
         <TabsContent value="tasks" className="pt-4">
           <TasksPanel opportunityId={id} tasks={tasks} onTasksChanged={setTasks} readOnly={!canWrite} />
+        </TabsContent>
+        <TabsContent value="activity" className="pt-4">
+          {activities.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No activity recorded yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {activities.map((a) => (
+                <div key={a.id} className="rounded-lg border p-3">
+                  <p className="text-sm">{a.description}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {a.userId || "system"}
+                    {a.createdAt ? ` · ${new Date(a.createdAt).toLocaleString()}` : ""}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
 

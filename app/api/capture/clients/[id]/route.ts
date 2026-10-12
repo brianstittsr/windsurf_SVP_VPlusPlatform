@@ -64,7 +64,11 @@ export async function DELETE(req: NextRequest, { params }: Params) {
   const snap = await ref.get();
   if (!snap.exists) return NextResponse.json({ error: "Client not found" }, { status: 404 });
 
-  await ref.update({ deletedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
+  await ref.update({
+    deletedAt: FieldValue.serverTimestamp(),
+    deletedBy: user.uid,
+    updatedAt: FieldValue.serverTimestamp(),
+  });
 
   await captureAudit({
     type: "delete",
