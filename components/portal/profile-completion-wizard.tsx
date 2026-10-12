@@ -75,8 +75,10 @@ const steps = [
 ];
 
 export function ProfileCompletionWizard() {
-  const { profile, updateProfile, profileCompletion, showProfileWizard, setShowProfileWizard } = useUserProfile();
+  const { profile, saveProfile, profileCompletion, showProfileWizard, setShowProfileWizard } = useUserProfile();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [formData, setFormData] = useState({
     firstName: profile.firstName || "",
     lastName: profile.lastName || "",
@@ -104,17 +106,27 @@ export function ProfileCompletionWizard() {
     }
   };
 
-  const handleComplete = () => {
-    updateProfile({
+  const handleComplete = async () => {
+    setIsSaving(true);
+    setSaveError("");
+    const saved = await saveProfile({
       ...formData,
       profileCompletedAt: new Date().toISOString(),
     });
-    setShowProfileWizard(false);
+    setIsSaving(false);
+    if (saved) {
+      setShowProfileWizard(false);
+    } else {
+      setSaveError("Your profile could not be saved. Please try again.");
+    }
   };
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
+    setIsSaving(true);
+    setSaveError("");
     // Save what we have so far
-    updateProfile(formData);
+    await saveProfile(formData);
+    setIsSaving(false);
     setShowProfileWizard(false);
   };
 
@@ -308,13 +320,17 @@ export function ProfileCompletionWizard() {
           </div>
         </div>
 
+        {saveError && (
+          <p className="px-4 pb-2 text-sm text-destructive">{saveError}</p>
+        )}
+
         <DialogFooter className="flex items-center justify-between">
-          <Button variant="ghost" onClick={handleSkip}>
+          <Button variant="ghost" onClick={handleSkip} disabled={isSaving}>
             Skip for now
           </Button>
           <div className="flex gap-2">
             {currentStep > 1 && (
-              <Button variant="outline" onClick={handleBack}>
+              <Button variant="outline" onClick={handleBack} disabled={isSaving}>
                 <ChevronLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
@@ -325,9 +341,9 @@ export function ProfileCompletionWizard() {
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             ) : (
-              <Button onClick={handleComplete} disabled={!isStepValid()}>
+              <Button onClick={handleComplete} disabled={!isStepValid() || isSaving}>
                 <CheckCircle className="h-4 w-4 mr-2" />
-                Complete Profile
+                {isSaving ? "Saving..." : "Complete Profile"}
               </Button>
             )}
           </div>

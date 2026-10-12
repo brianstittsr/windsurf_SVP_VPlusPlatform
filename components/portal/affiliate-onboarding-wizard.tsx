@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { useUserProfile } from "@/contexts/user-profile-context";
-import { db } from "@/lib/firebase";
-import { collection, addDoc, Timestamp, doc, setDoc } from "firebase/firestore";
 import {
   Dialog,
   DialogContent,
@@ -130,7 +128,7 @@ const steps = [
 ];
 
 export function AffiliateOnboardingWizard() {
-  const { profile, updateProfile, networkingCompletion, showAffiliateOnboarding, setShowAffiliateOnboarding } = useUserProfile();
+  const { profile, saveProfile, networkingCompletion, showAffiliateOnboarding, setShowAffiliateOnboarding } = useUserProfile();
   const [currentStep, setCurrentStep] = useState(1);
   const [acknowledgedCommitments, setAcknowledgedCommitments] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>(profile.networkingProfile.categories || []);
@@ -173,75 +171,27 @@ export function AffiliateOnboardingWizard() {
 
   const handleComplete = async () => {
     setIsSaving(true);
-    
-    try {
-      // Create Team Member document in Firebase
-      const teamMemberData = {
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-        emailPrimary: profile.email,
-        mobile: profile.phone || "",
-        expertise: expertise,
-        title: profile.jobTitle || "",
-        company: profile.company || "",
-        location: profile.location || "",
-        bio: profile.bio || "",
-        avatar: profile.avatarUrl || "",
-        linkedIn: "",
-        website: "",
-        role: "affiliate" as const,
-        status: "active" as const,
-        // Networking profile data
-        networkingProfile: {
-          categories: selectedCategories,
-          expertise: expertise.split(",").map((e) => e.trim()).filter((e) => e),
-          ...networkingData,
-        },
-        affiliateOnboardingComplete: true,
-        affiliateAgreementSigned: true,
-        affiliateAgreementDate: new Date().toISOString(),
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now(),
-      };
 
-      // Save to Firebase team_members collection
-      if (!db) {
-        throw new Error("Firebase not initialized");
-      }
-      const teamMembersRef = collection(db, "team_members");
-      const docRef = await addDoc(teamMembersRef, teamMemberData);
-      
-      console.log("Team Member created with ID:", docRef.id);
+    // Persisted via saveProfile: updates the linked teamMembers doc, or creates
+    // one (role: "affiliate") when none exists
+    const saved = await saveProfile({
+      affiliateOnboardingComplete: true,
+      affiliateAgreementSigned: true,
+      affiliateAgreementDate: new Date().toISOString(),
+      networkingProfile: {
+        ...profile.networkingProfile,
+        categories: selectedCategories,
+        expertise: expertise.split(",").map((e) => e.trim()).filter((e) => e),
+        ...networkingData,
+      },
+    });
 
-      // Update local profile state
-      updateProfile({
-        id: docRef.id,
-        affiliateOnboardingComplete: true,
-        networkingProfile: {
-          ...profile.networkingProfile,
-          categories: selectedCategories,
-          expertise: expertise.split(",").map((e) => e.trim()).filter((e) => e),
-          ...networkingData,
-        },
-      });
-      
-      setShowAffiliateOnboarding(false);
-    } catch (error) {
-      console.error("Error saving affiliate data to Firebase:", error);
-      // Still update local state even if Firebase fails
-      updateProfile({
-        affiliateOnboardingComplete: true,
-        networkingProfile: {
-          ...profile.networkingProfile,
-          categories: selectedCategories,
-          expertise: expertise.split(",").map((e) => e.trim()).filter((e) => e),
-          ...networkingData,
-        },
-      });
-      setShowAffiliateOnboarding(false);
-    } finally {
-      setIsSaving(false);
+    if (!saved) {
+      console.error("Error saving affiliate data to Firebase");
     }
+
+    setIsSaving(false);
+    setShowAffiliateOnboarding(false);
   };
 
   const isStepValid = () => {

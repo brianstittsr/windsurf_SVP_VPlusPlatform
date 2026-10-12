@@ -598,6 +598,39 @@ export interface TeamMemberDoc {
   clientNotes?: string; // Notes about them as a client
   // Mattermost integration
   mattermostUserId?: string; // Links to Mattermost user ID for playbook assignments
+  // Profile completion & extended profile fields (written by profile wizard/page)
+  profileCompletedAt?: string;
+  twitter?: string;
+  facebook?: string;
+  instagram?: string;
+  youtube?: string;
+  industries?: string[];
+  categories?: string[];
+  certifications?: Array<{
+    id: string;
+    name: string;
+    issuer: string;
+    date: string;
+    expires?: string | null;
+    status?: string;
+  }>;
+  availability?: { oneToOne: boolean; speaking: boolean; consulting: boolean };
+  canOffer?: string;
+  lookingFor?: string;
+  affiliateOnboardingComplete?: boolean;
+  affiliateAgreementSigned?: boolean;
+  affiliateAgreementDate?: string | null;
+  networkingProfile?: {
+    expertise: string[];
+    categories: string[];
+    idealReferralPartner?: string;
+    topReferralSources?: string;
+    goalsThisQuarter?: string;
+    uniqueValueProposition?: string;
+    targetClientProfile?: string;
+    problemsYouSolve?: string;
+    successStory?: string;
+  };
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -1456,6 +1489,160 @@ export interface MattermostPlaybookRunDoc {
 }
 
 // ============================================================================
+// Capture Management (GovCon BD) Types
+// ============================================================================
+
+/** Customer document — doubles as a govcon capture client when isCaptureClient is set */
+export interface CustomerDoc {
+  id: string;
+  name: string;
+  website?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  notes?: string;
+  status: "active" | "inactive";
+  primaryContact?: string;
+  isCaptureClient?: boolean;
+  contacts?: { name: string; title?: string; email?: string; phone?: string }[];
+  accountManagerId?: string;
+  accountManagerName?: string;
+  govcon?: {
+    uei?: string;
+    cageCode?: string;
+    samRegistrationExpiry?: string;
+    clearanceLevel?: string;
+    naicsCodes?: string[];
+    keywords?: string[];
+    targetAgencies?: string[];
+    certifications?: { name: string; expiresAt?: string }[];
+    capabilityStatements?: { fileId: string; name: string; version: string; storagePath: string; uploadedAt: string }[];
+    pastContracts?: { agency: string; contractNumber: string; value?: number; startDate?: string; endDate?: string }[];
+  };
+  deletedAt?: Timestamp | null;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export type CaptureOpportunityType = "rfi" | "sources-sought" | "rfp" | "rfq" | "grant";
+export type CaptureBoardType = "standard" | "rfi";
+export type CaptureOpportunitySource = "manual" | "imported";
+
+/** A deadline stored in the agency's timezone, rendered in both zones (rule 5) */
+export interface CaptureDeadline {
+  at: string;
+  timezone: string;
+}
+
+export interface CaptureFileRef {
+  id: string;
+  name: string;
+  storagePath: string;
+  url: string;
+  tag: string;
+  size?: number;
+  uploadedBy: string;
+  uploadedAt: string;
+}
+
+export interface CaptureNote {
+  id: string;
+  text: string;
+  authorId: string;
+  authorName: string;
+  createdAt: string;
+}
+
+export interface CaptureBidNoBid {
+  decision?: "bid" | "no-bid";
+  reason?: string;
+  score?: number;
+  suggestedDecision?: "bid" | "no-bid";
+  decidedById?: string;
+  decidedByName?: string;
+  decidedAt?: string;
+  settingsSnapshot?: unknown;
+}
+
+export interface CaptureOpportunityDoc {
+  id: string;
+  clientId: string;
+  clientName: string;
+  title: string;
+  solicitationNumber: string;
+  samNoticeId?: string;
+  source: CaptureOpportunitySource;
+  type: CaptureOpportunityType;
+  boardType: CaptureBoardType;
+  agency: string;
+  office?: string;
+  contractingOfficer?: { name?: string; email?: string };
+  links?: { samUrl?: string; qaUrl?: string; other?: string[] };
+  naicsCode?: string;
+  setAside?: string;
+  description?: string;
+  estimatedValue?: { min?: number; max?: number; text?: string };
+  stage: string;
+  questionsDue?: CaptureDeadline | null;
+  responseDue?: CaptureDeadline | null;
+  ownerId?: string;
+  ownerName?: string;
+  bidNoBid?: CaptureBidNoBid;
+  incumbent?: string;
+  competitors?: string[];
+  teamingPartners?: { name: string; role: "prime" | "sub" }[];
+  capabilityStatementRef?: string;
+  outcome?: { result?: "won" | "lost" | "no-award"; awardDate?: string };
+  files?: CaptureFileRef[];
+  notes?: CaptureNote[];
+  submittedAt?: string;
+  finalSubmissionFileId?: string;
+  matchScore?: number;
+  deletedAt?: Timestamp | null;
+  deletedBy?: string;
+  createdById?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface CaptureTaskDoc {
+  id: string;
+  opportunityId: string;
+  title: string;
+  assigneeId: string;
+  assigneeName: string;
+  dueDate?: string;
+  status: "open" | "done";
+  createdById?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface CaptureStageDef {
+  id: string;
+  label: string;
+}
+
+/** Convenience aliases matching the doc-named interfaces. */
+export type CaptureOpportunity = CaptureOpportunityDoc;
+export type CaptureTask = CaptureTaskDoc;
+
+export interface CaptureSettingsDoc {
+  id: string;
+  standardStages: CaptureStageDef[];
+  rfiStages: CaptureStageDef[];
+  opportunityTypes: string[];
+  setAsides: string[];
+  noBidReasons: string[];
+  fileTags: string[];
+  deadlineYellowDays: number;
+  deadlineRedDays: number;
+  expiryWarningDays: number;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+// ============================================================================
 // Collection Names
 // ============================================================================
 
@@ -1531,6 +1718,12 @@ export const COLLECTIONS = {
   MATTERMOST_PLAYBOOK_RUNS: "mattermostPlaybookRuns",
   // Book a Call Leads
   BOOK_CALL_LEADS: "bookCallLeads",
+  // Customers (doubles as Capture Management clients)
+  CUSTOMERS: "customers",
+  // Capture Management
+  CAPTURE_OPPORTUNITIES: "captureOpportunities",
+  CAPTURE_TASKS: "captureTasks",
+  CAPTURE_SETTINGS: "captureSettings",
   // Events
   EVENTS: "events",
   // NDA Management
@@ -1542,6 +1735,8 @@ export const COLLECTIONS = {
   ZENTHIUM_MEETINGS: "zenthiumMeetings",
   ZENTHIUM_DIRECT_CONTACTS: "zenthiumDirectContacts",
   ZENTHIUM_STATUS_HISTORY: "zenthiumStatusHistory",
+  ZENTHIUM_REFERRAL_AGREEMENTS: "zenthiumReferralAgreements",
+  ZENTHIUM_OPPORTUNITIES: "zenthiumOpportunities",
 } as const;
 
 // ============================================================================

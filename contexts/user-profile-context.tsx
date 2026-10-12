@@ -2,9 +2,10 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { addDoc, collection, doc, Timestamp, updateDoc } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
 import { getTeamMemberByAuthUid, findAndLinkTeamMember } from "@/lib/auth-team-member-link";
-import type { TeamMemberDoc } from "@/lib/schema";
+import { COLLECTIONS, type TeamMemberDoc } from "@/lib/schema";
 
 // User profile fields
 export interface UserProfile {
@@ -39,6 +40,26 @@ export interface UserProfile {
     successStory: string;
   };
   
+  // Extended fields persisted as extra fields on the teamMembers doc
+  linkedin?: string;
+  website?: string;
+  twitter?: string;
+  facebook?: string;
+  instagram?: string;
+  youtube?: string;
+  industries?: string[];
+  certifications?: Array<{
+    id: string;
+    name: string;
+    issuer: string;
+    date: string;
+    expires?: string | null;
+    status?: string;
+  }>;
+  availability?: { oneToOne: boolean; speaking: boolean; consulting: boolean };
+  canOffer?: string;
+  lookingFor?: string;
+
   // Profile completion tracking
   profileCompletedAt: string | null;
   createdAt: string;
@@ -130,6 +151,7 @@ export function needsAffiliateOnboarding(profile: UserProfile): boolean {
 
 // Map TeamMemberDoc to UserProfile
 function mapTeamMemberToProfile(teamMember: TeamMemberDoc): Partial<UserProfile> {
+  const savedNetworking = (teamMember.networkingProfile || {}) as Partial<UserProfile["networkingProfile"]>;
   return {
     id: teamMember.id,
     email: teamMember.emailPrimary || "",
@@ -145,7 +167,67 @@ function mapTeamMemberToProfile(teamMember: TeamMemberDoc): Partial<UserProfile>
           teamMember.role === "affiliate" ? "affiliate" : 
           teamMember.role === "consultant" ? "affiliate" : "team_member",
     isAffiliate: teamMember.role === "affiliate" || teamMember.role === "consultant",
+    linkedin: teamMember.linkedIn || "",
+    website: teamMember.website || "",
+    twitter: teamMember.twitter || "",
+    facebook: teamMember.facebook || "",
+    instagram: teamMember.instagram || "",
+    youtube: teamMember.youtube || "",
+    industries: teamMember.industries || [],
+    certifications: teamMember.certifications || [],
+    availability: teamMember.availability || { oneToOne: true, speaking: true, consulting: true },
+    canOffer: teamMember.canOffer || "",
+    lookingFor: teamMember.lookingFor || "",
+    affiliateOnboardingComplete: teamMember.affiliateOnboardingComplete ?? false,
+    affiliateAgreementSigned: teamMember.affiliateAgreementSigned ?? false,
+    affiliateAgreementDate: teamMember.affiliateAgreementDate || null,
+    networkingProfile: {
+      expertise: savedNetworking.expertise || [],
+      categories: savedNetworking.categories || [],
+      idealReferralPartner: savedNetworking.idealReferralPartner || "",
+      topReferralSources: savedNetworking.topReferralSources || "",
+      goalsThisQuarter: savedNetworking.goalsThisQuarter || "",
+      uniqueValueProposition: savedNetworking.uniqueValueProposition || "",
+      targetClientProfile: savedNetworking.targetClientProfile || "",
+      problemsYouSolve: savedNetworking.problemsYouSolve || "",
+      successStory: savedNetworking.successStory || "",
+    },
+    profileCompletedAt: teamMember.profileCompletedAt || null,
   };
+}
+
+// Map UserProfile fields back to teamMembers doc fields.
+// Undefined values are stripped so updateDoc doesn't reject them.
+function profileToTeamMemberFields(p: UserProfile): Record<string, unknown> {
+  const raw: Record<string, unknown> = {
+    firstName: p.firstName,
+    lastName: p.lastName,
+    emailPrimary: p.email,
+    mobile: p.phone,
+    title: p.jobTitle,
+    company: p.company,
+    location: p.location,
+    bio: p.bio,
+    avatar: p.avatarUrl,
+    linkedIn: p.linkedin,
+    website: p.website,
+    twitter: p.twitter,
+    facebook: p.facebook,
+    instagram: p.instagram,
+    youtube: p.youtube,
+    industries: p.industries,
+    certifications: p.certifications,
+    availability: p.availability,
+    canOffer: p.canOffer,
+    lookingFor: p.lookingFor,
+    expertise: p.networkingProfile.expertise.join(", "),
+    networkingProfile: p.networkingProfile,
+    affiliateOnboardingComplete: p.affiliateOnboardingComplete,
+    affiliateAgreementSigned: p.affiliateAgreementSigned,
+    affiliateAgreementDate: p.affiliateAgreementDate,
+    profileCompletedAt: p.profileCompletedAt,
+  };
+  return Object.fromEntries(Object.entries(raw).filter(([, v]) => v !== undefined));
 }
 
 // Context type
@@ -153,6 +235,8 @@ interface UserProfileContextType {
   profile: UserProfile;
   setProfile: (profile: UserProfile) => void;
   updateProfile: (updates: Partial<UserProfile>) => void;
+  saveProfile: (updates: Partial<UserProfile>) => Promise<boolean>;
+  firebaseUser: FirebaseUser | null;
   profileCompletion: number;
   networkingCompletion: number;
   isComplete: boolean;
@@ -177,6 +261,7 @@ export function UserProfileProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [linkedTeamMember, setLinkedTeamMember] = useState<TeamMemberDoc | null>(null);
+  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
 
   const profileCompletion = calculateProfileCompletion(profile);
   const networkingCompletion = calculateNetworkingCompletion(profile);
@@ -193,6 +278,7 @@ export function UserProfileProvider({ children }: { children: ReactNode }) {
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
       setIsLoading(true);
+      setFirebaseUser(firebaseUser);
       
       if (firebaseUser) {
         setIsAuthenticated(true);
@@ -270,6 +356,59 @@ export function UserProfileProvider({ children }: { children: ReactNode }) {
     }));
   };
 
+  // Persist profile updates to the linked teamMembers Firestore doc.
+  // Creates a new doc (role: "affiliate") when the user has no linked doc.
+  const saveProfile = async (updates: Partial<UserProfile>): Promise<boolean> => {
+    const merged = { ...profile, ...updates, updatedAt: new Date().toISOString() };
+    setProfile(merged);
+
+    if (!db) {
+      console.error("Firebase not initialized - profile not persisted");
+      return false;
+    }
+
+    try {
+      const docFields = {
+        ...profileToTeamMemberFields(merged),
+        updatedAt: Timestamp.now(),
+      };
+
+      let memberId = linkedTeamMember?.id;
+
+      // Retry linking in case a teamMembers doc was created since sign-in
+      if (!memberId && firebaseUser) {
+        const found = await findAndLinkTeamMember(firebaseUser.email || merged.email, firebaseUser.uid);
+        if (found) {
+          memberId = found.id;
+          setLinkedTeamMember(found);
+        }
+      }
+
+      if (memberId) {
+        await updateDoc(doc(db, COLLECTIONS.TEAM_MEMBERS, memberId), docFields);
+        setLinkedTeamMember((prev) =>
+          prev && prev.id === memberId ? ({ ...prev, ...docFields } as TeamMemberDoc) : prev
+        );
+      } else {
+        const payload = {
+          ...docFields,
+          firebaseUid: firebaseUser?.uid,
+          role: "affiliate" as const,
+          status: "active" as const,
+          createdAt: Timestamp.now(),
+        };
+        const docRef = await addDoc(collection(db, COLLECTIONS.TEAM_MEMBERS), payload);
+        setLinkedTeamMember({ id: docRef.id, ...payload } as TeamMemberDoc);
+        setProfile((prev) => ({ ...prev, id: docRef.id }));
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error saving profile to Firestore:", error);
+      return false;
+    }
+  };
+
   const getDisplayName = () => {
     if (profile.firstName && profile.lastName) {
       return `${profile.firstName} ${profile.lastName}`;
@@ -294,6 +433,8 @@ export function UserProfileProvider({ children }: { children: ReactNode }) {
         profile,
         setProfile,
         updateProfile,
+        saveProfile,
+        firebaseUser,
         profileCompletion,
         networkingCompletion,
         isComplete,

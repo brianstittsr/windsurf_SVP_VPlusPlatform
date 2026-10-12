@@ -82,6 +82,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useUserProfile } from "@/contexts/user-profile-context";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
 import ContactsTab from "./contacts-tab";
 
 // User roles
@@ -178,7 +179,7 @@ const mockOneToOnes = [
 ];
 
 export default function ProfilePage() {
-  const { profile: userProfile, getDisplayName, getInitials } = useUserProfile();
+  const { profile: userProfile, getDisplayName, getInitials, saveProfile: saveUserProfile, linkedTeamMember } = useUserProfile();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   
@@ -240,6 +241,48 @@ export default function ProfilePage() {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [passwordSuccess, setPasswordSuccess] = useState("");
+
+  // Hydrate form state from the saved profile once it loads
+  const hasHydrated = useRef(false);
+  useEffect(() => {
+    if (hasHydrated.current) return;
+    if (!userProfile.id && !userProfile.email) return;
+    hasHydrated.current = true;
+    setProfile((prev) => ({
+      ...prev,
+      id: userProfile.id || prev.id,
+      role: userProfile.role || prev.role,
+      firstName: userProfile.firstName || "",
+      lastName: userProfile.lastName || "",
+      email: userProfile.email || "",
+      phone: userProfile.phone || "",
+      title: userProfile.jobTitle || "",
+      company: userProfile.company || "",
+      location: userProfile.location || "",
+      website: userProfile.website || "",
+      linkedin: userProfile.linkedin || "",
+      twitter: userProfile.twitter || "",
+      facebook: userProfile.facebook || "",
+      instagram: userProfile.instagram || "",
+      youtube: userProfile.youtube || "",
+      bio: userProfile.bio || "",
+      categories: userProfile.networkingProfile.categories || [],
+      expertise: userProfile.networkingProfile.expertise || [],
+      industries: userProfile.industries || [],
+      idealReferral: userProfile.networkingProfile.idealReferralPartner || "",
+      canOffer: userProfile.canOffer || "",
+      lookingFor: userProfile.lookingFor || "",
+      goalsThisQuarter: userProfile.networkingProfile.goalsThisQuarter || "",
+      uniqueValueProposition: userProfile.networkingProfile.uniqueValueProposition || "",
+      targetClientProfile: userProfile.networkingProfile.targetClientProfile || "",
+      problemsYouSolve: userProfile.networkingProfile.problemsYouSolve || "",
+      availability: userProfile.availability || prev.availability,
+      certifications: userProfile.certifications && userProfile.certifications.length > 0
+        ? userProfile.certifications.map((c) => ({ ...c, expires: c.expires ?? null, status: c.status || "active" }))
+        : prev.certifications,
+      memberSince: linkedTeamMember?.createdAt?.toDate?.().toISOString().slice(0, 10) || prev.memberSince,
+    }));
+  }, [userProfile, linkedTeamMember]);
 
   const updateProfile = (field: string, value: any) => {
     setProfile({ ...profile, [field]: value });
@@ -305,9 +348,43 @@ export default function ProfilePage() {
 
   const saveProfile = async () => {
     setIsSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const saved = await saveUserProfile({
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      email: profile.email,
+      phone: profile.phone,
+      jobTitle: profile.title,
+      company: profile.company,
+      location: profile.location,
+      bio: profile.bio,
+      website: profile.website,
+      linkedin: profile.linkedin,
+      twitter: profile.twitter,
+      facebook: profile.facebook,
+      instagram: profile.instagram,
+      youtube: profile.youtube,
+      industries: profile.industries,
+      certifications: profile.certifications,
+      availability: profile.availability,
+      canOffer: profile.canOffer,
+      lookingFor: profile.lookingFor,
+      networkingProfile: {
+        ...userProfile.networkingProfile,
+        expertise: profile.expertise,
+        categories: profile.categories,
+        idealReferralPartner: profile.idealReferral,
+        goalsThisQuarter: profile.goalsThisQuarter,
+        uniqueValueProposition: profile.uniqueValueProposition,
+        targetClientProfile: profile.targetClientProfile,
+        problemsYouSolve: profile.problemsYouSolve,
+      },
+    });
     setIsSaving(false);
-    alert("Profile saved successfully!");
+    if (saved) {
+      toast.success("Profile saved successfully!");
+    } else {
+      toast.error("Profile could not be saved. Please try again.");
+    }
   };
 
   const handleChangePassword = async () => {
