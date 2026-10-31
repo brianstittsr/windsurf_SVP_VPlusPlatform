@@ -30,9 +30,6 @@ import {
   Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { db } from "@/lib/firebase";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
-import { COLLECTIONS } from "@/lib/schema";
 
 const services = [
   "Supplier Readiness & OEM Qualification",
@@ -56,6 +53,20 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookCallOpen, setBookCallOpen] = useState(false);
   const [isBookingCall, setIsBookingCall] = useState(false);
+  const [assessmentForm, setAssessmentForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    company: "",
+    jobTitle: "",
+    companySize: "",
+    industry: "",
+    serviceInterest: "",
+    message: "",
+    newsletterOptIn: false,
+    website: "",
+  });
   const [bookCallForm, setBookCallForm] = useState({
     firstName: "",
     lastName: "",
@@ -66,21 +77,62 @@ export default function ContactPage() {
     preferredDate: "",
     preferredTime: "",
     message: "",
+    website: "",
   });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    toast.success("Thank you for your inquiry!", {
-      description: "We'll get back to you within 24 hours.",
-    });
-
-    setIsSubmitting(false);
-    (e.target as HTMLFormElement).reset();
+    try {
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          formType: "assessment",
+          firstName: assessmentForm.firstName,
+          lastName: assessmentForm.lastName,
+          email: assessmentForm.email,
+          phone: assessmentForm.phone || undefined,
+          company: assessmentForm.company || undefined,
+          jobTitle: assessmentForm.jobTitle || undefined,
+          companySize: assessmentForm.companySize || undefined,
+          industry: assessmentForm.industry || undefined,
+          serviceInterest: assessmentForm.serviceInterest || undefined,
+          message: assessmentForm.message || undefined,
+          newsletterOptIn: assessmentForm.newsletterOptIn,
+          website: assessmentForm.website,
+        }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(data?.error || "Submission failed");
+      }
+      toast.success("Thank you for your inquiry!", {
+        description: "We'll get back to you within 24 hours.",
+      });
+      setAssessmentForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        company: "",
+        jobTitle: "",
+        companySize: "",
+        industry: "",
+        serviceInterest: "",
+        message: "",
+        newsletterOptIn: false,
+        website: "",
+      });
+    } catch (error) {
+      console.error("Error submitting assessment request:", error);
+      toast.error("Failed to submit request", {
+        description: error instanceof Error ? error.message : "Please try again or contact us directly.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleBookCall = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -88,25 +140,28 @@ export default function ContactPage() {
     setIsBookingCall(true);
 
     try {
-      if (!db) {
-        throw new Error("Database not configured");
-      }
-
-      await addDoc(collection(db, COLLECTIONS.BOOK_CALL_LEADS), {
-        firstName: bookCallForm.firstName,
-        lastName: bookCallForm.lastName,
-        email: bookCallForm.email,
-        phone: bookCallForm.phone || null,
-        company: bookCallForm.company || null,
-        jobTitle: bookCallForm.jobTitle || null,
-        preferredDate: bookCallForm.preferredDate || null,
-        preferredTime: bookCallForm.preferredTime || null,
-        message: bookCallForm.message || null,
-        source: "contact-page",
-        status: "new",
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now(),
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          formType: "book-call",
+          source: "contact-page",
+          firstName: bookCallForm.firstName,
+          lastName: bookCallForm.lastName,
+          email: bookCallForm.email,
+          phone: bookCallForm.phone || undefined,
+          company: bookCallForm.company || undefined,
+          jobTitle: bookCallForm.jobTitle || undefined,
+          preferredDate: bookCallForm.preferredDate || undefined,
+          preferredTime: bookCallForm.preferredTime || undefined,
+          message: bookCallForm.message || undefined,
+          website: bookCallForm.website,
+        }),
       });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(data?.error || "Submission failed");
+      }
 
       toast.success("Call request submitted!", {
         description: "We'll contact you shortly to schedule your call.",
@@ -122,12 +177,13 @@ export default function ContactPage() {
         preferredDate: "",
         preferredTime: "",
         message: "",
+        website: "",
       });
       setBookCallOpen(false);
     } catch (error) {
       console.error("Error submitting book call request:", error);
       toast.error("Failed to submit request", {
-        description: "Please try again or contact us directly.",
+        description: error instanceof Error ? error.message : "Please try again or contact us directly.",
       });
     } finally {
       setIsBookingCall(false);
@@ -144,7 +200,7 @@ export default function ContactPage() {
               Get in Touch
             </Badge>
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-              Let's Start Your{" "}
+              Let&apos;s Start Your{" "}
               <span className="text-primary">Transformation</span>
             </h1>
             <p className="mt-6 text-lg text-gray-300">
@@ -170,43 +226,94 @@ export default function ContactPage() {
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Honeypot — hidden from humans, bots fill it */}
+                    <input
+                      type="text"
+                      name="website"
+                      value={assessmentForm.website}
+                      onChange={(e) => setAssessmentForm({ ...assessmentForm, website: e.target.value })}
+                      tabIndex={-1}
+                      autoComplete="off"
+                      aria-hidden="true"
+                      className="hidden"
+                    />
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="firstName">First Name *</Label>
-                        <Input id="firstName" required placeholder="John" />
+                        <Input
+                          id="firstName"
+                          required
+                          placeholder="John"
+                          value={assessmentForm.firstName}
+                          onChange={(e) => setAssessmentForm({ ...assessmentForm, firstName: e.target.value })}
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="lastName">Last Name *</Label>
-                        <Input id="lastName" required placeholder="Smith" />
+                        <Input
+                          id="lastName"
+                          required
+                          placeholder="Smith"
+                          value={assessmentForm.lastName}
+                          onChange={(e) => setAssessmentForm({ ...assessmentForm, lastName: e.target.value })}
+                        />
                       </div>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="email">Email *</Label>
-                        <Input id="email" type="email" required placeholder="john@company.com" />
+                        <Input
+                          id="email"
+                          type="email"
+                          required
+                          placeholder="john@company.com"
+                          value={assessmentForm.email}
+                          onChange={(e) => setAssessmentForm({ ...assessmentForm, email: e.target.value })}
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="phone">Phone</Label>
-                        <Input id="phone" type="tel" placeholder="(555) 123-4567" />
+                        <Input
+                          id="phone"
+                          type="tel"
+                          placeholder="(555) 123-4567"
+                          value={assessmentForm.phone}
+                          onChange={(e) => setAssessmentForm({ ...assessmentForm, phone: e.target.value })}
+                        />
                       </div>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="company">Company Name *</Label>
-                        <Input id="company" required placeholder="Your Company Inc." />
+                        <Input
+                          id="company"
+                          required
+                          placeholder="Your Company Inc."
+                          value={assessmentForm.company}
+                          onChange={(e) => setAssessmentForm({ ...assessmentForm, company: e.target.value })}
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="title">Job Title</Label>
-                        <Input id="title" placeholder="VP Operations" />
+                        <Input
+                          id="title"
+                          placeholder="VP Operations"
+                          value={assessmentForm.jobTitle}
+                          onChange={(e) => setAssessmentForm({ ...assessmentForm, jobTitle: e.target.value })}
+                        />
                       </div>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="size">Company Size *</Label>
-                        <Select required>
+                        <Select
+                          required
+                          value={assessmentForm.companySize}
+                          onValueChange={(v) => setAssessmentForm({ ...assessmentForm, companySize: v })}
+                        >
                           <SelectTrigger>
                             <SelectValue placeholder="Select company size" />
                           </SelectTrigger>
@@ -221,13 +328,22 @@ export default function ContactPage() {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="industry">Industry</Label>
-                        <Input id="industry" placeholder="e.g., Automotive, Aerospace" />
+                        <Input
+                          id="industry"
+                          placeholder="e.g., Automotive, Aerospace"
+                          value={assessmentForm.industry}
+                          onChange={(e) => setAssessmentForm({ ...assessmentForm, industry: e.target.value })}
+                        />
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="service">Service of Interest *</Label>
-                      <Select required>
+                      <Select
+                        required
+                        value={assessmentForm.serviceInterest}
+                        onValueChange={(v) => setAssessmentForm({ ...assessmentForm, serviceInterest: v })}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select a service" />
                         </SelectTrigger>
@@ -247,11 +363,19 @@ export default function ContactPage() {
                         id="message"
                         placeholder="What challenges are you facing? What outcomes are you hoping to achieve?"
                         rows={4}
+                        value={assessmentForm.message}
+                        onChange={(e) => setAssessmentForm({ ...assessmentForm, message: e.target.value })}
                       />
                     </div>
 
                     <div className="flex items-start space-x-2">
-                      <Checkbox id="newsletter" />
+                      <Checkbox
+                        id="newsletter"
+                        checked={assessmentForm.newsletterOptIn}
+                        onCheckedChange={(checked) =>
+                          setAssessmentForm({ ...assessmentForm, newsletterOptIn: checked === true })
+                        }
+                      />
                       <Label htmlFor="newsletter" className="text-sm font-normal">
                         Subscribe to our newsletter for manufacturing insights and industry updates
                       </Label>
@@ -348,6 +472,17 @@ export default function ContactPage() {
                         </DialogDescription>
                       </DialogHeader>
                       <form onSubmit={handleBookCall} className="space-y-4 mt-4">
+                        {/* Honeypot — hidden from humans, bots fill it */}
+                        <input
+                          type="text"
+                          name="website"
+                          value={bookCallForm.website}
+                          onChange={(e) => setBookCallForm({ ...bookCallForm, website: e.target.value })}
+                          tabIndex={-1}
+                          autoComplete="off"
+                          aria-hidden="true"
+                          className="hidden"
+                        />
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <Label htmlFor="book-firstName">First Name *</Label>

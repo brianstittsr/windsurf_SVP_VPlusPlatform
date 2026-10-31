@@ -125,6 +125,11 @@ export default function BookCallLeadsPage() {
           timezone: data.timezone,
           message: data.message,
           source: data.source,
+          formType: data.formType,
+          companySize: data.companySize,
+          industry: data.industry,
+          serviceInterest: data.serviceInterest,
+          newsletterOptIn: data.newsletterOptIn,
           status: data.status,
           assignedTo: data.assignedTo,
           assignedToName: data.assignedToName,
@@ -265,6 +270,7 @@ export default function BookCallLeadsPage() {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Contact</TableHead>
+                  <TableHead>Type</TableHead>
                   <TableHead>Company</TableHead>
                   <TableHead>Preferred Time</TableHead>
                   <TableHead>Status</TableHead>
@@ -289,6 +295,11 @@ export default function BookCallLeadsPage() {
                           <span className="text-xs text-muted-foreground">{lead.phone}</span>
                         )}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">
+                        {lead.formType === "assessment" ? "Assessment" : "Call"}
+                      </Badge>
                     </TableCell>
                     <TableCell>{lead.company || "-"}</TableCell>
                     <TableCell>
@@ -395,6 +406,19 @@ export default function BookCallLeadsPage() {
                   </div>
                 </div>
                 <div>
+                  {selectedLead.formType === "assessment" && (
+                    <>
+                      <h4 className="font-semibold mb-2">Assessment Details</h4>
+                      <div className="space-y-2 text-sm mb-4">
+                        {selectedLead.serviceInterest && <p>Service: {selectedLead.serviceInterest}</p>}
+                        {selectedLead.companySize && <p>Company size: {selectedLead.companySize}</p>}
+                        {selectedLead.industry && <p>Industry: {selectedLead.industry}</p>}
+                        {selectedLead.newsletterOptIn && (
+                          <p className="text-muted-foreground">Subscribed to newsletter</p>
+                        )}
+                      </div>
+                    </>
+                  )}
                   <h4 className="font-semibold mb-2">Scheduling Preferences</h4>
                   <div className="space-y-2 text-sm">
                     {selectedLead.preferredDate && (

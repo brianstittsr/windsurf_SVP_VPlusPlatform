@@ -652,6 +652,12 @@ export interface BookCallLeadDoc {
   // Additional Info
   message?: string;
   source: "contact-page" | "cta" | "popup" | "other";
+  // Assessment form fields (when formType === "assessment")
+  formType?: "book-call" | "assessment";
+  companySize?: string;
+  industry?: string;
+  serviceInterest?: string;
+  newsletterOptIn?: boolean;
   // Status
   status: "new" | "contacted" | "scheduled" | "completed" | "cancelled";
   assignedTo?: string;

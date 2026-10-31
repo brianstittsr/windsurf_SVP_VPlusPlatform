@@ -593,6 +593,12 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Book Call Leads — created via /api/leads (Admin SDK); admin-only management
+    match /bookCallLeads/{leadId} {
+      allow create: if false;
+      allow read, update, delete: if isAdmin();
+    }
+
     // =========================================================================
     // Mattermost Playbooks Collections
     // TODO: Restrict to authenticated users in production
