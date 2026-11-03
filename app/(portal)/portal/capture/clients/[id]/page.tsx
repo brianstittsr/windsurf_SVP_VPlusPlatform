@@ -28,7 +28,7 @@ import type { CustomerDoc, CaptureOpportunity } from "@/lib/schema";
 import { toast } from "sonner";
 import { ArrowLeft, Save, Upload, FileText, Trash2, ExternalLink } from "lucide-react";
 
-const CERT_KEYS = ["8a", "hubzone", "sdvosb", "wosb", "mbe", "dbw"] as const;
+const CERT_KEYS = ["8a", "hubzone", "sdvosb", "vosb", "edwosb", "wosb", "mbe", "dbw"] as const;
 
 export default function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -47,6 +47,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
     cageCode: "",
     samExpiry: "",
     naicsCodes: "",
+    pscCodes: "",
     keywords: "",
     targetAgencies: "",
   });
@@ -69,6 +70,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
           cageCode: g.cageCode || "",
           samExpiry: g.samRegistrationExpiry ? g.samRegistrationExpiry.slice(0, 10) : "",
           naicsCodes: (g.naicsCodes || []).join(", "),
+          pscCodes: (g.pscCodes || []).join(", "),
           keywords: (g.keywords || []).join(", "),
           targetAgencies: (g.targetAgencies || []).join(", "),
         });
@@ -99,6 +101,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
             cageCode: form.cageCode || undefined,
             samRegistrationExpiry: form.samExpiry ? new Date(form.samExpiry).toISOString() : undefined,
             naicsCodes: split(form.naicsCodes),
+            pscCodes: split(form.pscCodes),
             keywords: split(form.keywords),
             targetAgencies: split(form.targetAgencies),
             certifications: CERT_KEYS.filter((k) => certs[k]).map((k) => ({
@@ -243,6 +246,10 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
             <div className="space-y-2">
               <Label>NAICS Codes (comma-separated)</Label>
               <Input value={form.naicsCodes} onChange={(e) => setForm({ ...form, naicsCodes: e.target.value })} disabled={!isAdmin} />
+            </div>
+            <div className="space-y-2">
+              <Label>PSC/FSC Codes (comma-separated)</Label>
+              <Input value={form.pscCodes} onChange={(e) => setForm({ ...form, pscCodes: e.target.value })} disabled={!isAdmin} />
             </div>
             <div className="space-y-2">
               <Label>Keywords (comma-separated)</Label>

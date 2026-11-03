@@ -4,12 +4,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { onAuthStateChanged, type User } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,412 +23,617 @@ import {
 } from "@/components/ui/select";
 import {
   Building2,
-  User,
-  MapPin,
-  Mail,
-  Phone,
-  Globe,
+  Landmark,
   Factory,
-  FileText,
-  Award,
-  Truck,
-  Shield,
   CheckCircle,
   ChevronRight,
   ChevronLeft,
-  Save,
   Loader2,
-  Upload,
   Users,
   Target,
-  Briefcase,
+  X,
+  Plus,
 } from "lucide-react";
+import { toast } from "sonner";
 
-// Company types
+const TABS = ["company", "govcon", "capabilities", "market", "review"] as const;
+type Tab = (typeof TABS)[number];
+
 const companyTypes = [
-  { id: "manufacturer", name: "Manufacturer" },
-  { id: "supplier", name: "Supplier/Vendor" },
-  { id: "oem", name: "OEM (Original Equipment Manufacturer)" },
-  { id: "tier1", name: "Tier 1 Supplier" },
-  { id: "tier2", name: "Tier 2 Supplier" },
-  { id: "distributor", name: "Distributor" },
-  { id: "service_provider", name: "Service Provider" },
-  { id: "other", name: "Other" },
+  "Manufacturer",
+  "Supplier/Vendor",
+  "OEM",
+  "Tier 1 Supplier",
+  "Tier 2 Supplier",
+  "Distributor",
+  "Service Provider",
+  "Other",
 ];
 
-// Industry sectors
 const industrySectors = [
-  { id: "automotive", name: "Automotive" },
-  { id: "aerospace", name: "Aerospace & Defense" },
-  { id: "electronics", name: "Electronics" },
-  { id: "medical", name: "Medical Devices" },
-  { id: "industrial", name: "Industrial Equipment" },
-  { id: "consumer", name: "Consumer Products" },
-  { id: "energy", name: "Energy & Utilities" },
-  { id: "food", name: "Food & Beverage" },
-  { id: "pharma", name: "Pharmaceutical" },
-  { id: "other", name: "Other" },
+  "Automotive",
+  "Aerospace & Defense",
+  "Electronics",
+  "Medical Devices",
+  "Industrial Equipment",
+  "Consumer Products",
+  "Energy & Utilities",
+  "Food & Beverage",
+  "Pharmaceutical",
+  "IT & Software",
+  "Professional Services",
+  "Other",
 ];
 
-// Manufacturing capabilities
-const manufacturingCapabilities = [
-  { id: "cnc", name: "CNC Machining" },
-  { id: "stamping", name: "Metal Stamping" },
-  { id: "injection", name: "Injection Molding" },
-  { id: "casting", name: "Die Casting" },
-  { id: "welding", name: "Welding & Fabrication" },
-  { id: "assembly", name: "Assembly" },
-  { id: "electronics", name: "Electronics Assembly" },
-  { id: "finishing", name: "Surface Finishing" },
-  { id: "testing", name: "Testing & Inspection" },
-  { id: "packaging", name: "Packaging" },
+const capabilities = [
+  "CNC Machining",
+  "Metal Stamping",
+  "Injection Molding",
+  "Die Casting",
+  "Welding & Fabrication",
+  "Assembly",
+  "Electronics Assembly",
+  "Surface Finishing",
+  "Testing & Inspection",
+  "Packaging",
+  "Engineering & Design",
+  "Logistics & Distribution",
 ];
 
-// Certifications
-const certificationOptions = [
-  { id: "iso9001", name: "ISO 9001" },
-  { id: "iso14001", name: "ISO 14001" },
-  { id: "iatf16949", name: "IATF 16949" },
-  { id: "as9100", name: "AS9100" },
-  { id: "iso13485", name: "ISO 13485" },
-  { id: "iso45001", name: "ISO 45001" },
-  { id: "nadcap", name: "NADCAP" },
-  { id: "cmmi", name: "CMMI" },
+const qualityCertifications = [
+  "ISO 9001",
+  "ISO 14001",
+  "IATF 16949",
+  "AS9100",
+  "ISO 13485",
+  "ISO 45001",
+  "NADCAP",
+  "CMMI",
+  "ITAR Registered",
+  "CMM/CQMS",
 ];
 
-// Services of interest
+// SBA / socioeconomic set-aside programs — drives SAM.gov match scoring.
+const setAsideCerts = [
+  { id: "8a", name: "8(a) Business Development" },
+  { id: "hubzone", name: "HUBZone" },
+  { id: "sdvosb", name: "Service-Disabled Veteran-Owned (SDVOSB)" },
+  { id: "vosb", name: "Veteran-Owned (VOSB)" },
+  { id: "edwosb", name: "Economically Disadvantaged WOSB" },
+  { id: "wosb", name: "Women-Owned Small Business (WOSB)" },
+  { id: "mbe", name: "Minority Business Enterprise (MBE)" },
+  { id: "dbw", name: "Disadvantaged Business Enterprise (DBE)" },
+];
+
+const clearanceLevels = [
+  { value: "none", label: "None" },
+  { value: "public-trust", label: "Public Trust" },
+  { value: "secret", label: "Secret" },
+  { value: "top-secret", label: "Top Secret" },
+  { value: "other", label: "Other" },
+];
+
 const servicesOfInterest = [
-  { id: "lean", name: "Lean Manufacturing" },
-  { id: "quality", name: "Quality Systems & ISO" },
-  { id: "automation", name: "Automation & Industry 4.0" },
-  { id: "workforce", name: "Workforce Development" },
-  { id: "supply_chain", name: "Supply Chain Optimization" },
-  { id: "digital", name: "Digital Transformation" },
-  { id: "assessment", name: "Manufacturing Assessment" },
-  { id: "training", name: "Training Programs" },
+  "Lean Manufacturing",
+  "Quality Systems & ISO",
+  "Automation & Industry 4.0",
+  "Workforce Development",
+  "Supply Chain Optimization",
+  "Digital Transformation",
+  "Government Contracting",
+  "Capture & Proposal Support",
 ];
 
-export default function ClientOnboardingPage() {
-  const router = useRouter();
-  const [activeTab, setActiveTab] = useState("company");
-  const [isSaving, setIsSaving] = useState(false);
-  const [completedTabs, setCompletedTabs] = useState<string[]>([]);
+interface FormData {
+  companyName: string;
+  companyType: string;
+  website: string;
+  yearEstablished: string;
+  employeeCount: string;
+  streetAddress: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  // GovCon
+  uei: string;
+  cageCode: string;
+  samExpiry: string;
+  samRegistered: boolean;
+  naicsCodes: string[];
+  pscCodes: string[];
+  clearanceLevel: string;
+  setAsides: Record<string, boolean>;
+  certExpiries: Record<string, string>;
+  keywords: string[];
+  targetAgencies: string[];
+  // Capabilities
+  industrySectors: string[];
+  capabilities: string[];
+  qualityCerts: string[];
+  quality: {
+    qualityManual: boolean;
+    documentedProcesses: boolean;
+    internalAudits: boolean;
+    correctiveActionProcess: boolean;
+    supplierQualification: boolean;
+  };
+  // Market & goals
+  servicesInterested: string[];
+  primaryGoals: string;
+  currentChallenges: string;
+  timeline: string;
+  howDidYouHear: string;
+  additionalNotes: string;
+  // Contacts
+  contactName: string;
+  contactTitle: string;
+  contactEmail: string;
+  contactPhone: string;
+  secondaryName: string;
+  secondaryTitle: string;
+  secondaryEmail: string;
+  secondaryPhone: string;
+  agreeToTerms: boolean;
+}
 
-  // Form state
-  const [formData, setFormData] = useState({
-    // Company Information
-    companyName: "",
-    companyType: "",
-    dunsNumber: "",
-    taxId: "",
-    yearEstablished: "",
-    employeeCount: "",
-    annualRevenue: "",
-    website: "",
-    
-    // Address
-    streetAddress: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    country: "United States",
-    
-    // Primary Contact
-    contactName: "",
-    contactTitle: "",
-    contactEmail: "",
-    contactPhone: "",
-    
-    // Secondary Contact
-    secondaryContactName: "",
-    secondaryContactTitle: "",
-    secondaryContactEmail: "",
-    secondaryContactPhone: "",
-    
-    // Manufacturing Profile
-    industrySectors: [] as string[],
-    capabilities: [] as string[],
-    certifications: [] as string[],
-    productionCapacity: "",
-    facilitySize: "",
-    
-    // Quality & Compliance
+const initialForm: FormData = {
+  companyName: "",
+  companyType: "",
+  website: "",
+  yearEstablished: "",
+  employeeCount: "",
+  streetAddress: "",
+  city: "",
+  state: "",
+  zipCode: "",
+  uei: "",
+  cageCode: "",
+  samExpiry: "",
+  samRegistered: false,
+  naicsCodes: [],
+  pscCodes: [],
+  clearanceLevel: "none",
+  setAsides: {},
+  certExpiries: {},
+  keywords: [],
+  targetAgencies: [],
+  industrySectors: [],
+  capabilities: [],
+  qualityCerts: [],
+  quality: {
     qualityManual: false,
     documentedProcesses: false,
     internalAudits: false,
     correctiveActionProcess: false,
     supplierQualification: false,
-    
-    // Services & Goals
-    servicesInterested: [] as string[],
-    primaryGoals: "",
-    currentChallenges: "",
-    timeline: "",
-    budget: "",
-    
-    // Additional Info
-    howDidYouHear: "",
-    additionalNotes: "",
-    agreeToTerms: false,
-  });
+  },
+  servicesInterested: [],
+  primaryGoals: "",
+  currentChallenges: "",
+  timeline: "",
+  howDidYouHear: "",
+  additionalNotes: "",
+  contactName: "",
+  contactTitle: "",
+  contactEmail: "",
+  contactPhone: "",
+  secondaryName: "",
+  secondaryTitle: "",
+  secondaryEmail: "",
+  secondaryPhone: "",
+  agreeToTerms: false,
+};
 
-  // Load session data on mount
-  useEffect(() => {
-    const userName = sessionStorage.getItem("svp_user_name") || "";
-    const userEmail = sessionStorage.getItem("svp_user_email") || "";
-    const userCompany = sessionStorage.getItem("svp_user_company") || "";
-    const userPhone = sessionStorage.getItem("svp_user_phone") || "";
+function ToggleGrid({
+  options,
+  selected,
+  onToggle,
+  cols = 3,
+}: {
+  options: string[];
+  selected: string[];
+  onToggle: (value: string) => void;
+  cols?: 2 | 3 | 4;
+}) {
+  const colClass = cols === 4 ? "md:grid-cols-4" : cols === 2 ? "md:grid-cols-2" : "md:grid-cols-3";
+  return (
+    <div className={`grid grid-cols-2 ${colClass} gap-3`}>
+      {options.map((option) => (
+        <div
+          key={option}
+          className={`flex items-center space-x-2 p-3 border rounded-lg cursor-pointer transition-all ${
+            selected.includes(option) ? "border-[#C8A951] bg-[#C8A951]/5" : "border-muted hover:border-muted-foreground/50"
+          }`}
+          onClick={() => onToggle(option)}
+        >
+          <Checkbox checked={selected.includes(option)} onCheckedChange={() => onToggle(option)} />
+          <span className="text-sm">{option}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
-    if (userName) {
-      setFormData(prev => ({
-        ...prev,
-        contactName: userName,
-        contactEmail: userEmail,
-        companyName: userCompany,
-        contactPhone: userPhone,
-      }));
+function TagInput({
+  label,
+  hint,
+  values,
+  onAdd,
+  onRemove,
+  placeholder,
+  pattern,
+  normalize,
+}: {
+  label: string;
+  hint?: string;
+  values: string[];
+  onAdd: (v: string) => void;
+  onRemove: (v: string) => void;
+  placeholder: string;
+  pattern?: RegExp;
+  normalize?: (v: string) => string;
+}) {
+  const [draft, setDraft] = useState("");
+  const add = () => {
+    const v = normalize ? normalize(draft) : draft.trim();
+    if (!v) return;
+    if (pattern && !pattern.test(v)) {
+      toast.error(`"${v}" doesn't match the expected format`);
+      return;
     }
+    if (!values.includes(v)) onAdd(v);
+    setDraft("");
+  };
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+      <div className="flex gap-2">
+        <Input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              add();
+            }
+          }}
+          placeholder={placeholder}
+        />
+        <Button type="button" variant="outline" size="icon" onClick={add} aria-label={`Add ${label}`}>
+          <Plus className="h-4 w-4" />
+        </Button>
+      </div>
+      {values.length > 0 && (
+        <div className="flex flex-wrap gap-2 pt-1">
+          {values.map((v) => (
+            <span key={v} className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-1 text-xs">
+              {v}
+              <button type="button" onClick={() => onRemove(v)} aria-label={`Remove ${v}`}>
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function ClientOnboardingPage() {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>("company");
+  const [isSaving, setIsSaving] = useState(false);
+  const [completedTabs, setCompletedTabs] = useState<string[]>([]);
+  const [formData, setFormData] = useState<FormData>(initialForm);
+
+  useEffect(() => {
+    if (!auth) {
+      setAuthChecked(true);
+      return;
+    }
+    return onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      setAuthChecked(true);
+      if (u) {
+        const name = sessionStorage.getItem("svp_user_name") || u.displayName || "";
+        const company = sessionStorage.getItem("svp_user_company") || "";
+        const phone = sessionStorage.getItem("svp_user_phone") || "";
+        setFormData((prev) => ({
+          ...prev,
+          contactName: prev.contactName || name,
+          contactEmail: prev.contactEmail || u.email || "",
+          companyName: prev.companyName || company,
+          contactPhone: prev.contactPhone || phone,
+        }));
+      }
+    });
   }, []);
 
-  const updateFormData = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const set = <K extends keyof FormData>(field: K, value: FormData[K]) =>
+    setFormData((prev) => ({ ...prev, [field]: value }));
+
+  const toggleIn = (field: keyof FormData, value: string) => {
+    const arr = (formData[field] as string[]) || [];
+    set(field as never, (arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value]) as never);
   };
 
-  const toggleArrayField = (field: string, value: string) => {
-    const currentArray = formData[field as keyof typeof formData] as string[];
-    if (currentArray.includes(value)) {
-      updateFormData(field, currentArray.filter(v => v !== value));
-    } else {
-      updateFormData(field, [...currentArray, value]);
-    }
-  };
+  const addTag = (field: "naicsCodes" | "pscCodes" | "keywords" | "targetAgencies", v: string) =>
+    set(field, [...formData[field], v]);
+  const removeTag = (field: "naicsCodes" | "pscCodes" | "keywords" | "targetAgencies", v: string) =>
+    set(field, formData[field].filter((x) => x !== v));
 
-  const calculateProgress = () => {
-    const requiredFields = [
-      formData.companyName,
-      formData.companyType,
-      formData.streetAddress,
-      formData.city,
-      formData.state,
-      formData.zipCode,
-      formData.contactName,
-      formData.contactEmail,
-      formData.contactPhone,
-    ];
-    const completed = requiredFields.filter(f => f && f.trim() !== "").length;
-    return Math.round((completed / requiredFields.length) * 100);
-  };
-
-  const isTabComplete = (tab: string) => {
+  const isTabComplete = (tab: Tab): boolean => {
     switch (tab) {
       case "company":
-        return formData.companyName && formData.companyType && formData.streetAddress && formData.city && formData.state && formData.zipCode;
-      case "contacts":
-        return formData.contactName && formData.contactEmail && formData.contactPhone;
-      case "manufacturing":
-        return formData.industrySectors.length > 0;
-      case "quality":
-        return true; // Optional
-      case "services":
-        return formData.servicesInterested.length > 0 && formData.agreeToTerms;
-      default:
-        return false;
+        return !!(formData.companyName && formData.streetAddress && formData.city && formData.state && formData.zipCode);
+      case "govcon":
+        return formData.naicsCodes.length > 0;
+      case "capabilities":
+        return true;
+      case "market":
+        return true;
+      case "review":
+        return !!(formData.contactName && formData.contactEmail && formData.agreeToTerms);
     }
   };
 
   const handleTabChange = (tab: string) => {
-    // Mark current tab as completed if valid
     if (isTabComplete(activeTab) && !completedTabs.includes(activeTab)) {
-      setCompletedTabs(prev => [...prev, activeTab]);
+      setCompletedTabs((prev) => [...prev, activeTab]);
     }
-    setActiveTab(tab);
+    setActiveTab(tab as Tab);
   };
 
-  const handleNext = () => {
-    const tabs = ["company", "contacts", "manufacturing", "quality", "services"];
-    const currentIndex = tabs.indexOf(activeTab);
-    if (currentIndex < tabs.length - 1) {
-      handleTabChange(tabs[currentIndex + 1]);
-    }
+  const step = (dir: 1 | -1) => {
+    const i = TABS.indexOf(activeTab) + dir;
+    if (i >= 0 && i < TABS.length) handleTabChange(TABS[i]);
   };
 
-  const handleBack = () => {
-    const tabs = ["company", "contacts", "manufacturing", "quality", "services"];
-    const currentIndex = tabs.indexOf(activeTab);
-    if (currentIndex > 0) {
-      handleTabChange(tabs[currentIndex - 1]);
-    }
-  };
+  const progress = Math.round((TABS.filter((t) => isTabComplete(t)).length / TABS.length) * 100);
 
   const handleSubmit = async () => {
+    if (!user) {
+      toast.error("Please sign in to submit your onboarding");
+      return;
+    }
     setIsSaving(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // In production, save to Firebase here
-      console.log("Client onboarding data:", formData);
-      
-      // Redirect to portal
+      const token = await user.getIdToken();
+      const certifications = setAsideCerts
+        .filter((c) => formData.setAsides[c.id])
+        .map((c) => ({
+          name: c.id,
+          ...(formData.certExpiries[c.id] ? { expiresAt: new Date(formData.certExpiries[c.id]).toISOString() } : {}),
+        }));
+
+      const res = await fetch("/api/onboarding/client", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          company: {
+            name: formData.companyName,
+            type: formData.companyType || undefined,
+            website: formData.website || undefined,
+            yearEstablished: formData.yearEstablished || undefined,
+            employeeCount: formData.employeeCount || undefined,
+            streetAddress: formData.streetAddress || undefined,
+            city: formData.city || undefined,
+            state: formData.state || undefined,
+            zipCode: formData.zipCode || undefined,
+            country: "United States",
+          },
+          primaryContact: {
+            name: formData.contactName,
+            title: formData.contactTitle || undefined,
+            email: formData.contactEmail,
+            phone: formData.contactPhone || undefined,
+          },
+          secondaryContact: formData.secondaryName
+            ? {
+                name: formData.secondaryName,
+                title: formData.secondaryTitle || undefined,
+                email: formData.secondaryEmail || undefined,
+                phone: formData.secondaryPhone || undefined,
+              }
+            : undefined,
+          govcon: {
+            uei: formData.uei || undefined,
+            cageCode: formData.cageCode || undefined,
+            samRegistrationExpiry: formData.samExpiry ? new Date(formData.samExpiry).toISOString() : undefined,
+            clearanceLevel: formData.clearanceLevel,
+            naicsCodes: formData.naicsCodes,
+            pscCodes: formData.pscCodes,
+            certifications,
+            keywords: formData.keywords,
+            targetAgencies: formData.targetAgencies,
+          },
+          onboarding: {
+            industrySectors: formData.industrySectors,
+            capabilities: formData.capabilities,
+            quality: {
+              ...formData.quality,
+              certifications: formData.qualityCerts,
+            },
+            servicesInterested: formData.servicesInterested,
+            primaryGoals: formData.primaryGoals || undefined,
+            currentChallenges: formData.currentChallenges || undefined,
+            timeline: formData.timeline || undefined,
+            howDidYouHear: formData.howDidYouHear || undefined,
+            additionalNotes: formData.additionalNotes || undefined,
+          },
+        }),
+      });
+
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(data?.error || "Submission failed");
+      }
+
+      toast.success("Profile saved!", { description: "Your company profile is now active for opportunity matching." });
       router.push("/portal");
     } catch (error) {
-      console.error("Error saving client data:", error);
+      console.error("Onboarding submit failed:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to save. Please try again.");
     } finally {
       setIsSaving(false);
     }
   };
 
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4">
+        <Card className="max-w-md w-full">
+          <CardHeader className="text-center">
+            <CardTitle>Sign In Required</CardTitle>
+            <CardDescription>
+              You need a Strategic Value+ account to complete client onboarding. Sign in or create an account to continue.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <Button asChild>
+              <Link href="/sign-in">Sign In</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/sign-up">Create Account</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const TabIcon = ({ tab }: { tab: Tab }) =>
+    completedTabs.includes(tab) ? <CheckCircle className="h-3 w-3 text-green-500" /> : null;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
         <div className="container flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <Image
-              src="/VPlus_logo.webp"
-              alt="Strategic Value+ Logo"
-              width={40}
-              height={40}
-              className="h-10 w-auto"
-            />
+            <Image src="/VPlus_logo.webp" alt="Strategic Value+ Logo" width={40} height={40} className="h-10 w-auto" />
             <div className="flex flex-col">
               <span className="text-lg font-bold leading-none">Strategic Value+</span>
               <span className="text-xs text-muted-foreground">Client Onboarding</span>
             </div>
           </Link>
           <div className="flex items-center gap-4">
-            <div className="text-sm text-muted-foreground">
-              Progress: {calculateProgress()}%
-            </div>
-            <Progress value={calculateProgress()} className="w-32 h-2" />
+            <div className="text-sm text-muted-foreground">Progress: {progress}%</div>
+            <Progress value={progress} className="w-32 h-2" />
           </div>
         </div>
       </header>
 
       <main className="container py-8">
         <div className="max-w-4xl mx-auto">
-          {/* Page Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-[#C8A951] to-[#a08840] mb-4">
-              <Factory className="h-8 w-8 text-white" />
+              <Landmark className="h-8 w-8 text-white" />
             </div>
             <h1 className="text-3xl font-bold mb-2">Client Registration</h1>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Complete your company profile to access Strategic Value+ services and connect with our network of manufacturing experts.
+              Complete your company and government-contracting profile so we can match you with relevant SAM.gov opportunities.
             </p>
           </div>
 
-          {/* Tabs */}
           <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="company" className="flex items-center gap-2">
                 <Building2 className="h-4 w-4" />
                 <span className="hidden sm:inline">Company</span>
-                {completedTabs.includes("company") && <CheckCircle className="h-3 w-3 text-green-500" />}
+                <TabIcon tab="company" />
               </TabsTrigger>
-              <TabsTrigger value="contacts" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                <span className="hidden sm:inline">Contacts</span>
-                {completedTabs.includes("contacts") && <CheckCircle className="h-3 w-3 text-green-500" />}
+              <TabsTrigger value="govcon" className="flex items-center gap-2">
+                <Landmark className="h-4 w-4" />
+                <span className="hidden sm:inline">GovCon</span>
+                <TabIcon tab="govcon" />
               </TabsTrigger>
-              <TabsTrigger value="manufacturing" className="flex items-center gap-2">
+              <TabsTrigger value="capabilities" className="flex items-center gap-2">
                 <Factory className="h-4 w-4" />
-                <span className="hidden sm:inline">Manufacturing</span>
-                {completedTabs.includes("manufacturing") && <CheckCircle className="h-3 w-3 text-green-500" />}
+                <span className="hidden sm:inline">Capabilities</span>
+                <TabIcon tab="capabilities" />
               </TabsTrigger>
-              <TabsTrigger value="quality" className="flex items-center gap-2">
-                <Shield className="h-4 w-4" />
-                <span className="hidden sm:inline">Quality</span>
-                {completedTabs.includes("quality") && <CheckCircle className="h-3 w-3 text-green-500" />}
-              </TabsTrigger>
-              <TabsTrigger value="services" className="flex items-center gap-2">
+              <TabsTrigger value="market" className="flex items-center gap-2">
                 <Target className="h-4 w-4" />
-                <span className="hidden sm:inline">Services</span>
-                {completedTabs.includes("services") && <CheckCircle className="h-3 w-3 text-green-500" />}
+                <span className="hidden sm:inline">Market</span>
+                <TabIcon tab="market" />
+              </TabsTrigger>
+              <TabsTrigger value="review" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                <span className="hidden sm:inline">Review</span>
+                <TabIcon tab="review" />
               </TabsTrigger>
             </TabsList>
 
-            {/* Company Information Tab */}
+            {/* ============ COMPANY ============ */}
             <TabsContent value="company" className="space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Company Information</CardTitle>
-                  <CardDescription>Tell us about your organization</CardDescription>
+                  <CardDescription>Basic details about your organization</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="companyName">Company Name *</Label>
-                      <Input
-                        id="companyName"
-                        value={formData.companyName}
-                        onChange={(e) => updateFormData("companyName", e.target.value)}
-                        placeholder="Your Company LLC"
-                      />
+                      <Input id="companyName" value={formData.companyName} onChange={(e) => set("companyName", e.target.value)} placeholder="Your Company LLC" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="companyType">Company Type *</Label>
-                      <Select value={formData.companyType} onValueChange={(v) => updateFormData("companyType", v)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
+                      <Label htmlFor="companyType">Company Type</Label>
+                      <Select value={formData.companyType} onValueChange={(v) => set("companyType", v)}>
+                        <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
                         <SelectContent>
-                          {companyTypes.map((type) => (
-                            <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
+                          {companyTypes.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="website">Website</Label>
+                      <Input id="website" value={formData.website} onChange={(e) => set("website", e.target.value)} placeholder="www.yourcompany.com" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="yearEstablished">Year Established</Label>
+                      <Input id="yearEstablished" value={formData.yearEstablished} onChange={(e) => set("yearEstablished", e.target.value)} placeholder="1990" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="employeeCount">Employees</Label>
+                      <Select value={formData.employeeCount} onValueChange={(v) => set("employeeCount", v)}>
+                        <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
+                        <SelectContent>
+                          {["1-10", "11-50", "51-100", "101-250", "251-500", "500+"].map((r) => (
+                            <SelectItem key={r} value={r}>{r}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="dunsNumber">DUNS Number</Label>
-                      <Input
-                        id="dunsNumber"
-                        value={formData.dunsNumber}
-                        onChange={(e) => updateFormData("dunsNumber", e.target.value)}
-                        placeholder="00-000-0000"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="yearEstablished">Year Established</Label>
-                      <Input
-                        id="yearEstablished"
-                        value={formData.yearEstablished}
-                        onChange={(e) => updateFormData("yearEstablished", e.target.value)}
-                        placeholder="1990"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="employeeCount">Number of Employees</Label>
-                      <Select value={formData.employeeCount} onValueChange={(v) => updateFormData("employeeCount", v)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select range" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1-10">1-10</SelectItem>
-                          <SelectItem value="11-50">11-50</SelectItem>
-                          <SelectItem value="51-100">51-100</SelectItem>
-                          <SelectItem value="101-250">101-250</SelectItem>
-                          <SelectItem value="251-500">251-500</SelectItem>
-                          <SelectItem value="500+">500+</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="website">Website</Label>
-                    <div className="relative">
-                      <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="website"
-                        value={formData.website}
-                        onChange={(e) => updateFormData("website", e.target.value)}
-                        placeholder="www.yourcompany.com"
-                        className="pl-10"
-                      />
+                  <div className="border-t pt-6">
+                    <h4 className="font-medium mb-1">Government Identifiers</h4>
+                    <p className="text-xs text-muted-foreground mb-4">
+                      From your SAM.gov entity registration — these power opportunity matching and eligibility checks.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="uei">UEI (Unique Entity ID)</Label>
+                        <Input id="uei" value={formData.uei} onChange={(e) => set("uei", e.target.value.toUpperCase())} placeholder="12-character SAM.gov UEI" maxLength={12} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="cageCode">CAGE Code</Label>
+                        <Input id="cageCode" value={formData.cageCode} onChange={(e) => set("cageCode", e.target.value.toUpperCase())} placeholder="5-character CAGE" maxLength={5} />
+                      </div>
                     </div>
                   </div>
 
@@ -436,49 +642,20 @@ export default function ClientOnboardingPage() {
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="streetAddress">Street Address *</Label>
-                        <Input
-                          id="streetAddress"
-                          value={formData.streetAddress}
-                          onChange={(e) => updateFormData("streetAddress", e.target.value)}
-                          placeholder="123 Manufacturing Way"
-                        />
+                        <Input id="streetAddress" value={formData.streetAddress} onChange={(e) => set("streetAddress", e.target.value)} placeholder="123 Manufacturing Way" />
                       </div>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="space-y-2 col-span-2 md:col-span-1">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
                           <Label htmlFor="city">City *</Label>
-                          <Input
-                            id="city"
-                            value={formData.city}
-                            onChange={(e) => updateFormData("city", e.target.value)}
-                            placeholder="Greensboro"
-                          />
+                          <Input id="city" value={formData.city} onChange={(e) => set("city", e.target.value)} placeholder="Greensboro" />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="state">State *</Label>
-                          <Input
-                            id="state"
-                            value={formData.state}
-                            onChange={(e) => updateFormData("state", e.target.value)}
-                            placeholder="NC"
-                          />
+                          <Input id="state" value={formData.state} onChange={(e) => set("state", e.target.value.toUpperCase())} placeholder="NC" maxLength={2} />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="zipCode">ZIP Code *</Label>
-                          <Input
-                            id="zipCode"
-                            value={formData.zipCode}
-                            onChange={(e) => updateFormData("zipCode", e.target.value)}
-                            placeholder="27401"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="country">Country</Label>
-                          <Input
-                            id="country"
-                            value={formData.country}
-                            onChange={(e) => updateFormData("country", e.target.value)}
-                            disabled
-                          />
+                          <Input id="zipCode" value={formData.zipCode} onChange={(e) => set("zipCode", e.target.value)} placeholder="27401" />
                         </div>
                       </div>
                     </div>
@@ -487,373 +664,233 @@ export default function ClientOnboardingPage() {
               </Card>
             </TabsContent>
 
-            {/* Contacts Tab */}
-            <TabsContent value="contacts" className="space-y-6">
+            {/* ============ GOVCON ============ */}
+            <TabsContent value="govcon" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Primary Contact</CardTitle>
-                  <CardDescription>Main point of contact for your organization</CardDescription>
+                  <CardTitle>SAM.gov Registration</CardTitle>
+                  <CardDescription>Your federal registration status drives eligibility warnings and expiry alerts</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="contactName">Full Name *</Label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="contactName"
-                          value={formData.contactName}
-                          onChange={(e) => updateFormData("contactName", e.target.value)}
-                          placeholder="John Doe"
-                          className="pl-10"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="contactTitle">Title</Label>
-                      <div className="relative">
-                        <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="contactTitle"
-                          value={formData.contactTitle}
-                          onChange={(e) => updateFormData("contactTitle", e.target.value)}
-                          placeholder="Operations Manager"
-                          className="pl-10"
-                        />
-                      </div>
+                  <div className="flex items-center space-x-3 p-4 border rounded-lg">
+                    <Checkbox
+                      id="samRegistered"
+                      checked={formData.samRegistered}
+                      onCheckedChange={(c) => set("samRegistered", c === true)}
+                    />
+                    <div>
+                      <Label htmlFor="samRegistered" className="font-medium cursor-pointer">Registered in SAM.gov</Label>
+                      <p className="text-sm text-muted-foreground">Our entity registration is active in SAM.gov</p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="contactEmail">Email *</Label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="contactEmail"
-                          type="email"
-                          value={formData.contactEmail}
-                          onChange={(e) => updateFormData("contactEmail", e.target.value)}
-                          placeholder="john@company.com"
-                          className="pl-10"
-                        />
-                      </div>
+                  {formData.samRegistered && (
+                    <div className="space-y-2 max-w-xs">
+                      <Label htmlFor="samExpiry">SAM Registration Expires</Label>
+                      <Input id="samExpiry" type="date" value={formData.samExpiry} onChange={(e) => set("samExpiry", e.target.value)} />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="contactPhone">Phone *</Label>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="contactPhone"
-                          value={formData.contactPhone}
-                          onChange={(e) => updateFormData("contactPhone", e.target.value)}
-                          placeholder="(555) 123-4567"
-                          className="pl-10"
-                        />
-                      </div>
-                    </div>
+                  )}
+                  <div className="space-y-2 max-w-xs">
+                    <Label htmlFor="clearanceLevel">Facility Clearance Level</Label>
+                    <Select value={formData.clearanceLevel} onValueChange={(v) => set("clearanceLevel", v)}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {clearanceLevels.map((l) => (
+                          <SelectItem key={l.value} value={l.value}>{l.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Secondary Contact (Optional)</CardTitle>
-                  <CardDescription>Backup contact for your organization</CardDescription>
+                  <CardTitle>Socioeconomic Certifications</CardTitle>
+                  <CardDescription>SBA and set-aside programs — determines which restricted opportunities you can bid</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="secondaryContactName">Full Name</Label>
-                      <Input
-                        id="secondaryContactName"
-                        value={formData.secondaryContactName}
-                        onChange={(e) => updateFormData("secondaryContactName", e.target.value)}
-                        placeholder="Jane Smith"
+                <CardContent className="space-y-3">
+                  {setAsideCerts.map((cert) => (
+                    <div key={cert.id} className="flex items-center gap-4 p-3 border rounded-lg">
+                      <Checkbox
+                        checked={!!formData.setAsides[cert.id]}
+                        onCheckedChange={(c) => set("setAsides", { ...formData.setAsides, [cert.id]: c === true })}
                       />
+                      <span className="text-sm flex-1">{cert.name}</span>
+                      {formData.setAsides[cert.id] && (
+                        <div className="flex items-center gap-2">
+                          <Label className="text-xs text-muted-foreground whitespace-nowrap">Expires</Label>
+                          <Input
+                            type="date"
+                            className="w-40"
+                            value={formData.certExpiries[cert.id] || ""}
+                            onChange={(e) => set("certExpiries", { ...formData.certExpiries, [cert.id]: e.target.value })}
+                          />
+                        </div>
+                      )}
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="secondaryContactTitle">Title</Label>
-                      <Input
-                        id="secondaryContactTitle"
-                        value={formData.secondaryContactTitle}
-                        onChange={(e) => updateFormData("secondaryContactTitle", e.target.value)}
-                        placeholder="Quality Manager"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="secondaryContactEmail">Email</Label>
-                      <Input
-                        id="secondaryContactEmail"
-                        type="email"
-                        value={formData.secondaryContactEmail}
-                        onChange={(e) => updateFormData("secondaryContactEmail", e.target.value)}
-                        placeholder="jane@company.com"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="secondaryContactPhone">Phone</Label>
-                      <Input
-                        id="secondaryContactPhone"
-                        value={formData.secondaryContactPhone}
-                        onChange={(e) => updateFormData("secondaryContactPhone", e.target.value)}
-                        placeholder="(555) 123-4568"
-                      />
-                    </div>
-                  </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Classification Codes *</CardTitle>
+                  <CardDescription>NAICS codes are the primary driver of SAM.gov opportunity matching</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <TagInput
+                    label="NAICS Codes"
+                    hint="4–6 digit codes from your SAM.gov registration (e.g. 541330, 332710). At least one required."
+                    values={formData.naicsCodes}
+                    onAdd={(v) => addTag("naicsCodes", v)}
+                    onRemove={(v) => removeTag("naicsCodes", v)}
+                    placeholder="e.g. 541330"
+                    pattern={/^\d{4,6}$/}
+                  />
+                  <TagInput
+                    label="PSC / FSC Codes (optional)"
+                    hint="Product Service Codes for goods you supply (e.g. 3440, R425)"
+                    values={formData.pscCodes}
+                    onAdd={(v) => addTag("pscCodes", v)}
+                    onRemove={(v) => removeTag("pscCodes", v)}
+                    placeholder="e.g. R425"
+                    normalize={(v) => v.trim().toUpperCase()}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
 
-            {/* Manufacturing Profile Tab */}
-            <TabsContent value="manufacturing" className="space-y-6">
+            {/* ============ CAPABILITIES ============ */}
+            <TabsContent value="capabilities" className="space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Industry Sectors</CardTitle>
                   <CardDescription>Select all industries you serve</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {industrySectors.map((sector) => (
-                      <div
-                        key={sector.id}
-                        className={`flex items-center space-x-2 p-3 border rounded-lg cursor-pointer transition-all ${
-                          formData.industrySectors.includes(sector.id)
-                            ? "border-[#C8A951] bg-[#C8A951]/5"
-                            : "border-muted hover:border-muted-foreground/50"
-                        }`}
-                        onClick={() => toggleArrayField("industrySectors", sector.id)}
-                      >
-                        <Checkbox
-                          checked={formData.industrySectors.includes(sector.id)}
-                          onCheckedChange={() => toggleArrayField("industrySectors", sector.id)}
-                        />
-                        <span className="text-sm">{sector.name}</span>
-                      </div>
-                    ))}
-                  </div>
+                  <ToggleGrid options={industrySectors} selected={formData.industrySectors} onToggle={(v) => toggleIn("industrySectors", v)} />
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Manufacturing Capabilities</CardTitle>
-                  <CardDescription>Select your core capabilities</CardDescription>
+                  <CardTitle>Core Capabilities</CardTitle>
+                  <CardDescription>These also seed your matching keywords</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {manufacturingCapabilities.map((cap) => (
-                      <div
-                        key={cap.id}
-                        className={`flex items-center space-x-2 p-3 border rounded-lg cursor-pointer transition-all ${
-                          formData.capabilities.includes(cap.id)
-                            ? "border-[#C8A951] bg-[#C8A951]/5"
-                            : "border-muted hover:border-muted-foreground/50"
-                        }`}
-                        onClick={() => toggleArrayField("capabilities", cap.id)}
-                      >
-                        <Checkbox
-                          checked={formData.capabilities.includes(cap.id)}
-                          onCheckedChange={() => toggleArrayField("capabilities", cap.id)}
-                        />
-                        <span className="text-sm">{cap.name}</span>
-                      </div>
-                    ))}
-                  </div>
+                  <ToggleGrid options={capabilities} selected={formData.capabilities} onToggle={(v) => toggleIn("capabilities", v)} />
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Certifications</CardTitle>
-                  <CardDescription>Select your current certifications</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {certificationOptions.map((cert) => (
-                      <div
-                        key={cert.id}
-                        className={`flex items-center space-x-2 p-3 border rounded-lg cursor-pointer transition-all ${
-                          formData.certifications.includes(cert.id)
-                            ? "border-[#C8A951] bg-[#C8A951]/5"
-                            : "border-muted hover:border-muted-foreground/50"
-                        }`}
-                        onClick={() => toggleArrayField("certifications", cert.id)}
-                      >
-                        <Checkbox
-                          checked={formData.certifications.includes(cert.id)}
-                          onCheckedChange={() => toggleArrayField("certifications", cert.id)}
-                        />
-                        <span className="text-sm">{cert.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Facility Information</CardTitle>
-                  <CardDescription>Tell us about your manufacturing facility</CardDescription>
+                  <CardTitle>Quality Certifications</CardTitle>
+                  <CardDescription>Quality/QMS credentials (separate from socioeconomic set-asides)</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="facilitySize">Facility Size (sq ft)</Label>
-                      <Input
-                        id="facilitySize"
-                        value={formData.facilitySize}
-                        onChange={(e) => updateFormData("facilitySize", e.target.value)}
-                        placeholder="50,000"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="productionCapacity">Production Capacity Description</Label>
-                      <Input
-                        id="productionCapacity"
-                        value={formData.productionCapacity}
-                        onChange={(e) => updateFormData("productionCapacity", e.target.value)}
-                        placeholder="e.g., 10,000 units/month"
-                      />
-                    </div>
+                  <ToggleGrid options={qualityCertifications} selected={formData.qualityCerts} onToggle={(v) => toggleIn("qualityCerts", v)} cols={4} />
+                  <div className="space-y-3 border-t pt-4">
+                    {(
+                      [
+                        ["qualityManual", "Quality Manual", "We have a documented quality manual"],
+                        ["documentedProcesses", "Documented Processes", "We have documented work instructions and procedures"],
+                        ["internalAudits", "Internal Audits", "We conduct regular internal quality audits"],
+                        ["correctiveActionProcess", "Corrective Action (CAPA)", "We have a formal corrective action process"],
+                        ["supplierQualification", "Supplier Qualification", "We have a supplier qualification and monitoring program"],
+                      ] as const
+                    ).map(([key, label, desc]) => (
+                      <div key={key} className="flex items-center space-x-3">
+                        <Checkbox
+                          id={key}
+                          checked={formData.quality[key]}
+                          onCheckedChange={(c) => set("quality", { ...formData.quality, [key]: c === true })}
+                        />
+                        <div>
+                          <Label htmlFor={key} className="font-medium cursor-pointer">{label}</Label>
+                          <p className="text-xs text-muted-foreground">{desc}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Matching Keywords</CardTitle>
+                  <CardDescription>Terms matched against SAM.gov notice titles and descriptions</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        set("keywords", Array.from(new Set([...formData.keywords, ...formData.capabilities])))
+                      }
+                    >
+                      <Plus className="h-3 w-3 mr-1" /> Add selected capabilities as keywords
+                    </Button>
+                  </div>
+                  <TagInput
+                    label="Keywords"
+                    values={formData.keywords}
+                    onAdd={(v) => addTag("keywords", v)}
+                    onRemove={(v) => removeTag("keywords", v)}
+                    placeholder="e.g. machining, prototyping, ISO"
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
 
-            {/* Quality & Compliance Tab */}
-            <TabsContent value="quality" className="space-y-6">
+            {/* ============ MARKET ============ */}
+            <TabsContent value="market" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Quality Management System</CardTitle>
-                  <CardDescription>Tell us about your quality practices</CardDescription>
+                  <CardTitle>Target Agencies</CardTitle>
+                  <CardDescription>Federal agencies you want to sell to — boosts matching for their notices</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-3 p-4 border rounded-lg">
-                      <Checkbox
-                        id="qualityManual"
-                        checked={formData.qualityManual}
-                        onCheckedChange={(checked) => updateFormData("qualityManual", checked)}
-                      />
-                      <div>
-                        <Label htmlFor="qualityManual" className="font-medium cursor-pointer">Quality Manual</Label>
-                        <p className="text-sm text-muted-foreground">We have a documented quality manual</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3 p-4 border rounded-lg">
-                      <Checkbox
-                        id="documentedProcesses"
-                        checked={formData.documentedProcesses}
-                        onCheckedChange={(checked) => updateFormData("documentedProcesses", checked)}
-                      />
-                      <div>
-                        <Label htmlFor="documentedProcesses" className="font-medium cursor-pointer">Documented Processes</Label>
-                        <p className="text-sm text-muted-foreground">We have documented work instructions and procedures</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3 p-4 border rounded-lg">
-                      <Checkbox
-                        id="internalAudits"
-                        checked={formData.internalAudits}
-                        onCheckedChange={(checked) => updateFormData("internalAudits", checked)}
-                      />
-                      <div>
-                        <Label htmlFor="internalAudits" className="font-medium cursor-pointer">Internal Audits</Label>
-                        <p className="text-sm text-muted-foreground">We conduct regular internal quality audits</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3 p-4 border rounded-lg">
-                      <Checkbox
-                        id="correctiveActionProcess"
-                        checked={formData.correctiveActionProcess}
-                        onCheckedChange={(checked) => updateFormData("correctiveActionProcess", checked)}
-                      />
-                      <div>
-                        <Label htmlFor="correctiveActionProcess" className="font-medium cursor-pointer">Corrective Action Process</Label>
-                        <p className="text-sm text-muted-foreground">We have a formal corrective action process (CAPA)</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3 p-4 border rounded-lg">
-                      <Checkbox
-                        id="supplierQualification"
-                        checked={formData.supplierQualification}
-                        onCheckedChange={(checked) => updateFormData("supplierQualification", checked)}
-                      />
-                      <div>
-                        <Label htmlFor="supplierQualification" className="font-medium cursor-pointer">Supplier Qualification</Label>
-                        <p className="text-sm text-muted-foreground">We have a supplier qualification and monitoring program</p>
-                      </div>
-                    </div>
-                  </div>
+                <CardContent>
+                  <TagInput
+                    label="Agencies"
+                    hint='e.g. "Department of Defense", "GSA", "NASA", "Department of Veterans Affairs"'
+                    values={formData.targetAgencies}
+                    onAdd={(v) => addTag("targetAgencies", v)}
+                    onRemove={(v) => removeTag("targetAgencies", v)}
+                    placeholder="e.g. Department of Defense"
+                  />
                 </CardContent>
               </Card>
-            </TabsContent>
 
-            {/* Services & Goals Tab */}
-            <TabsContent value="services" className="space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Services of Interest</CardTitle>
-                  <CardDescription>Select the V+ services you&apos;re interested in</CardDescription>
+                  <CardDescription>Strategic Value+ services you&apos;re interested in</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {servicesOfInterest.map((service) => (
-                      <div
-                        key={service.id}
-                        className={`flex items-center space-x-2 p-3 border rounded-lg cursor-pointer transition-all ${
-                          formData.servicesInterested.includes(service.id)
-                            ? "border-[#C8A951] bg-[#C8A951]/5"
-                            : "border-muted hover:border-muted-foreground/50"
-                        }`}
-                        onClick={() => toggleArrayField("servicesInterested", service.id)}
-                      >
-                        <Checkbox
-                          checked={formData.servicesInterested.includes(service.id)}
-                          onCheckedChange={() => toggleArrayField("servicesInterested", service.id)}
-                        />
-                        <span className="text-sm">{service.name}</span>
-                      </div>
-                    ))}
-                  </div>
+                  <ToggleGrid options={servicesOfInterest} selected={formData.servicesInterested} onToggle={(v) => toggleIn("servicesInterested", v)} cols={4} />
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
                   <CardTitle>Goals & Challenges</CardTitle>
-                  <CardDescription>Help us understand your needs</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="primaryGoals">Primary Goals</Label>
-                    <Textarea
-                      id="primaryGoals"
-                      value={formData.primaryGoals}
-                      onChange={(e) => updateFormData("primaryGoals", e.target.value)}
-                      placeholder="What are your main objectives for working with Strategic Value+?"
-                      rows={3}
-                    />
+                    <Textarea id="primaryGoals" value={formData.primaryGoals} onChange={(e) => set("primaryGoals", e.target.value)} placeholder="What are your main objectives?" rows={3} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="currentChallenges">Current Challenges</Label>
-                    <Textarea
-                      id="currentChallenges"
-                      value={formData.currentChallenges}
-                      onChange={(e) => updateFormData("currentChallenges", e.target.value)}
-                      placeholder="What challenges are you currently facing in your operations?"
-                      rows={3}
-                    />
+                    <Textarea id="currentChallenges" value={formData.currentChallenges} onChange={(e) => set("currentChallenges", e.target.value)} placeholder="What challenges are you facing?" rows={3} />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="timeline">Project Timeline</Label>
-                      <Select value={formData.timeline} onValueChange={(v) => updateFormData("timeline", v)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select timeline" />
-                        </SelectTrigger>
+                      <Label htmlFor="timeline">Timeline</Label>
+                      <Select value={formData.timeline} onValueChange={(v) => set("timeline", v)}>
+                        <SelectTrigger><SelectValue placeholder="Select timeline" /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="immediate">Immediate (within 1 month)</SelectItem>
                           <SelectItem value="short">Short-term (1-3 months)</SelectItem>
@@ -865,10 +902,8 @@ export default function ClientOnboardingPage() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="howDidYouHear">How did you hear about us?</Label>
-                      <Select value={formData.howDidYouHear} onValueChange={(v) => updateFormData("howDidYouHear", v)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select option" />
-                        </SelectTrigger>
+                      <Select value={formData.howDidYouHear} onValueChange={(v) => set("howDidYouHear", v)}>
+                        <SelectTrigger><SelectValue placeholder="Select option" /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="referral">Referral</SelectItem>
                           <SelectItem value="search">Online Search</SelectItem>
@@ -880,16 +915,79 @@ export default function ClientOnboardingPage() {
                       </Select>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="additionalNotes">Additional Notes</Label>
-                    <Textarea
-                      id="additionalNotes"
-                      value={formData.additionalNotes}
-                      onChange={(e) => updateFormData("additionalNotes", e.target.value)}
-                      placeholder="Any additional information you'd like to share..."
-                      rows={3}
-                    />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* ============ REVIEW ============ */}
+            <TabsContent value="review" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Primary Contact</CardTitle>
+                  <CardDescription>Main point of contact for your organization</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="contactName">Full Name *</Label>
+                      <Input id="contactName" value={formData.contactName} onChange={(e) => set("contactName", e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="contactTitle">Title</Label>
+                      <Input id="contactTitle" value={formData.contactTitle} onChange={(e) => set("contactTitle", e.target.value)} placeholder="Operations Manager" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="contactEmail">Email *</Label>
+                      <Input id="contactEmail" type="email" value={formData.contactEmail} onChange={(e) => set("contactEmail", e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="contactPhone">Phone</Label>
+                      <Input id="contactPhone" type="tel" value={formData.contactPhone} onChange={(e) => set("contactPhone", e.target.value)} placeholder="(555) 123-4567" />
+                    </div>
                   </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Secondary Contact (Optional)</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="secondaryName">Full Name</Label>
+                      <Input id="secondaryName" value={formData.secondaryName} onChange={(e) => set("secondaryName", e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="secondaryTitle">Title</Label>
+                      <Input id="secondaryTitle" value={formData.secondaryTitle} onChange={(e) => set("secondaryTitle", e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="secondaryEmail">Email</Label>
+                      <Input id="secondaryEmail" type="email" value={formData.secondaryEmail} onChange={(e) => set("secondaryEmail", e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="secondaryPhone">Phone</Label>
+                      <Input id="secondaryPhone" type="tel" value={formData.secondaryPhone} onChange={(e) => set("secondaryPhone", e.target.value)} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Profile Summary</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                    <div><dt className="text-muted-foreground inline">Company: </dt><dd className="inline">{formData.companyName || "—"}</dd></div>
+                    <div><dt className="text-muted-foreground inline">UEI: </dt><dd className="inline">{formData.uei || "—"}</dd></div>
+                    <div><dt className="text-muted-foreground inline">CAGE: </dt><dd className="inline">{formData.cageCode || "—"}</dd></div>
+                    <div><dt className="text-muted-foreground inline">NAICS: </dt><dd className="inline">{formData.naicsCodes.join(", ") || "—"}</dd></div>
+                    <div><dt className="text-muted-foreground inline">Set-asides: </dt><dd className="inline">{setAsideCerts.filter((c) => formData.setAsides[c.id]).map((c) => c.name).join(", ") || "None"}</dd></div>
+                    <div><dt className="text-muted-foreground inline">Agencies: </dt><dd className="inline">{formData.targetAgencies.join(", ") || "—"}</dd></div>
+                    <div><dt className="text-muted-foreground inline">Keywords: </dt><dd className="inline">{formData.keywords.join(", ") || "—"}</dd></div>
+                  </dl>
                 </CardContent>
               </Card>
 
@@ -899,62 +997,37 @@ export default function ClientOnboardingPage() {
                     <Checkbox
                       id="agreeToTerms"
                       checked={formData.agreeToTerms}
-                      onCheckedChange={(checked) => updateFormData("agreeToTerms", checked)}
+                      onCheckedChange={(c) => set("agreeToTerms", c === true)}
                     />
-                    <div>
-                      <Label htmlFor="agreeToTerms" className="cursor-pointer">
-                        I agree to the{" "}
-                        <Link href="/terms" className="text-primary hover:underline">Terms of Service</Link>
-                        {" "}and{" "}
-                        <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
-                      </Label>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        By submitting this form, you consent to Strategic Value+ contacting you about our services.
-                      </p>
-                    </div>
+                    <Label htmlFor="agreeToTerms" className="text-sm font-normal cursor-pointer">
+                      I certify that the information provided is accurate and agree to the{" "}
+                      <Link href="/terms" className="text-primary underline">Terms of Service</Link> and{" "}
+                      <Link href="/privacy" className="text-primary underline">Privacy Policy</Link>. *
+                    </Label>
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
 
-          {/* Navigation Buttons */}
-          <div className="flex items-center justify-between mt-8">
-            <Button
-              variant="outline"
-              onClick={handleBack}
-              disabled={activeTab === "company"}
-            >
-              <ChevronLeft className="h-4 w-4 mr-2" />
-              Back
+          {/* Navigation */}
+          <div className="flex justify-between mt-8">
+            <Button variant="outline" onClick={() => step(-1)} disabled={activeTab === "company"}>
+              <ChevronLeft className="mr-2 h-4 w-4" /> Back
             </Button>
-            
-            <div className="flex gap-3">
-              {activeTab !== "services" ? (
-                <Button onClick={handleNext}>
-                  Next
-                  <ChevronRight className="h-4 w-4 ml-2" />
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleSubmit}
-                  disabled={!formData.agreeToTerms || isSaving}
-                  className="bg-gradient-to-r from-[#C8A951] to-[#a08840] hover:from-[#b89841] hover:to-[#907830] text-white"
-                >
-                  {isSaving ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Complete Registration
-                    </>
-                  )}
-                </Button>
-              )}
-            </div>
+            {activeTab === "review" ? (
+              <Button onClick={handleSubmit} disabled={isSaving || !isTabComplete("review")} className="bg-[#C8A951] hover:bg-[#b89a48]">
+                {isSaving ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</>
+                ) : (
+                  <>Submit Registration <ChevronRight className="ml-2 h-4 w-4" /></>
+                )}
+              </Button>
+            ) : (
+              <Button onClick={() => step(1)} className="bg-[#C8A951] hover:bg-[#b89a48]">
+                Next <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
+            )}
           </div>
         </div>
       </main>

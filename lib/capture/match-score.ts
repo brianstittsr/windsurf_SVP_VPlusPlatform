@@ -69,8 +69,12 @@ export function scoreMatch(notice: MatchInput, client: CustomerDoc, settings: Ca
   const kwRatio = kws.length ? Math.min(1, kwHits / Math.max(1, Math.ceil(kws.length / 3))) : 0;
   breakdown.push({ factor: "Keyword overlap", points: Math.round(w.keywords * kwRatio), max: w.keywords });
 
-  // PSC code presence
-  breakdown.push({ factor: "PSC code", points: notice.pscCode ? w.psc : 0, max: w.psc });
+  // PSC code — if the client declares PSCs, require an intersection;
+  // otherwise fall back to awarding points when the notice has one
+  const clientPsc = (g.pscCodes || []).map((p) => p.toUpperCase());
+  const noticePsc = (notice.pscCode || "").toUpperCase();
+  const pscHit = !!noticePsc && (clientPsc.length === 0 || clientPsc.includes(noticePsc));
+  breakdown.push({ factor: "PSC code", points: pscHit ? w.psc : 0, max: w.psc });
 
   // Target agency match
   const agencyHay = `${notice.agency || ""} ${notice.office || ""}`.toLowerCase();

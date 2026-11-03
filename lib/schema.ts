@@ -1510,15 +1510,40 @@ export interface CustomerDoc {
   status: "active" | "inactive";
   primaryContact?: string;
   isCaptureClient?: boolean;
+  firebaseUid?: string;
   contacts?: { name: string; title?: string; email?: string; phone?: string }[];
   accountManagerId?: string;
   accountManagerName?: string;
+  /** Self-reported profile from /onboarding/client — non-matching fields */
+  onboarding?: {
+    companyType?: string;
+    yearEstablished?: string;
+    employeeCount?: string;
+    industrySectors?: string[];
+    capabilities?: string[];
+    quality?: {
+      qualityManual?: boolean;
+      documentedProcesses?: boolean;
+      internalAudits?: boolean;
+      correctiveActionProcess?: boolean;
+      supplierQualification?: boolean;
+      certifications?: string[];
+    };
+    servicesInterested?: string[];
+    primaryGoals?: string;
+    currentChallenges?: string;
+    timeline?: string;
+    howDidYouHear?: string;
+    additionalNotes?: string;
+    submittedAt?: string;
+  };
   govcon?: {
     uei?: string;
     cageCode?: string;
     samRegistrationExpiry?: string;
     clearanceLevel?: string;
     naicsCodes?: string[];
+    pscCodes?: string[];
     keywords?: string[];
     targetAgencies?: string[];
     certifications?: { name: string; expiresAt?: string }[];

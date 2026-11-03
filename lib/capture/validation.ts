@@ -32,6 +32,7 @@ export const clientCreateSchema = z.object({
       samRegistrationExpiry: z.string().optional(),
       clearanceLevel: z.string().optional(),
       naicsCodes: z.array(z.string()).optional(),
+      pscCodes: z.array(z.string()).optional(),
       keywords: z.array(z.string()).optional(),
       targetAgencies: z.array(z.string()).optional(),
       certifications: z
