@@ -12,12 +12,29 @@ import { COLLECTIONS } from "./schema";
 export type ActivityType = "create" | "update" | "delete" | "note";
 
 export type EntityType =
+  // EFVS Academy LMS entities
   | "course"
   | "enrollment"
   | "certificate"
   | "payment"
   | "user"
-  | "settings";
+  // GovCon/CRM entities (origin/main modules)
+  | "opportunity"
+  | "project"
+  | "organization"
+  | "meeting"
+  | "document"
+  | "task"
+  | "rock"
+  | "affiliate"
+  | "team-member"
+  | "proposal"
+  | "calendar"
+  | "settings"
+  | "capture-client"
+  | "capture-opportunity"
+  | "capture-task"
+  | "capture-match";
 
 export interface LogActivityParams {
   type: ActivityType;

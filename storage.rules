@@ -39,5 +39,11 @@ service firebase.storage {
     match /{allPaths=**} {
       allow read, write: if false;
     }
+
+    // Capture Management files (opportunity docs + client capability statements)
+    match /capture/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isValidFileSize(50);
+    }
   }
 }

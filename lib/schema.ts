@@ -66,6 +66,7 @@ export interface OpportunityDoc extends Omit<Opportunity, "createdAt" | "updated
   ownerId: string; // Reference to user
   assignedAffiliateIds?: string[]; // Reference IDs to users
   serviceIds: string[]; // Reference IDs to services
+  organizationName?: string; // Free-text org name (denormalized from organizationId)
 }
 
 /** Project document in Firestore */
@@ -607,6 +608,39 @@ export interface TeamMemberDoc {
   // Mattermost integration
   mattermostUserId?: string; // Links to Mattermost user ID for playbook assignments
   demoSeed?: string; // set on records created by the demo seeder
+  // Profile completion & extended profile fields (written by profile wizard/page)
+  profileCompletedAt?: string;
+  twitter?: string;
+  facebook?: string;
+  instagram?: string;
+  youtube?: string;
+  industries?: string[];
+  categories?: string[];
+  certifications?: Array<{
+    id: string;
+    name: string;
+    issuer: string;
+    date: string;
+    expires?: string | null;
+    status?: string;
+  }>;
+  availability?: { oneToOne: boolean; speaking: boolean; consulting: boolean };
+  canOffer?: string;
+  lookingFor?: string;
+  affiliateOnboardingComplete?: boolean;
+  affiliateAgreementSigned?: boolean;
+  affiliateAgreementDate?: string | null;
+  networkingProfile?: {
+    expertise: string[];
+    categories: string[];
+    idealReferralPartner?: string;
+    topReferralSources?: string;
+    goalsThisQuarter?: string;
+    uniqueValueProposition?: string;
+    targetClientProfile?: string;
+    problemsYouSolve?: string;
+    successStory?: string;
+  };
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -628,6 +662,12 @@ export interface BookCallLeadDoc {
   // Additional Info
   message?: string;
   source: "contact-page" | "cta" | "popup" | "other";
+  // Assessment form fields (when formType === "assessment")
+  formType?: "book-call" | "assessment";
+  companySize?: string;
+  industry?: string;
+  serviceInterest?: string;
+  newsletterOptIn?: boolean;
   // Status
   status: "new" | "contacted" | "scheduled" | "completed" | "cancelled";
   assignedTo?: string;
@@ -816,6 +856,14 @@ export interface PlatformSettingsDoc {
       apiSecret?: string;
       accountId?: string;
       status: "connected" | "disconnected" | "error";
+      lastTested?: Timestamp;
+    };
+    linkedin?: {
+      apiKey?: string;
+      clientId?: string;
+      clientSecret?: string;
+      organizationId?: string;
+      status?: "connected" | "disconnected" | "error";
       lastTested?: Timestamp;
     };
   };
@@ -1465,6 +1513,294 @@ export interface MattermostPlaybookRunDoc {
 }
 
 // ============================================================================
+// Capture Management (GovCon BD) Types
+// ============================================================================
+
+/** Customer document — doubles as a govcon capture client when isCaptureClient is set */
+export interface CustomerDoc {
+  id: string;
+  name: string;
+  website?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  notes?: string;
+  status: "active" | "inactive";
+  primaryContact?: string;
+  isCaptureClient?: boolean;
+  firebaseUid?: string;
+  contacts?: { name: string; title?: string; email?: string; phone?: string }[];
+  accountManagerId?: string;
+  accountManagerName?: string;
+  /** Self-reported profile from /onboarding/client — non-matching fields */
+  onboarding?: {
+    companyType?: string;
+    yearEstablished?: string;
+    employeeCount?: string;
+    industrySectors?: string[];
+    capabilities?: string[];
+    quality?: {
+      qualityManual?: boolean;
+      documentedProcesses?: boolean;
+      internalAudits?: boolean;
+      correctiveActionProcess?: boolean;
+      supplierQualification?: boolean;
+      certifications?: string[];
+    };
+    servicesInterested?: string[];
+    primaryGoals?: string;
+    currentChallenges?: string;
+    timeline?: string;
+    howDidYouHear?: string;
+    additionalNotes?: string;
+    submittedAt?: string;
+  };
+  govcon?: {
+    uei?: string;
+    cageCode?: string;
+    samRegistrationExpiry?: string;
+    clearanceLevel?: string;
+    naicsCodes?: string[];
+    pscCodes?: string[];
+    keywords?: string[];
+    targetAgencies?: string[];
+    certifications?: { name: string; expiresAt?: string }[];
+    capabilityStatements?: { fileId: string; name: string; version: string; storagePath: string; uploadedAt: string }[];
+    pastContracts?: { agency: string; contractNumber: string; value?: number; startDate?: string; endDate?: string }[];
+  };
+  deletedAt?: Timestamp | null;
+  deletedBy?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export type CaptureOpportunityType = "rfi" | "sources-sought" | "rfp" | "rfq" | "grant";
+export type CaptureBoardType = "standard" | "rfi";
+export type CaptureOpportunitySource = "manual" | "imported";
+
+/** A deadline stored in the agency's timezone, rendered in both zones (rule 5) */
+export interface CaptureDeadline {
+  at: string;
+  timezone: string;
+}
+
+export interface CaptureFileRef {
+  id: string;
+  name: string;
+  storagePath: string;
+  url: string;
+  tag: string;
+  size?: number;
+  uploadedBy: string;
+  uploadedAt: string;
+}
+
+export interface CaptureNote {
+  id: string;
+  text: string;
+  authorId: string;
+  authorName: string;
+  createdAt: string;
+}
+
+export interface CaptureBidNoBid {
+  decision?: "bid" | "no-bid";
+  reason?: string;
+  score?: number;
+  suggestedDecision?: "bid" | "no-bid";
+  scorecard?: {
+    mustHaveAnswers: Record<string, boolean>;
+    weightedAnswers: Record<string, number>;
+  };
+  decidedById?: string;
+  decidedByName?: string;
+  decidedAt?: string;
+  settingsSnapshot?: unknown;
+}
+
+export interface CaptureOpportunityDoc {
+  id: string;
+  clientId: string;
+  clientName: string;
+  title: string;
+  solicitationNumber: string;
+  samNoticeId?: string;
+  source: CaptureOpportunitySource;
+  type: CaptureOpportunityType;
+  boardType: CaptureBoardType;
+  agency: string;
+  office?: string;
+  contractingOfficer?: { name?: string; email?: string };
+  links?: { samUrl?: string; qaUrl?: string; other?: string[] };
+  naicsCode?: string;
+  setAside?: string;
+  description?: string;
+  estimatedValue?: { min?: number; max?: number; text?: string };
+  stage: string;
+  questionsDue?: CaptureDeadline | null;
+  responseDue?: CaptureDeadline | null;
+  ownerId?: string;
+  ownerName?: string;
+  bidNoBid?: CaptureBidNoBid;
+  incumbent?: string;
+  competitors?: string[];
+  teamingPartners?: { name: string; role: "prime" | "sub" }[];
+  capabilityStatementRef?: string;
+  outcome?: { result?: "won" | "lost" | "no-award"; awardDate?: string };
+  files?: CaptureFileRef[];
+  notes?: CaptureNote[];
+  submittedAt?: string;
+  finalSubmissionFileId?: string;
+  matchScore?: number;
+  matchBreakdown?: { factor: string; points: number; max: number }[];
+  convertedAt?: string;
+  aiSummary?: string;
+  aiSummaryAt?: string;
+  deletedAt?: Timestamp | null;
+  deletedBy?: string;
+  createdById?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface CaptureTaskDoc {
+  id: string;
+  opportunityId: string;
+  title: string;
+  assigneeId: string;
+  assigneeName: string;
+  dueDate?: string;
+  status: "open" | "done";
+  createdById?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface CaptureStageDef {
+  id: string;
+  label: string;
+}
+
+/** Convenience aliases matching the doc-named interfaces. */
+export type CaptureOpportunity = CaptureOpportunityDoc;
+export type CaptureTask = CaptureTaskDoc;
+
+/** A SAM.gov notice scored against a capture client (Phase 3 match queue). */
+export interface CaptureMatchDoc {
+  id: string;
+  samNoticeId: string;
+  title: string;
+  solicitationNumber?: string;
+  agency?: string;
+  office?: string;
+  type?: string;
+  setAside?: string;
+  naicsCode?: string;
+  pscCode?: string;
+  responseDeadline?: string;
+  description?: string;
+  samUrl?: string;
+  clientId: string;
+  clientName: string;
+  score: number;
+  scoreBreakdown: { factor: string; points: number; max: number }[];
+  status: "pending" | "accepted" | "dismissed";
+  aiSummary?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+export type CaptureMatch = CaptureMatchDoc;
+
+/** A saved SAM search used by the match/run cron (Phase 3). */
+export interface CaptureSavedSearchDoc {
+  id: string;
+  name: string;
+  query?: string;
+  naicsCode?: string;
+  setAside?: string;
+  /** SAM procurement-type codes filter (e.g. "o,k,r"). */
+  ptype?: string;
+  /** Custom posted-date lookback window for this search. */
+  daysBack?: number;
+  /** True when auto-created by match/run from a client's govcon profile. */
+  autoGenerated?: boolean;
+  lastRunAt?: Timestamp;
+  lastResultCount?: number;
+  ownerId: string;
+  isActive: boolean;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+export type CaptureSavedSearch = CaptureSavedSearchDoc;
+
+/** Record of an alert sent by the alerts cron (dedupe + audit). */
+export interface CaptureAlertLogDoc {
+  id: string;
+  type:
+    | "deadline-7d"
+    | "deadline-3d"
+    | "deadline-1d"
+    | "overdue"
+    | "task-due"
+    | "task-assigned"
+    | "due-date-changed"
+    | "cert-expiry"
+    | "sam-expiry";
+  entityType: "capture-opportunity" | "capture-task" | "capture-client";
+  entityId: string;
+  entityName: string;
+  recipientId?: string;
+  recipientEmail?: string;
+  message: string;
+  sentAt: Timestamp;
+}
+export type CaptureAlertLog = CaptureAlertLogDoc;
+
+/** Scorecard question config for the bid/no-bid decision. */
+export interface CaptureScorecardConfig {
+  /** Yes/No must-haves — any "no" forces a no-bid suggestion. */
+  mustHaves: string[];
+  /** Weighted questions scored 1–5; weights should sum to 100. */
+  weighted: { question: string; weight: number }[];
+  /** Score % at or above which "bid" is suggested. */
+  bidCutoff: number;
+  /** Score % at or below which "no-bid" is suggested. */
+  noBidCutoff: number;
+}
+
+export interface CaptureSettingsDoc {
+  id: string;
+  standardStages: CaptureStageDef[];
+  rfiStages: CaptureStageDef[];
+  opportunityTypes: string[];
+  setAsides: string[];
+  noBidReasons: string[];
+  fileTags: string[];
+  deadlineYellowDays: number;
+  deadlineRedDays: number;
+  expiryWarningDays: number;
+  /** Days before a deadline to fire alerts (7/3/1). */
+  alertDays: number[];
+  /** Days before cert/SAM expiry to warn (90/60/30). */
+  expiryAlertDays: number[];
+  /** Match scoring weights (should sum to 100) + minimum score to queue a match. */
+  matchWeights: {
+    naics: number;
+    setAside: number;
+    keywords: number;
+    psc: number;
+    agency: number;
+    value: number;
+  };
+  matchScoreCutoff: number;
+  /** Default posted-date lookback (days) for SAM match searches. */
+  matchLookbackDays?: number;
+  scorecard: CaptureScorecardConfig;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+// ============================================================================
 // Collection Names
 // ============================================================================
 
@@ -1540,6 +1876,15 @@ export const COLLECTIONS = {
   MATTERMOST_PLAYBOOK_RUNS: "mattermostPlaybookRuns",
   // Book a Call Leads
   BOOK_CALL_LEADS: "bookCallLeads",
+  // Customers (doubles as Capture Management clients)
+  CUSTOMERS: "customers",
+  // Capture Management
+  CAPTURE_OPPORTUNITIES: "captureOpportunities",
+  CAPTURE_TASKS: "captureTasks",
+  CAPTURE_SETTINGS: "captureSettings",
+  CAPTURE_MATCHES: "captureMatches",
+  CAPTURE_SAVED_SEARCHES: "captureSavedSearches",
+  CAPTURE_ALERT_LOG: "captureAlertLog",
   // Events
   EVENTS: "events",
   // NDA Management
