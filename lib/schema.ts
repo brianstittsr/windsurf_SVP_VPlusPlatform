@@ -1,5 +1,5 @@
 /**
- * Firestore Database Schema for Strategic Value Plus Platform
+ * Firestore Database Schema for the EFVS UAS Training Academy Platform
  * 
  * This file defines the database collections, document structures,
  * and helper types for Firestore integration.
@@ -418,9 +418,9 @@ export interface ReferralDoc {
   description: string;
   whyGoodFit?: string;
   
-  // Is this for SVP?
+  // Is this a platform referral?
   isSvpReferral: boolean;
-  svpServiceInterest?: string; // Which SVP service they might need
+  svpServiceInterest?: string; // Which platform service they might need
   
   // Pipeline status
   status: "submitted" | "contacted" | "meeting-scheduled" | "proposal" | "negotiation" | "won" | "lost";
@@ -469,7 +469,7 @@ export interface AffiliateStatsDoc {
   totalRevenueGenerated: number; // From referrals they gave that closed
   totalRevenueReceived: number; // From referrals they received that closed
   
-  // SVP-specific
+  // Platform-specific
   svpReferralsGiven: number;
   svpReferralsClosed: number;
   svpRevenueGenerated: number;
@@ -585,8 +585,16 @@ export interface TeamMemberDoc {
   avatar?: string;
   linkedIn?: string;
   website?: string;
-  role: "admin" | "team" | "affiliate" | "consultant";
+  role: "admin" | "instructor" | "student";
   status: "active" | "inactive" | "pending";
+  isVeteran?: boolean;
+  proStatus?: "inactive" | "active" | "canceled" | "past_due";
+  proPlanId?: string | null;
+  proOrderId?: string | null;
+  proExpiresAt?: Timestamp | null;
+  stripeCustomerId?: string | null;
+  stripeSubscriptionId?: string | null;
+  cancelAtPeriodEnd?: boolean;
   // Leadership role flags for About/Leadership pages
   isCEO?: boolean;
   isCOO?: boolean;
@@ -598,6 +606,7 @@ export interface TeamMemberDoc {
   clientNotes?: string; // Notes about them as a client
   // Mattermost integration
   mattermostUserId?: string; // Links to Mattermost user ID for playbook assignments
+  demoSeed?: string; // set on records created by the demo seeder
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -1279,7 +1288,7 @@ export type ToolType =
 export interface SoftwareKeyDoc {
   id: string;
   // Key details
-  key: string;                    // The actual license key (e.g., "SVP-XXXX-XXXX-XXXX")
+  key: string;                    // The actual license key (e.g., "EFVS-XXXX-XXXX-XXXX")
   name: string;                   // Friendly name for the key
   description?: string;
   // Tool access
@@ -1396,7 +1405,7 @@ export interface MattermostPlaybookDoc {
   teamName?: string;
   type: "reminder" | "rock" | "level10" | "recurring" | "custom";
   recurrence?: "daily" | "weekly" | "biweekly" | "monthly";
-  // Assigned team members (SVP Platform IDs)
+  // Assigned team members (platform team member IDs)
   assignedMemberIds: string[];
   // Mattermost user IDs
   mattermostMemberIds: string[];
@@ -1422,7 +1431,7 @@ export interface MattermostPlaybookDoc {
 export interface MattermostPlaybookRunDoc {
   id: string;
   mattermostRunId: string; // ID from Mattermost
-  playbookId: string; // SVP Platform playbook doc ID
+  playbookId: string; // Platform playbook doc ID
   mattermostPlaybookId: string; // Mattermost playbook ID
   name: string;
   description?: string;
@@ -1430,7 +1439,7 @@ export interface MattermostPlaybookRunDoc {
   channelId?: string; // Mattermost channel created for the run
   // Owner
   ownerUserId: string; // Mattermost user ID
-  ownerMemberId?: string; // SVP Platform team member ID
+  ownerMemberId?: string; // Platform team member ID
   // Status tracking
   status: "in_progress" | "finished" | "archived";
   currentStatus?: string;
@@ -1542,6 +1551,39 @@ export const COLLECTIONS = {
   ZENTHIUM_MEETINGS: "zenthiumMeetings",
   ZENTHIUM_DIRECT_CONTACTS: "zenthiumDirectContacts",
   ZENTHIUM_STATUS_HISTORY: "zenthiumStatusHistory",
+  ZENTHIUM_REFERRAL_AGREEMENTS: "zenthiumReferralAgreements",
+  ZENTHIUM_OPPORTUNITIES: "zenthiumOpportunities",
+
+  // ==========================================================================
+  // EFVS Academy LMS collections
+  // ==========================================================================
+  COURSES: "courses",
+  PRODUCTS: "products",
+  COURSE_MODULES: "courseModules",
+  SCORM_PACKAGES: "scormPackages",
+  ENROLLMENTS: "enrollments",
+  LESSON_PROGRESS: "lessonProgress",
+  SCORM_RUNTIME: "scormRuntime",
+  QUESTION_BANKS: "questionBanks",
+  EXAM_ATTEMPTS: "examAttempts",
+  CERTIFICATES: "certificates",
+  INVOICES: "invoices",
+  PAYMENTS: "payments",
+  DISCOUNT_CODES: "discountCodes",
+  DISCOUNT_REDEMPTIONS: "discountRedemptions",
+  AUDIT_LOGS: "auditLogs",
+  REGISTRATION_FORMS: "registrationForms",
+  REGISTRATION_SUBMISSIONS: "registrationSubmissions",
+  REGISTRATION_INVITES: "registrationInvites",
+  ORDERS: "orders",
+  STUDENT_DOCUMENTS: "studentDocuments",
+  STUDY_GUIDE_CATEGORIES: "studyGuideCategories",
+  STUDY_GUIDE_QUESTIONS: "studyGuideQuestions",
+  STUDY_GUIDE_SESSIONS: "studyGuideSessions",
+  STUDY_GUIDE_PROGRESS: "studyGuideProgress",
+  STUDY_GUIDE_VOCAB: "studyGuideVocab",
+  STUDY_GUIDE_META: "studyGuideMeta",
+  RATE_LIMITS: "registrationRateLimits",
 } as const;
 
 // ============================================================================
@@ -1657,6 +1699,599 @@ export const generateId = (collectionName: string): string | null => {
 };
 
 // ============================================================================
+// EFVS Academy LMS Document Types
+// ============================================================================
+
+/** LMS user roles */
+export type LmsRole = "admin" | "instructor" | "student";
+
+/** Course content format */
+export type CourseFormat = "scorm" | "native";
+
+export interface LmsProductDoc {
+  id: string;
+  code: string;
+  title: string;
+  description: string;
+  kind: "pro_access";
+  billingMode: "subscription" | "payment";
+  priceCents: number;
+  currency: string;
+  durationMonths: number;
+  interval?: "month" | "year";
+  benefits: string[];
+  published: boolean;
+  displayOrder: number;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+/** A course in the Academy catalog */
+export interface CourseBadgeDefinition {
+  title: string;
+  description: string;
+  skills: string[];
+  issueOnCompletion: boolean;
+}
+
+export interface CourseDoc {
+  id: string;
+  code: string; // e.g. "AC1"
+  title: string;
+  description: string;
+  shortDescription?: string;
+  category?: string;
+  estimatedHours?: number;
+  learningOutcomes?: string[];
+  prerequisiteCourseIds?: string[];
+  prerequisiteDescription?: string;
+  includedCourseIds?: string[];
+  bundleContents?: string[];
+  format: CourseFormat;
+  scormPackageId?: string;
+  /** How students buy: instant Stripe checkout, or staff-reviewed registration (e.g. prerequisite-verified programs). */
+  purchaseMode?: "checkout" | "registration";
+  priceCents: number;
+  currency?: string;
+  imageUrl?: string;
+  imageStoragePath?: string;
+  published: boolean;
+  archived?: boolean;
+  displayOrder?: number;
+  passingScore: number; // percent
+  maxAttempts: number;
+  badge?: CourseBadgeDefinition;
+  demoSeed?: string; // set on docs created by the demo seeder (for removal)
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+/** A module/lesson within a course (native format or SCORM SCO listing) */
+export interface CourseModuleDoc {
+  id: string;
+  courseId: string;
+  title: string;
+  description?: string;
+  order: number;
+  type: "scorm" | "video" | "document" | "quiz";
+  scormItemId?: string;
+  quizId?: string;
+  contentUrl?: string;
+  contentHtml?: string; // rich lesson body (admin-authored HTML)
+  demoSeed?: string;
+  createdAt: Timestamp;
+}
+
+/** An uploaded SCORM package's manifest metadata */
+export interface ScormPackageDoc {
+  id: string;
+  courseId: string;
+  fileName: string;
+  version: "1.2" | "2004";
+  title: string;
+  storagePath: string; // e.g. "scorm/{packageId}/"
+  launchPath: string; // e.g. "scorm/{packageId}/index.html"
+  itemCount: number;
+  uploadedBy: string;
+  createdAt: Timestamp;
+}
+
+/** A student's enrollment in a course */
+export interface EnrollmentDoc {
+  id: string;
+  studentId: string; // TeamMemberDoc id
+  firebaseUid: string;
+  courseId: string;
+  organizationId?: string; // B2B org purchase
+  status: "active" | "completed" | "expired" | "cancelled";
+  progressPercent: number;
+  enrolledAt: Timestamp;
+  completedAt?: Timestamp;
+  lastAccessedAt?: Timestamp;
+  paymentId?: string;
+  orderId?: string;
+  updatedAt?: Timestamp;
+  demoSeed?: string;
+}
+
+/** Per-lesson progress for a student */
+export interface LessonProgressDoc {
+  id: string;
+  enrollmentId: string;
+  courseId: string;
+  studentId: string;
+  firebaseUid?: string;
+  moduleId: string;
+  status: "not-started" | "in-progress" | "completed";
+  score?: number;
+  timeSpentSeconds: number;
+  demoSeed?: string;
+  updatedAt: Timestamp;
+}
+
+/** Persisted SCORM runtime (CMI) data for resume support */
+export interface ScormRuntimeDoc {
+  id: string;
+  enrollmentId: string;
+  courseId: string;
+  studentId: string;
+  firebaseUid?: string;
+  scormVersion: "1.2" | "2004";
+  cmiData: Record<string, string>;
+  lessonStatus?: string;
+  scoreRaw?: string;
+  suspendData?: string;
+  updatedAt: Timestamp;
+}
+
+/** A quiz/exam question */
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation?: string;
+}
+
+/** A question bank backing a quiz or exam */
+export interface QuestionBankDoc {
+  id: string;
+  courseId: string;
+  moduleId?: string; // set when the quiz belongs to a specific lesson
+  title: string;
+  type: "quiz" | "exam";
+  questions: QuizQuestion[];
+  randomize: boolean;
+  questionsPerAttempt?: number;
+  demoSeed?: string;
+  createdAt: Timestamp;
+}
+
+export type LearnerQuizQuestion = Omit<QuizQuestion, "correctIndex">;
+export type LearnerQuestionBankDoc = Omit<QuestionBankDoc, "questions"> & {
+  questions: LearnerQuizQuestion[];
+};
+
+/** A single quiz/exam attempt */
+export interface ExamAttemptDoc {
+  id: string;
+  enrollmentId: string;
+  courseId: string;
+  studentId: string;
+  firebaseUid?: string;
+  quizId: string;
+  attemptNumber: number;
+  scorePercent: number;
+  passed: boolean;
+  answers: { questionId: string; selectedIndex: number; correct: boolean }[];
+  demoSeed?: string;
+  startedAt: Timestamp;
+  submittedAt: Timestamp;
+}
+
+/** An issued completion certificate */
+export interface CertificateDoc {
+  id: string;
+  certificateNumber: string; // e.g. "EFVS-2026-000123"
+  studentId: string;
+  firebaseUid?: string;
+  studentName: string;
+  courseId: string;
+  courseCode: string;
+  courseTitle: string;
+  enrollmentId: string;
+  issuedAt: Timestamp;
+  issuedBy?: string;
+  publicCredentialId?: string;
+  publicSharingEnabled?: boolean;
+  publicNameConsent?: boolean;
+  publicConsentAt?: Timestamp;
+  publicConsentVersion?: string;
+  revokedAt?: Timestamp;
+  badgeTitle?: string;
+  demoSeed?: string;
+}
+
+/** An invoice (Stripe or manual ACH) */
+export interface InvoiceDoc {
+  id: string;
+  studentId: string;
+  firebaseUid?: string;
+  organizationId?: string;
+  courseId?: string;
+  productId?: string;
+  courseIds?: string[];
+  amountCents: number;
+  discountCents: number;
+  netCents: number;
+  currency: string;
+  status: "pending" | "paid" | "partially_refunded" | "refunded" | "void";
+  method: "stripe" | "ach-manual";
+  stripeSessionId?: string;
+  stripePaymentIntentId?: string;
+  stripeSubscriptionId?: string;
+  orderId?: string;
+  discountCode?: string;
+  notes?: string;
+  refundedCents?: number;
+  createdAt: Timestamp;
+  paidAt?: Timestamp;
+  refundedAt?: Timestamp;
+}
+
+/** A recorded payment event */
+export interface PaymentDoc {
+  id: string;
+  invoiceId: string;
+  orderId?: string;
+  studentId: string;
+  firebaseUid?: string;
+  amountCents: number;
+  method: "card" | "us_bank_account" | "ach-manual";
+  stripePaymentIntentId?: string;
+  status: "succeeded" | "pending" | "failed" | "partially_refunded" | "refunded";
+  refundedCents?: number;
+  createdAt: Timestamp;
+}
+
+/** A discount / promotional code */
+export interface DiscountCodeDoc {
+  id: string;
+  code: string;
+  percentOff: number;
+  stripePromotionCodeId?: string;
+  militaryOnly: boolean;
+  active: boolean;
+  maxRedemptions?: number;
+  timesRedeemed: number;
+  expiresAt?: Timestamp;
+  createdAt: Timestamp;
+}
+
+/** An audit log entry for administrative actions */
+export interface AuditLogDoc {
+  id: string;
+  actorId: string;
+  actorEmail: string;
+  action: string;
+  entityType: string;
+  entityId: string;
+  metadata?: Record<string, unknown>;
+  createdAt: Timestamp;
+}
+
+export type RegistrationFieldType =
+  | "section"
+  | "paragraph"
+  | "text"
+  | "textarea"
+  | "name"
+  | "email"
+  | "phone"
+  | "number"
+  | "date"
+  | "monthYear"
+  | "address"
+  | "select"
+  | "radio"
+  | "checkboxes"
+  | "yesNoPreferNot"
+  | "courseSelector"
+  | "file"
+  | "consent"
+  | "signature";
+
+export type RegistrationFieldPurpose =
+  | "fullName"
+  | "company"
+  | "birthMonthYear"
+  | "email"
+  | "phone"
+  | "address"
+  | "veteranStatus"
+  | "courseSelection"
+  | "newsletterConsent"
+  | "studentAcknowledgment"
+  | "programPolicies"
+  | "signature";
+
+export interface RegistrationFieldOption {
+  label: string;
+  value: string;
+}
+
+export interface RegistrationFieldCondition {
+  fieldId: string;
+  operator: "equals" | "notEquals" | "contains";
+  value: string;
+}
+
+export interface RegistrationFormFieldDoc {
+  id: string;
+  type: RegistrationFieldType;
+  purpose?: RegistrationFieldPurpose;
+  label: string;
+  helpText?: string;
+  helpLink?: { label: string; url: string };
+  placeholder?: string;
+  required: boolean;
+  options?: RegistrationFieldOption[];
+  condition?: RegistrationFieldCondition;
+  validation?: {
+    minLength?: number;
+    maxLength?: number;
+    min?: number;
+    max?: number;
+    pattern?: string;
+    allowedMimeTypes?: string[];
+    maxFileSizeBytes?: number;
+  };
+}
+
+export interface RegistrationFormDoc {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  status: "draft" | "published" | "archived";
+  version: number;
+  fields: RegistrationFormFieldDoc[];
+  publishedFields?: RegistrationFormFieldDoc[];
+  publishedVersion?: number;
+  createdBy: string;
+  updatedBy: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  publishedAt?: Timestamp;
+}
+
+export type RegistrationStatus =
+  | "submitted"
+  | "in_review"
+  | "needs_information"
+  | "approved"
+  | "rejected"
+  | "checkout_pending"
+  | "paid"
+  | "cancelled";
+
+export interface RegistrationSignatureDoc {
+  fieldId: string;
+  typedName: string;
+  imageStoragePath: string;
+  imageSha256: string;
+  consentText: string;
+  formVersion: number;
+  signedAt: Timestamp;
+  formSnapshotHash: string;
+}
+
+export interface RegistrationSubmissionDoc {
+  id: string;
+  formId: string;
+  formSlug: string;
+  formVersion: number;
+  formSnapshot: RegistrationFormFieldDoc[];
+  fullName: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  status: RegistrationStatus;
+  sponsorshipApproved?: boolean;
+  veteranStatusVerified?: boolean;
+  answers: Record<string, unknown>;
+  selectedCourseIds: string[];
+  selectedCoursesSnapshot: {
+    courseId: string;
+    code: string;
+    title: string;
+    description: string;
+    priceCents: number;
+    includedCourseIds: string[];
+  }[];
+  totalCents: number;
+  currency: string;
+  newsletterConsent: boolean;
+  attachments?: {
+    fieldId: string;
+    displayName: string;
+    fileName: string;
+    contentType: string;
+    sizeBytes: number;
+    storagePath: string;
+    checksumSha256: string;
+  }[];
+  signatures: RegistrationSignatureDoc[];
+  sourceIpHash?: string;
+  userId?: string;
+  inviteId?: string;
+  orderId?: string;
+  reviewerId?: string;
+  reviewerNotes?: string;
+  submittedAt: Timestamp;
+  reviewedAt?: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface RegistrationInviteDoc {
+  id: string;
+  tokenHash: string;
+  submissionId: string;
+  email: string;
+  expiresAt: Timestamp;
+  claimedAt?: Timestamp;
+  claimedByUid?: string;
+  revokedAt?: Timestamp;
+  createdBy: string;
+  createdAt: Timestamp;
+}
+
+export interface OrderItemDoc {
+  courseId?: string;
+  productId?: string;
+  code: string;
+  title: string;
+  unitAmountCents: number;
+  quantity: number;
+  includedCourseIds?: string[];
+  includedInBundle?: boolean;
+}
+
+export interface OrderDoc {
+  id: string;
+  firebaseUid: string;
+  studentId: string;
+  registrationSubmissionId?: string;
+  productId?: string;
+  /** Set for direct (non-registration) course purchases. */
+  courseId?: string;
+  purchaseKind?: "registration" | "course" | "pro-access" | "free" | "manual";
+  items: OrderItemDoc[];
+  subtotalCents: number;
+  discountCents: number;
+  discountCode?: string;
+  taxCents: number;
+  totalCents: number;
+  currency: string;
+  status: "pending" | "paid" | "partially_refunded" | "failed" | "refunded" | "cancelled";
+  refundedCents?: number;
+  fulfillmentStatus?: "pending" | "fulfilled" | "failed";
+  paymentMethod?: "stripe" | "ach-manual" | "sponsored" | "free" | "manual";
+  stripeCheckoutSessionId?: string;
+  stripePaymentIntentId?: string;
+  stripeSubscriptionId?: string;
+  createdAt: Timestamp;
+  paidAt?: Timestamp;
+  refundedAt?: Timestamp;
+}
+
+export type StudentDocumentKind =
+  | "signed_registration"
+  | "receipt"
+  | "faa_certificate_proof"
+  | "training_credential"
+  | "course_certificate"
+  | "other";
+
+export interface StudentDocumentDoc {
+  id: string;
+  firebaseUid: string;
+  studentId: string;
+  kind: StudentDocumentKind;
+  displayName: string;
+  fileName: string;
+  contentType: string;
+  sizeBytes: number;
+  storagePath: string;
+  checksumSha256?: string;
+  registrationSubmissionId?: string;
+  orderId?: string;
+  courseId?: string;
+  enrollmentId?: string;
+  certificateId?: string;
+  uploadedBy: string;
+  createdAt: Timestamp;
+}
+
+export interface StudyGuideCategoryDoc {
+  id: string;
+  name: string;
+  description: string;
+  displayOrder: number;
+}
+
+export interface StudyGuideVocabDoc {
+  id: string;
+  term: string;
+  definition: string;
+  categoryId: string;
+}
+
+export interface StudyGuideQuestion {
+  id: string;
+  categoryId: string;
+  question: string;
+  answers: string[];
+  correctIndex: number;
+  explanation: string;
+}
+
+export interface StudyGuideQuizSessionDoc {
+  id: string;
+  firebaseUid: string;
+  studentId: string;
+  categoryId: "all" | string;
+  questionCount: number;
+  currentIndex: number;
+  score: number;
+  status: "in_progress" | "completed";
+  items: {
+    questionId: string;
+    categoryId: string;
+    selectedIndex: number | null;
+    correctIndex: number;
+    correct: boolean | null;
+    answered: boolean;
+    answeredAt?: Timestamp;
+  }[];
+  startedAt: Timestamp;
+  updatedAt: Timestamp;
+  completedAt?: Timestamp;
+}
+
+export interface StudyGuideProgressDoc {
+  id: string;
+  firebaseUid: string;
+  studentId: string;
+  answered: number;
+  correct: number;
+  streak: number;
+  lastActivityDate: string | null;
+  knownVocab: string[];
+  byCategory: Record<string, { answered: number; correct: number }>;
+  updatedAt: Timestamp;
+}
+
+// LMS collection references
+export const coursesCollection = () => getCollection<CourseDoc>(COLLECTIONS.COURSES);
+export const courseModulesCollection = () => getCollection<CourseModuleDoc>(COLLECTIONS.COURSE_MODULES);
+export const scormPackagesCollection = () => getCollection<ScormPackageDoc>(COLLECTIONS.SCORM_PACKAGES);
+export const enrollmentsCollection = () => getCollection<EnrollmentDoc>(COLLECTIONS.ENROLLMENTS);
+export const lessonProgressCollection = () => getCollection<LessonProgressDoc>(COLLECTIONS.LESSON_PROGRESS);
+export const scormRuntimeCollection = () => getCollection<ScormRuntimeDoc>(COLLECTIONS.SCORM_RUNTIME);
+export const questionBanksCollection = () => getCollection<QuestionBankDoc>(COLLECTIONS.QUESTION_BANKS);
+export const examAttemptsCollection = () => getCollection<ExamAttemptDoc>(COLLECTIONS.EXAM_ATTEMPTS);
+export const certificatesCollection = () => getCollection<CertificateDoc>(COLLECTIONS.CERTIFICATES);
+export const invoicesCollection = () => getCollection<InvoiceDoc>(COLLECTIONS.INVOICES);
+export const registrationFormsCollection = () => getCollection<RegistrationFormDoc>(COLLECTIONS.REGISTRATION_FORMS);
+export const registrationSubmissionsCollection = () => getCollection<RegistrationSubmissionDoc>(COLLECTIONS.REGISTRATION_SUBMISSIONS);
+export const ordersCollection = () => getCollection<OrderDoc>(COLLECTIONS.ORDERS);
+export const studentDocumentsCollection = () => getCollection<StudentDocumentDoc>(COLLECTIONS.STUDENT_DOCUMENTS);
+export const paymentsCollection = () => getCollection<PaymentDoc>(COLLECTIONS.PAYMENTS);
+export const discountCodesCollection = () => getCollection<DiscountCodeDoc>(COLLECTIONS.DISCOUNT_CODES);
+export const auditLogsCollection = () => getCollection<AuditLogDoc>(COLLECTIONS.AUDIT_LOGS);
+
+// ============================================================================
 // Database Schema Documentation
 // ============================================================================
 
@@ -1721,7 +2356,7 @@ export const generateId = (collectionName: string): string | null => {
  *   - OneToOneMeetingDoc (Scheduled one-to-one meetings between affiliates)
  * 
  * /referrals/{referralId}
- *   - ReferralDoc (Referrals given/received, including SVP referrals)
+ *   - ReferralDoc (Referrals given/received, including platform referrals)
  * 
  * /affiliateStats/{statsId}
  *   - AffiliateStatsDoc (Aggregated metrics per affiliate)

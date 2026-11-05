@@ -1,12 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import NextImage from "next/image";
-import { usePathname } from "next/navigation";
-import { db } from "@/lib/firebase";
-import { collection, query, where, onSnapshot, doc, getDoc } from "firebase/firestore";
-import { COLLECTIONS, type PlatformSettingsDoc } from "@/lib/schema";
+import { usePathname, useRouter } from "next/navigation";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import { useUserProfile } from "@/contexts/user-profile-context";
 import {
   Sidebar,
@@ -19,7 +17,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuBadge,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -31,682 +28,174 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
-  Factory,
   LayoutDashboard,
-  Target,
-  FolderKanban,
+  BookOpen,
+  GraduationCap,
+  Award,
+  BarChart3,
   Users,
-  Building,
+  CreditCard,
+  Tag,
   FileText,
-  Calendar,
-  CalendarDays,
-  CheckSquare,
-  MessageSquare,
   Bell,
   Settings,
   LogOut,
   ChevronUp,
-  ChevronDown,
-  ChevronRight,
-  Sparkles,
-  Handshake,
-  DollarSign,
   User,
-  ImageIcon,
-  Shield,
-  Rocket,
-  Battery,
-  UserCog,
-  Building2,
-  Search,
-  Linkedin,
-  FileSignature,
-  Bot,
-  Plug,
-  Bug,
-  Heart,
-  Phone,
-  CalendarClock,
-  Eye,
-  EyeOff,
-  UserCheck,
+  ClipboardList,
+  Package,
   Database,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
 
-const mainNavItems = [
-  {
-    title: "Command Center",
-    href: "/portal/command-center",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Opportunities",
-    href: "/portal/opportunities",
-    icon: Target,
-    badge: "5",
-  },
-  {
-    title: "Projects",
-    href: "/portal/projects",
-    icon: FolderKanban,
-    badge: "3",
-  },
-  {
-    title: "Affiliates",
-    href: "/portal/affiliates",
-    icon: Users,
-  },
-  {
-    title: "Customers",
-    href: "/portal/customers",
-    icon: Building,
-  },
+const studentItems = [
+  { title: "Dashboard", href: "/portal", icon: LayoutDashboard },
+  { title: "My Courses", href: "/portal/my-courses", icon: GraduationCap },
+  { title: "Course Catalog", href: "/portal/courses", icon: BookOpen },
+  { title: "Part 107 Study Guide", href: "/portal/study-guide", icon: BookOpen },
+  { title: "Pro Access", href: "/portal/pro", icon: Package },
+  { title: "Purchases & Documents", href: "/portal/documents", icon: FileText },
+  { title: "Certificates", href: "/portal/certificates", icon: Award },
+  { title: "Notifications", href: "/portal/notifications", icon: Bell },
 ];
 
-const workItems = [
-  {
-    title: "Apollo Search",
-    href: "/portal/apollo-search",
-    icon: Search,
-    badge: "AI",
-  },
-  {
-    title: "Supplier Search",
-    href: "/portal/supplier-search",
-    icon: Factory,
-    badge: "AI",
-  },
-  {
-    title: "Documents",
-    href: "/portal/documents",
-    icon: FileText,
-  },
-  {
-    title: "Calendar",
-    href: "/portal/calendar",
-    icon: Calendar,
-  },
-  {
-    title: "Availability",
-    href: "/portal/availability",
-    icon: CalendarDays,
-  },
-  {
-    title: "Meetings",
-    href: "/portal/meetings",
-    icon: Users,
-  },
-  {
-    title: "Rocks",
-    href: "/portal/rocks",
-    icon: CheckSquare,
-  },
-  {
-    title: "Networking",
-    href: "/portal/networking",
-    icon: Handshake,
-  },
-  {
-    title: "Deals",
-    href: "/portal/deals",
-    icon: DollarSign,
-  },
-  {
-    title: "LinkedIn Content",
-    href: "/portal/linkedin-content",
-    icon: Linkedin,
-    badge: "AI",
-  },
-  {
-    title: "EOS2 Dashboard",
-    href: "/portal/eos2",
-    icon: Target,
-    badge: "EOS",
-  },
-  {
-    title: "AI Workforce",
-    href: "/portal/ai-workforce",
-    icon: Bot,
-    badge: "AI",
-  },
-  {
-    title: "Proposal Creator",
-    href: "/portal/proposals",
-    icon: FileText,
-    badge: "AI",
-  },
-  {
-    title: "GoHighLevel",
-    href: "/portal/gohighlevel",
-    icon: Plug,
-    badge: "CRM",
-  },
-  {
-    title: "Bug Tracker",
-    href: "/portal/bug-tracker",
-    icon: Bug,
-  },
-  {
-    title: "SVP Tools",
-    href: "/portal/svp-tools",
-    icon: Sparkles,
-    badge: "AI",
-  },
+const instructorItems = [
+  { title: "Class Roster", href: "/portal/roster", icon: Users },
+  { title: "Grading", href: "/portal/grading", icon: ClipboardList },
 ];
 
 const adminItems = [
-  {
-    title: "Team Members",
-    href: "/portal/admin/team-members",
-    icon: UserCog,
-  },
-  {
-    title: "Strategic Partners",
-    href: "/portal/admin/strategic-partners",
-    icon: Building2,
-  },
-  {
-    title: "Hero Management",
-    href: "/portal/admin/hero",
-    icon: ImageIcon,
-  },
-  {
-    title: "Contact Popup",
-    href: "/portal/admin/popup",
-    icon: MessageSquare,
-  },
-  {
-    title: "Events",
-    href: "/portal/admin/events",
-    icon: CalendarClock,
-  },
-  {
-    title: "Zenthium Referrals",
-    href: "/portal/admin/zenthium-referrals",
-    icon: Database,
-    badge: "NEW",
-  },
-];
-
-const initiativeItems = [
-  {
-    title: "Initiatives",
-    href: "/portal/admin/initiatives",
-    icon: Rocket,
-  },
-  {
-    title: "TBMNC Suppliers",
-    href: "/portal/admin/initiatives/tbmnc",
-    icon: Battery,
-  },
-];
-
-const aiItems = [
-  {
-    title: "Ask IntellEDGE",
-    href: "/portal/ask",
-    icon: Sparkles,
-  },
-];
-
-// All available roles for the role switcher
-const AVAILABLE_ROLES = [
-  { value: "admin", label: "Admin" },
-  { value: "team_member", label: "Team Member" },
-  { value: "affiliate", label: "Affiliate" },
-  { value: "client", label: "Client" },
-  { value: "viewer", label: "Viewer" },
-];
-
-// Export all nav items for use in settings
-export const ALL_NAV_ITEMS = [
-  ...mainNavItems.map(item => ({ ...item, section: "Navigation" })),
-  ...workItems.map(item => ({ ...item, section: "Work" })),
-  ...aiItems.map(item => ({ ...item, section: "Intelligence" })),
-  ...adminItems.map(item => ({ ...item, section: "Admin" })),
-  ...initiativeItems.map(item => ({ ...item, section: "Initiatives" })),
+  { title: "Reports", href: "/portal/reports", icon: BarChart3 },
+  { title: "Users", href: "/portal/admin/users", icon: Users },
+  { title: "Courses", href: "/portal/admin/courses", icon: BookOpen },
+  { title: "Digital Products", href: "/portal/admin/products", icon: Package },
+  { title: "Forms", href: "/portal/admin/forms", icon: FileText },
+  { title: "Registrations", href: "/portal/admin/registrations", icon: ClipboardList },
+  { title: "SCORM Packages", href: "/portal/admin/scorm", icon: Package },
+  { title: "Enrollments", href: "/portal/admin/enrollments", icon: FileText },
+  { title: "Payments", href: "/portal/admin/payments", icon: CreditCard },
+  { title: "Discounts", href: "/portal/admin/discounts", icon: Tag },
+  { title: "Demo Data", href: "/portal/admin/seed", icon: Database },
 ];
 
 export function PortalSidebar() {
   const pathname = usePathname();
-  const { getDisplayName, getInitials, profile } = useUserProfile();
-  const [bookCallLeadsCount, setBookCallLeadsCount] = useState(0);
-  const [hiddenNavItems, setHiddenNavItems] = useState<string[]>([]);
-  const [roleVisibility, setRoleVisibility] = useState<Record<string, string[]>>({});
-  const [previewRole, setPreviewRole] = useState<string | null>(null);
-  const isAdmin = profile.role === "admin";
-  
-  // The effective role for filtering (either preview role or actual role)
-  const effectiveRole = previewRole || profile.role;
+  const router = useRouter();
+  const { getDisplayName, getInitials, profile, isAdmin, isInstructor } =
+    useUserProfile();
 
-  // Subscribe to BookCallLeads count (new leads only)
-  useEffect(() => {
-    if (!db) return;
-    
-    const q = query(
-      collection(db, COLLECTIONS.BOOK_CALL_LEADS),
-      where("status", "==", "new")
-    );
-    
-    const unsubscribe = onSnapshot(
-      q, 
-      (snapshot) => {
-        setBookCallLeadsCount(snapshot.size);
-      },
-      (error) => {
-        // Silently handle permission errors - user may not have access to this collection
-        console.warn("BookCallLeads snapshot error (may be permission-related):", error.code);
-      }
-    );
-    
-    return () => unsubscribe();
-  }, []);
-  
-  // Load navigation settings from Firebase
-  useEffect(() => {
-    const loadNavSettings = async () => {
-      if (!db) return;
-      try {
-        const docRef = doc(db, COLLECTIONS.PLATFORM_SETTINGS, "global");
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data() as PlatformSettingsDoc;
-          if (data.navigationSettings?.hiddenItems) {
-            setHiddenNavItems(data.navigationSettings.hiddenItems);
-          }
-          if (data.navigationSettings?.roleVisibility) {
-            setRoleVisibility(data.navigationSettings.roleVisibility);
-          }
-        }
-      } catch (error) {
-        console.error("Error loading navigation settings:", error);
-      }
-    };
-    loadNavSettings();
-  }, []);
-  
-  // Filter nav items based on role-based visibility
-  const filterNavItems = (items: typeof mainNavItems) => {
-    return items.filter(item => {
-      // If admin is not previewing, show all items
-      if (isAdmin && !previewRole) return true;
-      
-      // Check role-based visibility
-      const roleHiddenItems = roleVisibility[effectiveRole] || [];
-      const isHiddenForRole = roleHiddenItems.includes(item.href);
-      
-      // Also check legacy hiddenItems for backwards compatibility
-      const isGloballyHidden = hiddenNavItems.includes(item.href);
-      
-      return !isHiddenForRole && !isGloballyHidden;
-    });
+  const handleSignOut = async () => {
+    if (auth) await signOut(auth);
+    router.push("/sign-in");
   };
-  
-  // Check if item should show as hidden (for admin preview)
-  const isItemHidden = (href: string) => {
-    const roleHiddenItems = roleVisibility[effectiveRole] || [];
-    return roleHiddenItems.includes(href) || hiddenNavItems.includes(href);
-  };
-  
-  // Collapsible state for each section
-  const [openSections, setOpenSections] = useState({
-    navigation: true,
-    work: true,
-    intelligence: true,
-    admin: false,
-    initiatives: false,
-  });
 
-  const toggleSection = (section: keyof typeof openSections) => {
-    setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
-  };
+  const renderItems = (items: typeof studentItems) =>
+    items.map((item) => (
+      <SidebarMenuItem key={item.href}>
+        <SidebarMenuButton
+          asChild
+          isActive={
+            item.href === "/portal"
+              ? pathname === "/portal"
+              : pathname.startsWith(item.href)
+          }
+          tooltip={item.title}
+        >
+          <Link href={item.href}>
+            <item.icon className="h-4 w-4" />
+            <span>{item.title}</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    ));
 
   return (
     <Sidebar>
       <SidebarHeader className="border-b border-sidebar-border">
         <Link href="/portal" className="flex items-center gap-2 px-2 py-4">
           <NextImage
-            src="/VPlus_logo.webp"
-            alt="Strategic Value+ Logo"
-            width={40}
-            height={40}
-            style={{ width: 'auto', height: 'auto' }}
+            src="/images/efvs-mark-light.png"
+            alt="EFVS"
+            width={36}
+            height={36}
+            style={{ width: "auto", height: "auto" }}
           />
           <div className="flex flex-col">
-            <span className="text-lg font-bold leading-none">Strategic Value+</span>
-            <span className="text-xs text-sidebar-foreground/60">Business Portal</span>
+            <span className="text-lg font-bold leading-none font-display tracking-wide">
+              EFVS ACADEMY
+            </span>
+            <span className="text-xs text-sidebar-foreground/60">
+              Student Portal
+            </span>
           </div>
         </Link>
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Main Navigation */}
-        <Collapsible open={openSections.navigation} onOpenChange={() => toggleSection("navigation")}>
-          <SidebarGroup>
-            <CollapsibleTrigger asChild>
-              <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50 rounded-md flex items-center justify-between pr-2">
-                <span>Navigation</span>
-                {openSections.navigation ? (
-                  <ChevronDown className="h-4 w-4 text-sidebar-foreground/60" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-sidebar-foreground/60" />
-                )}
-              </SidebarGroupLabel>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {filterNavItems(mainNavItems).map((item) => {
-                    const hidden = isItemHidden(item.href);
-                    return (
-                      <SidebarMenuItem key={item.href} className={cn(hidden && isAdmin && !previewRole && "opacity-50")}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={pathname === item.href}
-                          tooltip={item.title}
-                        >
-                          <Link href={item.href}>
-                            <item.icon className="h-4 w-4" />
-                            <span>{item.title}</span>
-                            {hidden && isAdmin && !previewRole && (
-                              <EyeOff className="h-3 w-3 ml-auto text-muted-foreground" />
-                            )}
-                          </Link>
-                        </SidebarMenuButton>
-                        {item.badge && !hidden && (
-                          <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
-                        )}
-                      </SidebarMenuItem>
-                    );
-                  })}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </CollapsibleContent>
-          </SidebarGroup>
-        </Collapsible>
+        <SidebarGroup>
+          <SidebarGroupLabel>Learning</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>{renderItems(studentItems)}</SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-        {/* Work Items */}
-        <Collapsible open={openSections.work} onOpenChange={() => toggleSection("work")}>
+        {isInstructor && (
           <SidebarGroup>
-            <CollapsibleTrigger asChild>
-              <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50 rounded-md flex items-center justify-between pr-2">
-                <span>Work</span>
-                {openSections.work ? (
-                  <ChevronDown className="h-4 w-4 text-sidebar-foreground/60" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-sidebar-foreground/60" />
-                )}
-              </SidebarGroupLabel>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {filterNavItems(workItems).map((item) => {
-                    const hidden = isItemHidden(item.href);
-                    return (
-                      <SidebarMenuItem key={item.href} className={cn(hidden && isAdmin && !previewRole && "opacity-50")}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={pathname === item.href}
-                          tooltip={item.title}
-                        >
-                          <Link href={item.href}>
-                            <item.icon className="h-4 w-4" />
-                            <span>{item.title}</span>
-                            {hidden && isAdmin && !previewRole && (
-                              <EyeOff className="h-3 w-3 ml-auto text-muted-foreground" />
-                            )}
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    );
-                  })}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </CollapsibleContent>
+            <SidebarGroupLabel>Instructor</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>{renderItems(instructorItems)}</SidebarMenu>
+            </SidebarGroupContent>
           </SidebarGroup>
-        </Collapsible>
+        )}
 
-        {/* AI */}
-        <Collapsible open={openSections.intelligence} onOpenChange={() => toggleSection("intelligence")}>
+        {isAdmin && (
           <SidebarGroup>
-            <CollapsibleTrigger asChild>
-              <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50 rounded-md flex items-center justify-between pr-2">
-                <span>Intelligence</span>
-                {openSections.intelligence ? (
-                  <ChevronDown className="h-4 w-4 text-sidebar-foreground/60" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-sidebar-foreground/60" />
-                )}
-              </SidebarGroupLabel>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {filterNavItems(aiItems).map((item) => {
-                    const hidden = isItemHidden(item.href);
-                    return (
-                      <SidebarMenuItem key={item.href} className={cn(hidden && isAdmin && !previewRole && "opacity-50")}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={pathname === item.href}
-                          tooltip={item.title}
-                        >
-                          <Link href={item.href}>
-                            <item.icon className="h-4 w-4" />
-                            <span>{item.title}</span>
-                            {hidden && isAdmin && !previewRole && (
-                              <EyeOff className="h-3 w-3 ml-auto text-muted-foreground" />
-                            )}
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    );
-                  })}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </CollapsibleContent>
+            <SidebarGroupLabel>Administration</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>{renderItems(adminItems)}</SidebarMenu>
+            </SidebarGroupContent>
           </SidebarGroup>
-        </Collapsible>
-
-        {/* Admin */}
-        <Collapsible open={openSections.admin} onOpenChange={() => toggleSection("admin")}>
-          <SidebarGroup>
-            <CollapsibleTrigger asChild>
-              <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50 rounded-md flex items-center justify-between pr-2">
-                <span>Admin</span>
-                {openSections.admin ? (
-                  <ChevronDown className="h-4 w-4 text-sidebar-foreground/60" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-sidebar-foreground/60" />
-                )}
-              </SidebarGroupLabel>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {/* Book Call Leads - with dynamic count */}
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname === "/portal/admin/book-call-leads"}
-                      tooltip="Book Call Leads"
-                    >
-                      <Link href="/portal/admin/book-call-leads">
-                        <Phone className="h-4 w-4" />
-                        <span>Book Call Leads</span>
-                      </Link>
-                    </SidebarMenuButton>
-                    {bookCallLeadsCount > 0 && (
-                      <SidebarMenuBadge className="bg-red-500 text-white">
-                        {bookCallLeadsCount}
-                      </SidebarMenuBadge>
-                    )}
-                  </SidebarMenuItem>
-                  {filterNavItems(adminItems).map((item) => {
-                    const hidden = isItemHidden(item.href);
-                    return (
-                      <SidebarMenuItem key={item.href} className={cn(hidden && isAdmin && !previewRole && "opacity-50")}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={pathname === item.href || pathname.startsWith(item.href)}
-                          tooltip={item.title}
-                        >
-                          <Link href={item.href}>
-                            <item.icon className="h-4 w-4" />
-                            <span>{item.title}</span>
-                            {hidden && isAdmin && !previewRole && (
-                              <EyeOff className="h-3 w-3 ml-auto text-muted-foreground" />
-                            )}
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    );
-                  })}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </CollapsibleContent>
-          </SidebarGroup>
-        </Collapsible>
-
-        {/* Initiatives */}
-        <Collapsible open={openSections.initiatives} onOpenChange={() => toggleSection("initiatives")}>
-          <SidebarGroup>
-            <CollapsibleTrigger asChild>
-              <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50 rounded-md flex items-center justify-between pr-2">
-                <span>Initiatives</span>
-                {openSections.initiatives ? (
-                  <ChevronDown className="h-4 w-4 text-sidebar-foreground/60" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-sidebar-foreground/60" />
-                )}
-              </SidebarGroupLabel>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {filterNavItems(initiativeItems).map((item) => {
-                    const hidden = isItemHidden(item.href);
-                    return (
-                      <SidebarMenuItem key={item.href} className={cn(hidden && isAdmin && !previewRole && "opacity-50")}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={pathname === item.href || pathname.startsWith(item.href + "/")}
-                          tooltip={item.title}
-                        >
-                          <Link href={item.href}>
-                            <item.icon className="h-4 w-4" />
-                            <span>{item.title}</span>
-                            {hidden && isAdmin && !previewRole && (
-                              <EyeOff className="h-3 w-3 ml-auto text-muted-foreground" />
-                            )}
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    );
-                  })}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </CollapsibleContent>
-          </SidebarGroup>
-        </Collapsible>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border">
-        {/* Admin Role Switcher */}
-        {isAdmin && (
-          <div className="px-3 py-2 border-b border-sidebar-border">
-            <div className="flex items-center gap-2 mb-2">
-              <UserCheck className="h-4 w-4 text-sidebar-foreground/60" />
-              <span className="text-xs font-medium text-sidebar-foreground/60">Preview as Role</span>
-            </div>
-            <Select
-              value={previewRole || "admin"}
-              onValueChange={(value) => setPreviewRole(value === "admin" ? null : value)}
-            >
-              <SelectTrigger className="h-8 text-xs">
-                <SelectValue placeholder="Select role to preview" />
-              </SelectTrigger>
-              <SelectContent>
-                {AVAILABLE_ROLES.map((role) => (
-                  <SelectItem key={role.value} value={role.value} className="text-xs">
-                    <div className="flex items-center gap-2">
-                      {role.label}
-                      {role.value === "admin" && (
-                        <Badge variant="outline" className="text-[10px] h-4">Your Role</Badge>
-                      )}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {previewRole && (
-              <p className="text-[10px] text-amber-600 mt-1 flex items-center gap-1">
-                <Eye className="h-3 w-3" />
-                Previewing as {AVAILABLE_ROLES.find(r => r.value === previewRole)?.label}
-              </p>
-            )}
-          </div>
-        )}
-        
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton className="w-full">
-                  <Avatar className="h-6 w-6">
-                    <AvatarFallback className="bg-primary/20 text-primary text-xs">
+                <SidebarMenuButton className="h-auto py-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={profile.avatarUrl} />
+                    <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground text-xs">
                       {getInitials()}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="flex flex-col items-start text-sm">
-                    <span className="font-medium">{getDisplayName()}</span>
+                  <div className="flex flex-col items-start text-left">
+                    <span className="text-sm font-medium truncate max-w-[140px]">
+                      {getDisplayName()}
+                    </span>
                     <span className="text-xs text-sidebar-foreground/60 capitalize">
-                      {previewRole ? `${profile.role.replace("_", " ")} (viewing as ${previewRole.replace("_", " ")})` : profile.role.replace("_", " ")}
+                      {profile.role}
                     </span>
                   </div>
-                  <ChevronUp className="ml-auto h-4 w-4" />
+                  <ChevronUp className="h-4 w-4 ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent side="top" align="start" className="w-56">
+              <DropdownMenuContent side="top" className="w-56">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/portal/profile">
-                    <User className="mr-2 h-4 w-4" />
-                    Profile
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/portal/settings?tab=notifications">
-                    <Bell className="mr-2 h-4 w-4" />
-                    Notifications
+                    <User className="mr-2 h-4 w-4" /> Profile
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/portal/settings">
-                    <Settings className="mr-2 h-4 w-4" />
-                    Settings
+                    <Settings className="mr-2 h-4 w-4" /> Settings
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Sign Out
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" /> Sign Out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

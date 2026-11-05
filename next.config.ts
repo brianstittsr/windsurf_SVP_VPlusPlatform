@@ -9,15 +9,19 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "strategicvalueplus.com",
+        hostname: "efvertical.com",
       },
       {
         protocol: "https",
-        hostname: "images.unsplash.com",
+        hostname: "www.efvertical.com",
       },
       {
         protocol: "https",
-        hostname: "images.pexels.com",
+        hostname: "academy.efvertical.com",
+      },
+      {
+        protocol: "https",
+        hostname: "firebasestorage.googleapis.com",
       },
     ],
   },

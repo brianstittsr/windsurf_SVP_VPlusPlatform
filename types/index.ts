@@ -1,4 +1,4 @@
-// Core Types for Strategic Value Plus Platform
+// Core Types for the EFVS Academy Platform
 
 // User roles
 export type UserRole = 'admin' | 'team' | 'affiliate' | 'customer' | 'partner';

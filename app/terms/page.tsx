@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
 export const metadata = {
-  title: "Terms of Service | Strategic Value+",
-  description: "Terms of Service for Strategic Value+ platform and services.",
+  title: "Terms of Service | EFVS Academy",
+  description: "Terms of Service for EFVS Academy platform and services.",
 };
 
 export default function TermsPage() {
@@ -28,14 +28,14 @@ export default function TermsPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">1. Acceptance of Terms</h2>
             <p>
-              By accessing or using the Strategic Value Plus Solutions LLC (&quot;V+&quot;) platform and services, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.
+              By accessing or using the Aviante HWC, Inc. dba Eagle Flight Vertical Solutions (&quot;EFVS&quot;) platform and services, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">2. Description of Services</h2>
             <p>
-              V+ provides manufacturing transformation services, consulting, and a digital platform designed to help U.S. manufacturers modernize operations, achieve certifications, and connect with OEM opportunities.
+              EFVS provides UAS training courses, certification preparation, and a learning management platform designed for aviation workforce development.
             </p>
           </section>
 
@@ -65,14 +65,14 @@ export default function TermsPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">5. Intellectual Property</h2>
             <p>
-              All content, features, and functionality of the V+ platform are owned by Strategic Value Plus Solutions LLC and are protected by intellectual property laws. You may not copy, modify, or distribute our content without permission.
+              All content, features, and functionality of the EFVS Academy platform are owned by Aviante HWC, Inc. dba Eagle Flight Vertical Solutions and are protected by intellectual property laws. You may not copy, modify, or distribute our content without permission.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">6. Limitation of Liability</h2>
             <p>
-              V+ shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use our services.
+              EFVS shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use our services.
             </p>
           </section>
 
@@ -89,9 +89,9 @@ export default function TermsPage() {
               If you have any questions about these Terms of Service, please contact us at:
             </p>
             <p className="mt-2">
-              <strong>Strategic Value Plus Solutions LLC</strong><br />
-              Email: legal@strategicvalueplus.com<br />
-              Website: <Link href="https://strategicvalueplus.com" className="text-primary hover:underline">strategicvalueplus.com</Link>
+              <strong>Aviante HWC, Inc. dba Eagle Flight Vertical Solutions</strong><br />
+              Email: info@efvertical.com<br />
+              Website: <Link href="https://www.efvertical.com" className="text-primary hover:underline">efvertical.com</Link>
             </p>
           </section>
         </div>

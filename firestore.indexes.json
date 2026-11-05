@@ -1,202 +1,195 @@
 {
   "indexes": [
     {
-      "collectionGroup": "opportunities",
+      "collectionGroup": "enrollments",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "organizationId", "order": "ASCENDING" },
-        { "fieldPath": "stage", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "opportunities",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "ownerId", "order": "ASCENDING" },
-        { "fieldPath": "expectedCloseDate", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "opportunities",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "stage", "order": "ASCENDING" },
-        { "fieldPath": "expectedCloseDate", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "opportunities",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "ownerId", "order": "ASCENDING" },
-        { "fieldPath": "stage", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "projects",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "organizationId", "order": "ASCENDING" },
+        { "fieldPath": "studentId", "order": "ASCENDING" },
         { "fieldPath": "status", "order": "ASCENDING" }
       ]
     },
     {
-      "collectionGroup": "projects",
+      "collectionGroup": "enrollments",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "startDate", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "activities",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "entityType", "order": "ASCENDING" },
-        { "fieldPath": "entityId", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "actionItems",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "assigneeId", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "dueDate", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "actionItems",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "priority", "order": "ASCENDING" },
-        { "fieldPath": "dueDate", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "rocks",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "ownerId", "order": "ASCENDING" },
-        { "fieldPath": "quarter", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "rocks",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "quarter", "order": "ASCENDING" },
+        { "fieldPath": "studentId", "order": "ASCENDING" },
+        { "fieldPath": "courseId", "order": "ASCENDING" },
         { "fieldPath": "status", "order": "ASCENDING" }
       ]
     },
     {
-      "collectionGroup": "meetings",
+      "collectionGroup": "enrollments",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "projectId", "order": "ASCENDING" },
-        { "fieldPath": "date", "order": "DESCENDING" }
+        { "fieldPath": "firebaseUid", "order": "ASCENDING" },
+        { "fieldPath": "courseId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
       ]
     },
     {
-      "collectionGroup": "notes",
+      "collectionGroup": "lessonProgress",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "entityType", "order": "ASCENDING" },
-        { "fieldPath": "entityId", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
+        { "fieldPath": "enrollmentId", "order": "ASCENDING" },
+        { "fieldPath": "moduleId", "order": "ASCENDING" }
       ]
     },
     {
-      "collectionGroup": "documents",
+      "collectionGroup": "courseModules",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "projectId", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
+        { "fieldPath": "courseId", "order": "ASCENDING" },
+        { "fieldPath": "order", "order": "ASCENDING" }
       ]
     },
     {
-      "collectionGroup": "documents",
+      "collectionGroup": "questionBanks",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "organizationId", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
+        { "fieldPath": "courseId", "order": "ASCENDING" },
+        { "fieldPath": "type", "order": "ASCENDING" }
       ]
     },
     {
-      "collectionGroup": "oneToOneMeetings",
+      "collectionGroup": "examAttempts",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "initiatorId", "order": "ASCENDING" },
-        { "fieldPath": "scheduledDate", "order": "DESCENDING" }
+        { "fieldPath": "enrollmentId", "order": "ASCENDING" },
+        { "fieldPath": "quizId", "order": "ASCENDING" }
       ]
     },
     {
-      "collectionGroup": "oneToOneMeetings",
+      "collectionGroup": "examAttempts",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "partnerId", "order": "ASCENDING" },
-        { "fieldPath": "scheduledDate", "order": "DESCENDING" }
+        { "fieldPath": "firebaseUid", "order": "ASCENDING" },
+        { "fieldPath": "enrollmentId", "order": "ASCENDING" },
+        { "fieldPath": "quizId", "order": "ASCENDING" }
       ]
     },
     {
-      "collectionGroup": "oneToOneMeetings",
+      "collectionGroup": "examAttempts",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "scheduledDate", "order": "ASCENDING" }
+        { "fieldPath": "enrollmentId", "order": "ASCENDING" },
+        { "fieldPath": "passed", "order": "ASCENDING" }
       ]
     },
     {
-      "collectionGroup": "referrals",
+      "collectionGroup": "discountCodes",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "referrerId", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
+        { "fieldPath": "code", "order": "ASCENDING" },
+        { "fieldPath": "active", "order": "ASCENDING" }
       ]
     },
     {
-      "collectionGroup": "referrals",
+      "collectionGroup": "registrationForms",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "recipientId", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
+        { "fieldPath": "slug", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
       ]
     },
     {
-      "collectionGroup": "referrals",
+      "collectionGroup": "studentDocuments",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
+        { "fieldPath": "firebaseUid", "order": "ASCENDING" },
+        { "fieldPath": "kind", "order": "ASCENDING" }
       ]
     },
     {
-      "collectionGroup": "referrals",
+      "collectionGroup": "certificates",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "isSvpReferral", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
+        { "fieldPath": "firebaseUid", "order": "ASCENDING" },
+        { "fieldPath": "publicCredentialId", "order": "ASCENDING" }
       ]
     },
     {
-      "collectionGroup": "aiMatchSuggestions",
+      "collectionGroup": "certificates",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "affiliateId", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "matchScore", "order": "DESCENDING" }
+        { "fieldPath": "publicCredentialId", "order": "ASCENDING" },
+        { "fieldPath": "publicSharingEnabled", "order": "ASCENDING" },
+        { "fieldPath": "publicNameConsent", "order": "ASCENDING" }
       ]
     },
     {
-      "collectionGroup": "aiMatchSuggestions",
+      "collectionGroup": "studyGuideSessions",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "affiliateId", "order": "ASCENDING" },
-        { "fieldPath": "expiresAt", "order": "ASCENDING" }
+        { "fieldPath": "firebaseUid", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "firebaseUid", "order": "ASCENDING" },
+        { "fieldPath": "productId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "firebaseUid", "order": "ASCENDING" },
+        { "fieldPath": "courseId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "registrationSubmissions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "enrollments",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "firebaseUid", "order": "ASCENDING" },
+        { "fieldPath": "studentId", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "enrollments",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "firebaseUid", "order": "ASCENDING" },
+        { "fieldPath": "studentId", "order": "ASCENDING" },
+        { "fieldPath": "courseId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "scormRuntime",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "firebaseUid", "order": "ASCENDING" },
+        { "fieldPath": "enrollmentId", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "certificates",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "firebaseUid", "order": "ASCENDING" },
+        { "fieldPath": "studentId", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "courses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "demoSeed", "order": "ASCENDING" },
+        { "fieldPath": "importedFrom", "order": "ASCENDING" }
       ]
     }
   ],

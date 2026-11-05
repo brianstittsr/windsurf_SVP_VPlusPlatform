@@ -1,177 +1,69 @@
-# Strategic Value+ Platform
+# EFVS Academy — UAS Training LMS
 
-A modern **Next.js 14+** application serving as both a **marketing website** and an **intelligent business orchestration platform** for Strategic Value Plus.
+A **Next.js 16** learning management platform for **Eagle Flight Vertical
+Solutions (EFVS)** — hosted at `academy.efvertical.com` — delivering the
+**AC1 FAA Part 107 Remote Pilot Certification Preparation Course** with
+SCORM 1.2/2004 playback, quizzes & exams, certificates, payments, and
+administration.
 
-## Overview
+## Features
 
-Strategic Value+ helps small- and mid-sized U.S. manufacturers (25-500 employees) win OEM contracts through supplier qualification, ISO certification, and operational readiness.
+- **Dynamic course catalog & pricing** — courses, the Part 107 guide, course bundles, and Pro plans are read from LMS Firestore-backed catalogs; each course chooses instant Stripe checkout or staff-reviewed registration, and zero-dollar courses enroll free
+- **Registration Form Builder** — versioned forms with conditional fields, uploads, policy links, typed/drawn e-signatures, immutable signed PDFs, and private submission review
+- **Study Guide** — the complete nine-category Part 107 question bank, explanations, vocabulary deck, saved/resumable quizzes, study streaks, and progress analytics run entirely on the EFVS LMS Firebase project; answer keys are server-side
+- **SCORM player** — `scorm-again` runtime, launch/resume, CMI persistence, completion & score tracking (SCORM 1.2 and SCORM 2004)
+- **Assessments** — server-graded randomized exams, passing scores, attempt limits, and feedback
+- **Certificates & badges** — branded PDFs and unique verification pages, with student-controlled public-name consent and LinkedIn Add to Profile support
+- **Roles & records** — student / instructor / admin, private purchase history, signed forms, uploaded documents, and course completion records
+- **Payments** — Stripe Checkout (dynamic payment methods, including supported ACH), monthly Pro subscription, 6/12-month prepaid Pro access, one-time courses/bundles, validated discounts, and manual ACH invoices for B2B
+- **Instructor tools** — roster, grading review, CSV/PDF reports
+- **Admin tools** — course/product management, form builder and review queue, SCORM upload, enrollments, payments, discount codes, user roles, and audit logging
 
-This platform unifies:
-- **Marketing Website** - Lead capture, service showcase, event promotion
-- **Business Portal** - Command center, pipeline management, affiliate coordination
-- **AI Intelligence** - Natural language queries across business data
+## Stack
 
-## Tech Stack
-
-- **Framework:** Next.js 14+ (App Router)
-- **UI Components:** shadcn/ui
-- **Styling:** Tailwind CSS
-- **Icons:** Lucide React
-- **State Management:** Zustand
-- **Data Fetching:** TanStack React Query
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 ·
+Firebase Auth + Firestore + Storage · Firebase Admin SDK · Stripe ·
+scorm-again · jszip · jspdf · shadcn/ui
 
 ## Getting Started
 
-### Prerequisites
-
-- Node.js 18+
-- npm or yarn
-
-### Installation
-
 ```bash
-# Install dependencies
 npm install
-
-# Copy environment variables
-cp .env.example .env.local
-
-# Run development server
-npm run dev
+cp .env.example .env.local   # fill in Firebase + Stripe keys
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the application.
+See `.env.example` for every environment variable, including the Firebase Admin service account, `REGISTRATION_INVITE_SECRET` (32+ characters), optional registration email settings, `STRIPE_WEBHOOK_SECRET`, and the LinkedIn Add to Profile provider URL. Keep all non-`NEXT_PUBLIC_*` values server-side.
 
-## Project Structure
+## Security & Access Control
 
-```
-svp-platform/
-├── app/
-│   ├── (marketing)/          # Public marketing pages
-│   │   ├── page.tsx          # Homepage
-│   │   ├── about/
-│   │   ├── contact/
-│   │   ├── v-edge/
-│   │   └── ...
-│   ├── (portal)/             # Authenticated portal
-│   │   └── portal/
-│   │       ├── command-center/
-│   │       ├── opportunities/
-│   │       ├── projects/
-│   │       ├── affiliates/
-│   │       ├── customers/
-│   │       ├── meetings/
-│   │       ├── rocks/
-│   │       ├── documents/
-│   │       └── ask/          # AI query interface
-│   ├── api/                  # API routes
-│   ├── layout.tsx
-│   └── globals.css
-├── components/
-│   ├── ui/                   # shadcn/ui components
-│   ├── marketing/            # Marketing page components
-│   ├── portal/               # Portal components
-│   └── shared/               # Shared components
-├── lib/                      # Utilities
-├── types/                    # TypeScript types
-└── public/                   # Static assets
-```
+- Firestore rules (`firestore.rules`) scope user profiles, enrollment grants, assessments, certificates, and private records to owners/staff/admin. New profiles are bootstrapped through a Firebase ID-token-verified server route; learners cannot create enrollments or grades directly.
+- Question-bank answer keys are not returned to learners; quiz attempts are graded and stored server-side. Study-guide questions, progress, and in-progress sessions use only the EFVS LMS Firebase database.
+- Registration submissions, signatures, certificates, and uploaded documents are stored privately and delivered through authenticated server endpoints. Public credential pages show learner identity only after explicit opt-in.
+- SCORM content is served through `/api/scorm/content` behind a signed, short-lived `scorm_session` cookie (`SCORM_SESSION_SECRET`).
+- Stripe webhooks verify signatures and use idempotent order fulfillment for courses, bundles, Pro purchases, subscription changes, refunds, and discount redemptions.
+- Bank details are never stored: ACH debit is collected by Stripe Checkout; offline B2B ACH is recorded as a manual invoice only. Raw card data is never collected.
 
-## Key Features
+## Launch Setup
 
-### Marketing Website
-- **Homepage** with hero, services overview, testimonials
-- **Service Pages** for V+ EDGE, TwinEDGE, IntellEDGE
-- **Contact Form** with lead capture
-- **About Page** with team and mission
-
-### Business Portal
-- **Command Center** - Real-time dashboard with pipeline, projects, rocks
-- **Opportunities** - Sales pipeline management
-- **Projects** - Active engagement tracking
-- **Affiliates** - Network capability directory
-- **Customers** - CRM functionality
-- **Meetings** - Schedule and AI-extracted insights
-- **Rocks** - 90-day goal tracking (EOS methodology)
-- **Documents** - File management and sharing
-- **Ask IntellEDGE** - AI-powered business queries
-
-## Environment Variables
-
-Create a `.env.local` file with:
-
-```env
-# Database
-DATABASE_URL="postgresql://..."
-
-# Authentication
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="your-secret-key"
-
-# AI
-OPENAI_API_KEY="sk-..."
-
-# Integrations (Phase 2)
-GHL_API_KEY="..."
-FIREFLIES_API_KEY="..."
-MATTERMOST_URL="..."
-
-# Accessibility (UserWay)
-NEXT_PUBLIC_USERWAY_ACCOUNT_ID="your-userway-account-id"
-```
-
-## Development
-
-```bash
-# Run development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
-
-# Run linting
-npm run lint
-```
+1. Seed the first administrator by creating `roles/{firebaseUid}` with `{ "role": "admin" }` in Firestore.
+2. Set `REGISTRATION_INVITE_SECRET` to a unique random secret with at least 32 characters. Configure Microsoft Graph email variables and `EFVS_REGISTRATION_EMAIL` if invitation and status emails should be delivered automatically.
+3. In `/portal/admin/courses`, import the registration-form catalog. Review the unpublished course drafts, set prices for `SG107` and `AC1-SG107`, verify bundle membership, and publish only after content/pricing approval. The existing AC1 sample is reused as a draft, retaining its lessons and mock records.
+4. In `/portal/admin/products`, import the retained Pro plans ($97 monthly, $497/6 months, $897/12 months). The standard Pro plan records are published; review plan text, discounts, and access terms before launch.
+5. In `/portal/admin/seed`, import the complete Part 107 study guide to LMS Firestore. The old `part107-quiz` project is not a runtime dependency and is not contacted. The same page can seed the AC1 demonstration course and mock data.
+6. Configure the Stripe webhook for Checkout completion/async payment, subscription create/update/delete, invoice paid/payment failed, and charge refunded events. Configure Stripe Billing Portal cancellation/payment-method settings and enable any desired ACH methods.
+7. Set `NEXT_PUBLIC_LINKEDIN_ADD_TO_PROFILE_URL` to the EFVS provider URL generated from LinkedIn's Add to Profile provider site. The learner sharing switch defaults off.
+8. Have EFVS counsel review the e-sign consent wording, refund/cancellation policies, certificate wording, and the public student credential disclosure before publication.
+9. After the LMS payment flow is validated in Stripe test mode, retire the old standalone app's production checkout/billing entry points as part of cutover. The LMS has no runtime connection to that project.
+10. Deploy the Firestore rules, indexes (`firestore.indexes.json`), and Storage rules (`storage.rules`) alongside the app.
 
 ## Deployment
 
-Deploy to Vercel:
-
-```bash
-npx vercel
-```
-
-Or use the Vercel Dashboard for automatic deployments from GitHub.
-
-## Roadmap
-
-### Phase 1 (Current)
-- [x] Marketing website
-- [x] Portal layout and navigation
-- [x] Command Center dashboard
-- [x] Core portal pages (opportunities, projects, affiliates, etc.)
-- [x] Ask IntellEDGE UI
-
-### Phase 2 (Next)
-- [ ] Authentication with NextAuth.js
-- [ ] Database integration with Prisma
-- [ ] Go High Level CRM integration
-- [ ] FireFlies meeting intelligence
-
-### Phase 3 (Future)
-- [ ] Mattermost integration
-- [ ] Real AI-powered queries
-- [ ] Affiliate matching engine
-- [ ] Customer portal
+Designed for the Firebase Hosting + Next.js (or Vercel) model.
 
 ## License
 
-Proprietary - Strategic Value+ Solutions
+Proprietary — Eagle Flight Vertical Solutions
 
-## Contact
-
-- Website: [strategicvalueplus.com](https://strategicvalueplus.com)
-- Email: info@strategicvalueplus.com
+- Website: [efvertical.com](https://www.efvertical.com)
+- Email: info@efvertical.com · Phone: 805-584-1157

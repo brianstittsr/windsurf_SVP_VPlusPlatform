@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Non-app tooling and generated/legacy content
+    "scripts/**",
+    "_bmad/**",
+    "docs/**",
   ]),
 ]);
 

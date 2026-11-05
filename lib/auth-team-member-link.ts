@@ -7,18 +7,39 @@
  * - getTeamMemberByAuthUid: Gets Team Member data by Firebase Auth UID
  */
 
-import { 
-  collection, 
-  query, 
-  where, 
-  getDocs, 
-  updateDoc, 
-  doc, 
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  addDoc,
+  setDoc,
+  doc,
   Timestamp,
-  getDoc,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import { COLLECTIONS, type TeamMemberDoc } from "./schema";
+import { COLLECTIONS, type LmsRole, type TeamMemberDoc } from "./schema";
+
+/**
+ * Sync the roles/{uid} lookup document used by Firestore security rules.
+ * Role elevation must happen through an admin; non-admin updates are
+ * denied by security rules and failures are ignored here.
+ * @param uid - Firebase Auth UID
+ * @param role - Effective LMS role
+ */
+export async function syncRoleDoc(uid: string, role: LmsRole): Promise<void> {
+  if (!db) return;
+  try {
+    await setDoc(doc(db, "roles", uid), {
+      role,
+      firebaseUid: uid,
+      updatedAt: Timestamp.now(),
+    });
+  } catch {
+    // Non-admins cannot update their role doc — expected on sign-in.
+  }
+}
 
 /**
  * Find a Team Member by email address
@@ -168,4 +189,63 @@ export async function findAndLinkTeamMember(
   }
 
   return null;
+}
+
+/**
+ * Ensure a user record exists for an authenticated user.
+ * Links an existing record if found; otherwise creates a new student record.
+ * @param email - User's email address
+ * @param firebaseUid - User's Firebase Auth UID
+ * @param firstName - User's first name
+ * @param lastName - User's last name
+ * @returns TeamMemberDoc for the user, or null on failure
+ */
+export async function ensureUserRecord(
+  email: string,
+  firebaseUid: string,
+  firstName: string,
+  lastName: string,
+  extras?: { phone?: string; company?: string; isVeteran?: boolean }
+): Promise<TeamMemberDoc | null> {
+  const existing = await findAndLinkTeamMember(email, firebaseUid);
+  if (existing) {
+    const role =
+      existing.role === "admin"
+        ? "admin"
+        : existing.role === "instructor"
+          ? "instructor"
+          : "student";
+    await syncRoleDoc(firebaseUid, role);
+    return existing;
+  }
+  if (!db) {
+    console.error("Firebase not initialized");
+    return null;
+  }
+
+  try {
+    const newRecord = {
+      firebaseUid,
+      firstName,
+      lastName,
+      expertise: "",
+      emailPrimary: email.toLowerCase().trim(),
+      mobile: extras?.phone || "",
+      company: extras?.company || "",
+      isVeteran: extras?.isVeteran === true,
+      role: "student" as const,
+      status: "active" as const,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    };
+    const docRef = await addDoc(
+      collection(db, COLLECTIONS.TEAM_MEMBERS),
+      newRecord
+    );
+    await syncRoleDoc(firebaseUid, "student");
+    return { id: docRef.id, ...newRecord } as TeamMemberDoc;
+  } catch (error) {
+    console.error("Error creating user record:", error);
+    return null;
+  }
 }

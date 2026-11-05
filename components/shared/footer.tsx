@@ -1,157 +1,117 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Linkedin, Twitter, Youtube, Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, Globe } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
-const footerLinks = {
-  services: [
-    { title: "V+ EDGE™", href: "/v-edge" },
-    { title: "TwinEDGE™", href: "/twinedge" },
-    { title: "IntellEDGE™", href: "/intelledge" },
-    { title: "ISO & QMS", href: "/v-edge/quality" },
-    { title: "Reshoring", href: "/v-edge/reshore" },
-    { title: "Supplier Readiness", href: "/services/supplier-readiness" },
-  ],
-  company: [
-    { title: "About Us", href: "/about" },
-    { title: "Core Team", href: "/about#team" },
-    { title: "Affiliates", href: "/affiliates" },
-    { title: "Case Studies", href: "/case-studies" },
-    { title: "Careers", href: "/careers" },
-    { title: "Contact", href: "/contact" },
-  ],
-  resources: [
-    { title: "Blog", href: "/resources/blog" },
-    { title: "Guides & Playbooks", href: "/resources/guides" },
-    { title: "Webinars", href: "/resources/webinars" },
-    { title: "Events", href: "/events" },
-    { title: "FAQ", href: "/faq" },
-    { title: "News", href: "/news" },
-  ],
-  legal: [
-    { title: "Privacy Policy", href: "/privacy" },
-    { title: "Terms of Service", href: "/terms" },
-    { title: "Cookie Policy", href: "/cookies" },
-    { title: "Accessibility", href: "/accessibility" },
-  ],
-};
+const legalLinks = [
+  { title: "Privacy Policy", href: "/privacy" },
+  { title: "Terms of Service", href: "/terms" },
+  { title: "Student Agreement", href: "/eula" },
+];
 
 export function Footer() {
   return (
-    <footer className="bg-black text-white">
+    <footer className="bg-[#071628] text-white">
       <div className="container py-12 md:py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {/* Brand Column */}
-          <div className="col-span-2 md:col-span-4 lg:col-span-1 space-y-4">
-            <Link href="/" className="flex items-center gap-2">
+          <div className="space-y-4">
+            <Link href="/" className="inline-block">
               <Image
-                src="/VPlus_logo.webp"
-                alt="Strategic Value+ Logo"
-                width={40}
-                height={40}
-                className="h-10 w-auto"
+                src="/images/efvs-logo.png"
+                alt="Eagle Flight Vertical Solutions"
+                width={180}
+                height={52}
+                className="h-12 w-auto"
               />
-              <div className="flex flex-col">
-                <span className="text-lg font-bold leading-none">Strategic Value+</span>
-                <span className="text-xs text-gray-400">Transforming U.S. Manufacturing</span>
-              </div>
             </Link>
-            <p className="text-sm text-gray-400 max-w-xs">
-              Helping small- and mid-sized U.S. manufacturers win OEM contracts through 
-              supplier qualification, ISO certification, and operational readiness.
+            <p className="text-sm text-white/70 max-w-xs">
+              The EFVS UAS Training Academy delivers FAA Part 107 certification
+              preparation and specialized uncrewed aircraft systems training.
             </p>
-            <div className="flex gap-4">
-              <Link href="https://linkedin.com" className="text-gray-400 hover:text-primary transition-colors">
-                <Linkedin className="h-5 w-5" />
-              </Link>
-              <Link href="https://twitter.com" className="text-gray-400 hover:text-primary transition-colors">
-                <Twitter className="h-5 w-5" />
-              </Link>
-              <Link href="https://youtube.com" className="text-gray-400 hover:text-primary transition-colors">
-                <Youtube className="h-5 w-5" />
-              </Link>
-            </div>
           </div>
 
-          {/* Services */}
+          {/* Academy */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-accent">Services</h3>
-            <ul className="space-y-2">
-              {footerLinks.services.map((link) => (
-                <li key={link.title}>
-                  <Link href={link.href} className="text-sm text-gray-400 hover:text-white transition-colors">
-                    {link.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-accent">Company</h3>
-            <ul className="space-y-2">
-              {footerLinks.company.map((link) => (
-                <li key={link.title}>
-                  <Link href={link.href} className="text-sm text-gray-400 hover:text-white transition-colors">
-                    {link.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-accent">Resources</h3>
-            <ul className="space-y-2">
-              {footerLinks.resources.map((link) => (
-                <li key={link.title}>
-                  <Link href={link.href} className="text-sm text-gray-400 hover:text-white transition-colors">
-                    {link.title}
-                  </Link>
-                </li>
-              ))}
+            <h3 className="font-semibold text-[#d3ac63] font-display tracking-wide">
+              ACADEMY
+            </h3>
+            <ul className="space-y-2 text-sm text-white/70">
+              <li>
+                <Link href="/#courses" className="hover:text-white transition-colors">
+                  Course Catalog
+                </Link>
+              </li>
+              <li>
+                <Link href="/sign-up" className="hover:text-white transition-colors">
+                  Student Registration
+                </Link>
+              </li>
+              <li>
+                <Link href="/sign-in" className="hover:text-white transition-colors">
+                  Student Portal
+                </Link>
+              </li>
+              <li>
+                <a
+                  href="https://www.efvertical.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors inline-flex items-center gap-1"
+                >
+                  <Globe className="h-3.5 w-3.5" /> efvertical.com
+                </a>
+              </li>
             </ul>
           </div>
 
           {/* Contact */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-accent">Contact</h3>
+            <h3 className="font-semibold text-[#d3ac63] font-display tracking-wide">
+              CONTACT EFVS
+            </h3>
             <ul className="space-y-3">
-              <li className="flex items-start gap-2 text-sm text-gray-400">
-                <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
-                <span>United States</span>
-              </li>
               <li>
-                <Link href="mailto:info@strategicvalueplus.com" className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
+                <a
+                  href="mailto:info@efvertical.com"
+                  className="flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors"
+                >
                   <Mail className="h-4 w-4" />
-                  info@strategicvalueplus.com
-                </Link>
+                  info@efvertical.com
+                </a>
               </li>
               <li>
-                <Link href="tel:+1-555-123-4567" className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
+                <a
+                  href="tel:+18055841157"
+                  className="flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors"
+                >
                   <Phone className="h-4 w-4" />
-                  (555) 123-4567
-                </Link>
+                  805-584-1157
+                </a>
               </li>
             </ul>
+            <p className="text-xs text-white/50 leading-relaxed">
+              Platform certificates document completion of EFVS training. They do
+              not constitute an FAA Remote Pilot Certificate or replace the FAA
+              certification process.
+            </p>
           </div>
         </div>
 
-        <Separator className="my-8 bg-gray-800" />
+        <Separator className="my-8 bg-white/10" />
 
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-gray-400">
-            © {new Date().getFullYear()} Strategic Value+ Solutions. All rights reserved.
+          <p className="text-sm text-white/60">
+            © {new Date().getFullYear()} Eagle Flight Vertical Solutions® · A dba
+            of Aviante HWC, Inc.
           </p>
           <div className="flex gap-6">
-            {footerLinks.legal.map((link) => (
+            {legalLinks.map((link) => (
               <Link
                 key={link.title}
                 href={link.href}
-                className="text-sm text-gray-400 hover:text-white transition-colors"
+                className="text-sm text-white/60 hover:text-white transition-colors"
               >
                 {link.title}
               </Link>

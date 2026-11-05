@@ -24,7 +24,7 @@ interface SendEmailParams {
  * This integrates with the existing Azure AD email infrastructure
  */
 export async function sendEmail(params: SendEmailParams): Promise<void> {
-  const { to, cc, bcc, subject, html, text, attachments } = params;
+  const { to, cc, bcc, subject, html, attachments } = params;
 
   // Check if email is configured
   if (!isEmailConfigured()) {
@@ -42,8 +42,8 @@ export async function sendEmail(params: SendEmailParams): Promise<void> {
     const tenantId = process.env.AZURE_TENANT_ID;
     const clientId = process.env.AZURE_CLIENT_ID;
     const clientSecret = process.env.AZURE_CLIENT_SECRET;
-    const fromEmail = process.env.SMTP_FROM_EMAIL || "noreply@strategicvalueplus.com";
-    const fromName = process.env.SMTP_FROM_NAME || "Strategic Value Plus";
+    const fromEmail = process.env.SMTP_FROM_EMAIL || "noreply@efvertical.com";
+    const fromName = process.env.SMTP_FROM_NAME || "EFVS Academy";
 
     // Get access token
     const tokenResponse = await fetch(
@@ -70,7 +70,19 @@ export async function sendEmail(params: SendEmailParams): Promise<void> {
     const accessToken = tokenData.access_token;
 
     // Build email payload
-    const emailPayload: any = {
+    interface GraphMailBody {
+      message: {
+        subject: string;
+        body: { contentType: string; content: string };
+        from: { emailAddress: { address: string; name: string } };
+        toRecipients: { emailAddress: { address: string } }[];
+        ccRecipients?: { emailAddress: { address: string } }[];
+        bccRecipients?: { emailAddress: { address: string } }[];
+        attachments?: Record<string, unknown>[];
+      };
+      saveToSentItems: boolean;
+    }
+    const emailPayload: GraphMailBody = {
       message: {
         subject,
         body: {

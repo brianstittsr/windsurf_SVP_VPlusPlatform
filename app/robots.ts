@@ -1,19 +1,14 @@
 import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = "https://strategicvalueplus.com";
+  const baseUrl = "https://academy.efvertical.com";
 
   return {
     rules: [
       {
         userAgent: "*",
         allow: "/",
-        disallow: [
-          "/portal/",
-          "/api/",
-          "/_next/",
-          "/admin/",
-        ],
+        disallow: ["/portal/", "/api/", "/_next/", "/admin/"],
       },
       {
         userAgent: "Googlebot",

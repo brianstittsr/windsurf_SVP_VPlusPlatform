@@ -2,14 +2,14 @@ import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Strategic Value+ | Transforming U.S. Manufacturing",
-    short_name: "Strategic Value+",
+    name: "EFVS UAS Training Academy",
+    short_name: "EFVS Academy",
     description:
-      "We help small- and mid-sized U.S. manufacturers win OEM contracts through supplier qualification, ISO certification, and operational readiness.",
+      "FAA Part 107 Remote Pilot certification preparation and specialized UAS training from Eagle Flight Vertical Solutions.",
     start_url: "/",
     display: "standalone",
-    background_color: "#000000",
-    theme_color: "#37ca37",
+    background_color: "#071628",
+    theme_color: "#071628",
     orientation: "portrait-primary",
     icons: [
       {
@@ -25,12 +25,12 @@ export default function manifest(): MetadataRoute.Manifest {
         purpose: "any",
       },
       {
-        src: "/VPlus_logo.webp",
+        src: "/images/efvs-mark-light.png",
         sizes: "any",
-        type: "image/webp",
+        type: "image/png",
       },
     ],
-    categories: ["business", "productivity"],
+    categories: ["education"],
     lang: "en-US",
     dir: "ltr",
   };

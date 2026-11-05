@@ -8,12 +8,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { findAndLinkTeamMember } from "@/lib/auth-team-member-link";
+
 
 export default function SignInPage() {
   const router = useRouter();
@@ -26,9 +33,9 @@ export default function SignInPage() {
 
   // Load saved credentials on mount
   useEffect(() => {
-    const savedEmail = localStorage.getItem("svp_remembered_email");
-    const savedRememberMe = localStorage.getItem("svp_remember_me") === "true";
-    
+    const savedEmail = localStorage.getItem("efvs_remembered_email");
+    const savedRememberMe = localStorage.getItem("efvs_remember_me") === "true";
+
     if (savedEmail && savedRememberMe) {
       setEmail(savedEmail);
       setRememberMe(true);
@@ -41,13 +48,12 @@ export default function SignInPage() {
     setIsLoading(true);
 
     try {
-      // Save or clear remembered credentials
       if (rememberMe) {
-        localStorage.setItem("svp_remembered_email", email);
-        localStorage.setItem("svp_remember_me", "true");
+        localStorage.setItem("efvs_remembered_email", email);
+        localStorage.setItem("efvs_remember_me", "true");
       } else {
-        localStorage.removeItem("svp_remembered_email");
-        localStorage.removeItem("svp_remember_me");
+        localStorage.removeItem("efvs_remembered_email");
+        localStorage.removeItem("efvs_remember_me");
       }
 
       if (!email || !password) {
@@ -56,94 +62,83 @@ export default function SignInPage() {
         return;
       }
 
-      let firebaseUid: string | null = null;
-      let userName: string | null = null;
+      if (!auth) {
+        setError("Authentication is not configured. Please contact support.");
+        setIsLoading(false);
+        return;
+      }
 
-      // Try Firebase Auth sign-in if available
-      if (auth) {
-        try {
-          const userCredential = await signInWithEmailAndPassword(auth, email, password);
-          firebaseUid = userCredential.user.uid;
-          userName = userCredential.user.displayName;
-
-          // Check if this email matches an existing Team Member and link them
-          // This handles the case where a Team Member exists but hasn't been linked yet
-          const teamMember = await findAndLinkTeamMember(email, firebaseUid);
-          if (teamMember) {
-            console.log(`Linked to Team Member: ${teamMember.firstName} ${teamMember.lastName}`);
-            sessionStorage.setItem("svp_team_member_id", teamMember.id);
-            sessionStorage.setItem("svp_user_role", teamMember.role);
-            sessionStorage.setItem("svp_user_name", `${teamMember.firstName} ${teamMember.lastName}`);
-          }
-        } catch (authError: any) {
-          // Handle specific Firebase Auth errors
-          if (authError.code === "auth/user-not-found") {
-            setError("No account found with this email. Please sign up first.");
-            setIsLoading(false);
-            return;
-          }
-          if (authError.code === "auth/wrong-password" || authError.code === "auth/invalid-credential") {
-            setError("Invalid email or password. Please try again.");
-            setIsLoading(false);
-            return;
-          }
-          console.error("Firebase Auth error:", authError);
-          // Fall through to session-based auth for demo
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const idToken = await userCredential.user.getIdToken();
+        const profileResponse = await fetch("/api/profile/bootstrap", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+          body: JSON.stringify({}),
+        });
+        if (!profileResponse.ok) {
+          const profileResult = await profileResponse.json();
+          throw new Error(profileResult.error || "Student profile setup requires EFVS support");
         }
+      } catch (authError: unknown) {
+        const code = (authError as { code?: string }).code;
+        if (code === "auth/user-not-found") {
+          setError("No account found with this email. Please sign up first.");
+          setIsLoading(false);
+          return;
+        }
+        if (
+          code === "auth/wrong-password" ||
+          code === "auth/invalid-credential"
+        ) {
+          setError("Invalid email or password. Please try again.");
+          setIsLoading(false);
+          return;
+        }
+        throw authError;
       }
 
-      // Store session info
-      sessionStorage.setItem("svp_authenticated", "true");
-      sessionStorage.setItem("svp_user_email", email);
-      if (firebaseUid) {
-        sessionStorage.setItem("svp_firebase_uid", firebaseUid);
-      }
-      if (userName) {
-        sessionStorage.setItem("svp_user_name", userName);
-      }
-      
-      // Redirect to portal
-      router.push("/portal");
-    } catch (err) {
-      setError("An error occurred during sign in. Please try again.");
+      const requestedPath = new URLSearchParams(window.location.search).get("next") || "/portal";
+      router.push(requestedPath.startsWith("/portal") ? requestedPath : "/portal");
+    } catch (signInError) {
+      setError(signInError instanceof Error ? signInError.message : "An error occurred during sign in. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-grid-slate-200/50 dark:bg-grid-slate-700/25 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
-      
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8f7f1] p-4">
       <div className="relative z-10 w-full max-w-md">
         {/* Logo and Branding */}
         <div className="flex flex-col items-center mb-8">
-          <Link href="/" className="flex flex-col items-center gap-3 group">
-            <div className="relative">
-              <div className="absolute -inset-2 bg-gradient-to-r from-[#C8A951] to-[#a08840] rounded-full blur-lg opacity-30 group-hover:opacity-50 transition-opacity" />
+          <Link href="/" className="flex flex-col items-center gap-3">
+            <div className="bg-[#071628] rounded-xl px-6 py-4">
               <Image
-                src="/VPlus_logo.webp"
-                alt="Strategic Value+ Logo"
-                width={80}
-                height={80}
-                className="relative h-20 w-auto"
+                src="/images/efvs-logo-transparent.png"
+                alt="Eagle Flight Vertical Solutions"
+                width={200}
+                height={60}
+                className="h-14 w-auto"
                 priority
               />
             </div>
-            <div className="text-center">
-              <h1 className="text-2xl font-bold text-foreground">Strategic Value+</h1>
-              <p className="text-sm text-muted-foreground">Transforming U.S. Manufacturing</p>
+            <div className="text-center mt-2">
+              <p className="text-sm font-semibold tracking-[0.2em] text-[#1478ac] font-display">
+                UAS TRAINING ACADEMY
+              </p>
             </div>
           </Link>
         </div>
 
         {/* Sign In Card */}
-        <Card className="shadow-xl border-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
+        <Card className="shadow-xl border-[#d9d8ce]">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-2xl text-center">Welcome Back</CardTitle>
+            <CardTitle className="text-2xl text-center font-display">
+              Welcome Back
+            </CardTitle>
             <CardDescription className="text-center">
-              Sign in to access your V+ Portal
+              Sign in to your EFVS Academy account
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -154,13 +149,13 @@ export default function SignInPage() {
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
-              
+
               <div className="space-y-2">
                 <Label htmlFor="email">Email Address</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@company.com"
+                  placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -168,12 +163,12 @@ export default function SignInPage() {
                   className="h-11"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
-                  <Link 
-                    href="/forgot-password" 
+                  <Link
+                    href="/forgot-password"
                     className="text-sm text-primary hover:underline"
                   >
                     Forgot password?
@@ -208,19 +203,21 @@ export default function SignInPage() {
                 <Checkbox
                   id="remember"
                   checked={rememberMe}
-                  onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                  onCheckedChange={(checked) =>
+                    setRememberMe(checked as boolean)
+                  }
                 />
-                <Label 
-                  htmlFor="remember" 
+                <Label
+                  htmlFor="remember"
                   className="text-sm font-normal cursor-pointer"
                 >
                   Remember me
                 </Label>
               </div>
 
-              <Button 
-                type="submit" 
-                className="w-full h-11 bg-gradient-to-r from-[#C8A951] to-[#a08840] hover:from-[#b89841] hover:to-[#907830] text-white font-semibold"
+              <Button
+                type="submit"
+                className="w-full h-11 bg-[#1478ac] hover:bg-[#318dc1] text-white font-semibold"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -235,38 +232,20 @@ export default function SignInPage() {
             </form>
           </CardContent>
           <CardFooter className="flex flex-col gap-4 pt-0">
-            <div className="relative w-full">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white dark:bg-slate-900 px-2 text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-            
-            <Button 
-              variant="outline" 
-              className="w-full h-11"
-              onClick={() => {
-                // Microsoft SSO would go here
-                router.push("/api/auth/microsoft");
-              }}
-            >
-              <svg className="mr-2 h-4 w-4" viewBox="0 0 21 21" fill="none">
-                <path d="M10 0H0V10H10V0Z" fill="#F25022"/>
-                <path d="M21 0H11V10H21V0Z" fill="#7FBA00"/>
-                <path d="M10 11H0V21H10V11Z" fill="#00A4EF"/>
-                <path d="M21 11H11V21H21V11Z" fill="#FFB900"/>
-              </svg>
-              Sign in with Microsoft
-            </Button>
-
             <p className="text-center text-sm text-muted-foreground">
               Don&apos;t have an account?{" "}
-              <Link href="/sign-up" className="text-primary hover:underline font-medium">
-                Sign up
+              <Link
+                href="/sign-up"
+                onClick={(event) => {
+                  const next = new URLSearchParams(window.location.search).get("next");
+                  if (next?.startsWith("/portal")) {
+                    event.preventDefault();
+                    router.push(`/sign-up?next=${encodeURIComponent(next)}`);
+                  }
+                }}
+                className="text-primary hover:underline font-medium"
+              >
+                Register
               </Link>
             </p>
           </CardFooter>
@@ -275,9 +254,13 @@ export default function SignInPage() {
         {/* Footer */}
         <p className="mt-6 text-center text-xs text-muted-foreground">
           By signing in, you agree to our{" "}
-          <Link href="/terms" className="hover:underline">Terms of Service</Link>
-          {" "}and{" "}
-          <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
+          <Link href="/terms" className="hover:underline">
+            Terms of Service
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy" className="hover:underline">
+            Privacy Policy
+          </Link>
         </p>
       </div>
     </div>
