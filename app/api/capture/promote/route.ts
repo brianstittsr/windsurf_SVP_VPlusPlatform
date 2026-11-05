@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
         solicitationNumber: n.solicitationNumber,
         agency: n.department || n.subTier,
         office: n.office,
-        setAside: n.setAside,
+        setAside: n.typeOfSetAsideDescription || n.typeOfSetAside,
         naicsCode: n.naicsCode,
         description: n.description,
         responseDeadLine: n.responseDeadLine,

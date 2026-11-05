@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
       agency: notice.department || notice.subTier || "",
       office: notice.office || "",
       type: "rfp",
-      setAside: notice.setAside || undefined,
+      setAside: notice.typeOfSetAsideDescription || notice.typeOfSetAside || undefined,
       naicsCode: notice.naicsCode || undefined,
       description: description || notice.description || undefined,
       responseDue: notice.responseDeadLine

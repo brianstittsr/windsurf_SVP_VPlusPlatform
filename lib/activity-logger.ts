@@ -36,7 +36,8 @@ export type EntityType =
   | "settings"
   | "capture-client"
   | "capture-opportunity"
-  | "capture-task";
+  | "capture-task"
+  | "capture-match";
 
 export interface LogActivityParams {
   type: ActivityType;

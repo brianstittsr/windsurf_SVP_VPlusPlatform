@@ -92,7 +92,7 @@ export default function SolicitationsPage() {
           agency: n.department || n.subTier,
           office: n.office,
           type: n.type,
-          setAside: n.setAside,
+          setAside: n.typeOfSetAsideDescription || n.typeOfSetAside,
           naicsCode: n.naicsCode,
           responseDeadline: n.responseDeadLine,
           samUrl: n.uiLink || `https://sam.gov/opp/${n.noticeId}/view`,
@@ -247,7 +247,7 @@ export default function SolicitationsPage() {
               {
                 solicitation: n.solicitationNumber,
                 agency: n.department || n.subTier,
-                setAside: n.setAside,
+                setAside: n.typeOfSetAsideDescription || n.typeOfSetAside,
                 naics: n.naicsCode,
                 due: n.responseDeadLine,
                 url: n.uiLink || `https://sam.gov/opp/${n.noticeId}/view`,

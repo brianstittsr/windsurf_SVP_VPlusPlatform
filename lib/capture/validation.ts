@@ -251,6 +251,10 @@ export const savedSearchSchema = z.object({
   query: z.string().optional(),
   naicsCode: z.string().optional(),
   setAside: z.string().optional(),
+  /** SAM procurement-type codes filter, e.g. "o,k,r". */
+  ptype: z.string().optional(),
+  /** Custom posted-date lookback in days (default comes from settings/30). */
+  daysBack: z.number().int().min(1).max(365).optional(),
   isActive: z.boolean().default(true),
 });
 

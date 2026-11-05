@@ -41,12 +41,18 @@ import {
   Building,
   Calendar,
   DollarSign,
+  ExternalLink,
+  Landmark,
   Target,
 } from "lucide-react";
-import { db } from "@/lib/firebase";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { auth, db } from "@/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 import { collection, query, orderBy, getDocs, deleteDoc, doc, Timestamp } from "firebase/firestore";
 import { COLLECTIONS, type OpportunityDoc } from "@/lib/schema";
 import { logActivity } from "@/lib/activity-logger";
+import { captureJson } from "@/lib/capture/api-client";
+import { useUserProfile } from "@/contexts/user-profile-context";
 
 interface OpportunityDisplay {
   id: string;
@@ -93,14 +99,68 @@ function formatDate(date: Date) {
   });
 }
 
+interface SamMatch {
+  id: string;
+  title?: string;
+  agency?: string;
+  solicitationNumber?: string;
+  naicsCode?: string;
+  setAside?: string;
+  score?: number;
+  responseDeadline?: string;
+  samUrl?: string;
+}
+
+interface SamPursuit {
+  id: string;
+  title?: string;
+  stage?: string;
+  agency?: string;
+  solicitationNumber?: string;
+}
+
+interface SamData {
+  hasCompany: boolean;
+  companyName?: string;
+  matches: SamMatch[];
+  pursuits: SamPursuit[];
+}
+
 export default function OpportunitiesPage() {
+  const { profile } = useUserProfile();
+  const canOpenCapture = ["admin", "team", "team_member"].includes(profile.role || "");
   const [opportunities, setOpportunities] = useState<OpportunityDisplay[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [stageFilter, setStageFilter] = useState("All Stages");
+  const [sam, setSam] = useState<SamData | null>(null);
+  const [samLoading, setSamLoading] = useState(true);
+  const [samError, setSamError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchOpportunities();
+  }, []);
+
+  useEffect(() => {
+    if (!auth) {
+      setSamLoading(false);
+      return;
+    }
+    return onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        setSamLoading(false);
+        setSamError("Sign in to see SAM.gov matches for your company");
+        return;
+      }
+      try {
+        const res = await captureJson<{ data: SamData }>("/api/opportunities/mine");
+        setSam(res.data);
+      } catch (e) {
+        setSamError(e instanceof Error ? e.message : "Failed to load SAM matches");
+      } finally {
+        setSamLoading(false);
+      }
+    });
   }, []);
 
   async function fetchOpportunities() {
@@ -121,7 +181,7 @@ export default function OpportunitiesPage() {
         oppsData.push({
           id: doc.id,
           name: data.name || "Unnamed Opportunity",
-          company: (data as any).organizationName || "",
+          company: data.organizationName || "",
           stage: data.stage || "lead",
           value: data.value || 0,
           probability: data.probability || 0,
@@ -270,6 +330,19 @@ export default function OpportunitiesPage() {
         </Card>
       </div>
 
+      <Tabs defaultValue="pipeline" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
+          <TabsTrigger value="sam" className="flex items-center gap-2">
+            <Landmark className="h-4 w-4" />
+            SAM.gov Matches
+            {sam && sam.matches.length > 0 && (
+              <Badge variant="secondary" className="ml-1">{sam.matches.length}</Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="pipeline" className="space-y-6">
       {/* Filters */}
       <Card>
         <CardContent className="pt-6">
@@ -418,6 +491,155 @@ export default function OpportunitiesPage() {
           </Table>
         </CardContent>
       </Card>
+        </TabsContent>
+
+        {/* ================= SAM.gov Matches ================= */}
+        <TabsContent value="sam" className="space-y-6">
+          {samLoading ? (
+            <Card>
+              <CardContent className="pt-6 space-y-3">
+                <Skeleton className="h-5 w-48" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </CardContent>
+            </Card>
+          ) : samError ? (
+            <Card>
+              <CardContent className="pt-6 text-center py-12">
+                <Landmark className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                <p className="text-muted-foreground">{samError}</p>
+              </CardContent>
+            </Card>
+          ) : !sam?.hasCompany ? (
+            <Card>
+              <CardContent className="pt-6 text-center py-12">
+                <Landmark className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                <p className="text-lg font-medium mb-2">No company profile linked</p>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                  Complete your client onboarding with your GovCon profile (NAICS, set-asides,
+                  keywords) and we&apos;ll match SAM.gov opportunities to your company.
+                </p>
+                <Button asChild>
+                  <Link href="/onboarding/client">Complete Company Profile</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              {/* Active pursuits */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Active Pursuits — {sam.companyName}</CardTitle>
+                  <CardDescription>
+                    SAM.gov opportunities already in your capture pipeline
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {sam.pursuits.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No active pursuits yet.</p>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Opportunity</TableHead>
+                          <TableHead>Agency</TableHead>
+                          <TableHead>Stage</TableHead>
+                          <TableHead className="w-[50px]"></TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {sam.pursuits.map((p) => (
+                          <TableRow key={p.id}>
+                            <TableCell>
+                              {canOpenCapture ? (
+                                <Link href={`/portal/capture/opportunities/${p.id}`} className="font-medium hover:underline">
+                                  {p.title || "Untitled"}
+                                </Link>
+                              ) : (
+                                <span className="font-medium">{p.title || "Untitled"}</span>
+                              )}
+                              {p.solicitationNumber && (
+                                <p className="text-xs text-muted-foreground">{p.solicitationNumber}</p>
+                              )}
+                            </TableCell>
+                            <TableCell>{p.agency || "—"}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className="capitalize">{p.stage || "found"}</Badge>
+                            </TableCell>
+                            <TableCell></TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Pending matches */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>New Matches ({sam.matches.length})</CardTitle>
+                  <CardDescription>
+                    SAM.gov notices scored against your GovCon profile — our team reviews and pursues qualifying matches
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {sam.matches.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      No new matches right now. Matching runs several times a day against your profile.
+                    </p>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Notice</TableHead>
+                          <TableHead>Agency</TableHead>
+                          <TableHead>Set-Aside</TableHead>
+                          <TableHead>Score</TableHead>
+                          <TableHead>Response Due</TableHead>
+                          <TableHead className="w-[50px]"></TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {sam.matches.map((m) => (
+                          <TableRow key={m.id}>
+                            <TableCell>
+                              <span className="font-medium">{m.title || "Untitled notice"}</span>
+                              {m.solicitationNumber && (
+                                <p className="text-xs text-muted-foreground">{m.solicitationNumber}</p>
+                              )}
+                              {m.naicsCode && (
+                                <p className="text-xs text-muted-foreground">NAICS {m.naicsCode}</p>
+                              )}
+                            </TableCell>
+                            <TableCell>{m.agency || "—"}</TableCell>
+                            <TableCell>{m.setAside || "Unrestricted"}</TableCell>
+                            <TableCell>
+                              <Badge variant="secondary">{m.score ?? "—"}</Badge>
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {m.responseDeadline ? formatDate(new Date(m.responseDeadline)) : "—"}
+                            </TableCell>
+                            <TableCell>
+                              {m.samUrl && (
+                                <Button variant="ghost" size="icon" asChild>
+                                  <a href={m.samUrl} target="_blank" rel="noreferrer" aria-label="View on SAM.gov">
+                                    <ExternalLink className="h-4 w-4" />
+                                  </a>
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+            </>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
