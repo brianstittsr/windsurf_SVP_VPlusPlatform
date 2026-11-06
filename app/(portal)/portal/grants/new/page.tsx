@@ -10,8 +10,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { captureJson } from "@/lib/capture/api-client";
+import { GrantedSearch } from "@/components/grants/granted-search";
 import type { GrantOpportunityDoc } from "@/lib/schema";
-import { ArrowLeft, Globe, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, Globe, Loader2, Search, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 interface SerializedGrant extends Omit<GrantOpportunityDoc, "deadlineAt" | "createdAt" | "updatedAt" | "analyzedAt" | "submittedAt"> {
@@ -76,7 +77,7 @@ export default function NewGrantPage() {
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto space-y-6">
+    <div className="p-6 max-w-4xl mx-auto space-y-6">
       <Button variant="ghost" size="sm" asChild>
         <Link href="/portal/grants">
           <ArrowLeft className="h-4 w-4 mr-1" /> Back to board
@@ -90,13 +91,20 @@ export default function NewGrantPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="url">
+      <Tabs defaultValue="discover">
         <TabsList>
+          <TabsTrigger value="discover">
+            <Search className="h-4 w-4 mr-1.5" /> Find Grants
+          </TabsTrigger>
           <TabsTrigger value="url">
             <Globe className="h-4 w-4 mr-1.5" /> Analyze URL
           </TabsTrigger>
           <TabsTrigger value="manual">Manual entry</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="discover" className="mt-4">
+          <GrantedSearch />
+        </TabsContent>
 
         <TabsContent value="url">
           <Card>
