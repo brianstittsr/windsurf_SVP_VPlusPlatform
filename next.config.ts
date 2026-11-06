@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Keep Node-native document parsers out of the bundle (Grant Builder markdown conversion)
+  serverExternalPackages: ["pdf-parse", "mammoth"],
+
   // Image optimization
   images: {
     formats: ["image/avif", "image/webp"],

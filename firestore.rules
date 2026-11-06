@@ -587,6 +587,17 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // Grant Builder — API/Admin SDK only (staff-gated via /api/grants)
+    match /grantOpportunities/{docId} {
+      allow read, write: if false;
+    }
+    match /grantOrgProfiles/{docId} {
+      allow read, write: if false;
+    }
+    match /grantDocuments/{docId} {
+      allow read, write: if false;
+    }
+
     // =========================================================================
     // Mattermost Playbooks Collections
     // TODO: Restrict to authenticated users in production

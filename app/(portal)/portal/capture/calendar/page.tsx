@@ -15,13 +15,22 @@ interface CalItem {
   date: Date;
 }
 
+interface GrantCalItem {
+  grant: { id: string; title: string };
+  date: Date;
+}
+
 export default function CaptureCalendarPage() {
   const [opps, setOpps] = useState<CaptureOpportunity[]>([]);
+  const [grants, setGrants] = useState<Array<{ id: string; title: string; stage: string; deadlineAt?: string }>>([]);
   const [cursor, setCursor] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
 
   useEffect(() => {
     captureJson<{ opportunities: CaptureOpportunity[] }>("/api/capture/opportunities")
       .then((d) => setOpps(d.opportunities))
+      .catch((e) => console.error(e));
+    captureJson<{ grants: Array<{ id: string; title: string; stage: string; deadlineAt?: string }> }>("/api/grants")
+      .then((d) => setGrants(d.grants))
       .catch((e) => console.error(e));
   }, []);
 
@@ -42,6 +51,20 @@ export default function CaptureCalendarPage() {
     }
     return map;
   }, [opps]);
+
+  const grantItemsByDay = useMemo(() => {
+    const map = new Map<string, GrantCalItem[]>();
+    for (const g of grants) {
+      if (!g.deadlineAt || g.stage === "awarded" || g.stage === "denied") continue;
+      const d = new Date(g.deadlineAt);
+      if (Number.isNaN(d.getTime())) continue;
+      const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+      const list = map.get(key) || [];
+      list.push({ grant: { id: g.id, title: g.title }, date: d });
+      map.set(key, list);
+    }
+    return map;
+  }, [grants]);
 
   const year = cursor.getFullYear();
   const month = cursor.getMonth();
@@ -82,11 +105,24 @@ export default function CaptureCalendarPage() {
             {Array.from({ length: daysInMonth }).map((_, i) => {
               const day = i + 1;
               const items = itemsByDay.get(`${year}-${month}-${day}`) || [];
+              const grantItems = grantItemsByDay.get(`${year}-${month}-${day}`) || [];
+              const overflow = items.length + grantItems.length - 3;
               return (
                 <div key={day} className={`bg-background min-h-24 p-1.5 ${isToday(day) ? "ring-2 ring-primary ring-inset" : ""}`}>
                   <p className="text-xs text-muted-foreground mb-1">{day}</p>
                   <div className="space-y-1">
-                    {items.slice(0, 3).map((item, j) => (
+                    {grantItems.slice(0, 3).map((item, j) => (
+                      <Link key={`grant-${item.grant.id}-${j}`} href={`/portal/grants/${item.grant.id}`}>
+                        <Badge
+                          variant="secondary"
+                          className="w-full justify-start text-xs truncate bg-violet-100 text-violet-800"
+                          title={`${item.grant.title} — grant deadline`}
+                        >
+                          G: {item.grant.title}
+                        </Badge>
+                      </Link>
+                    ))}
+                    {items.slice(0, Math.max(0, 3 - grantItems.length)).map((item, j) => (
                       <Link key={`${item.opp.id}-${item.kind}-${j}`} href={`/portal/capture/opportunities/${item.opp.id}`}>
                         <Badge
                           variant="secondary"
@@ -99,8 +135,8 @@ export default function CaptureCalendarPage() {
                         </Badge>
                       </Link>
                     ))}
-                    {items.length > 3 && (
-                      <p className="text-[10px] text-muted-foreground">+{items.length - 3} more</p>
+                    {overflow > 0 && (
+                      <p className="text-[10px] text-muted-foreground">+{overflow} more</p>
                     )}
                   </div>
                 </div>
@@ -116,6 +152,9 @@ export default function CaptureCalendarPage() {
         </span>
         <span className="flex items-center gap-1.5">
           <span className="w-3 h-3 rounded bg-red-200 inline-block" /> Response due
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded bg-violet-200 inline-block" /> Grant deadline
         </span>
       </div>
     </div>

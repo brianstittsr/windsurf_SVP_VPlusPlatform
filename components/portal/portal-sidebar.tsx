@@ -45,6 +45,7 @@ import {
   ClipboardList,
   Package,
   Database,
+  Sparkles,
 } from "lucide-react";
 
 const studentItems = [
@@ -65,6 +66,7 @@ const instructorItems = [
 
 const adminItems = [
   { title: "Reports", href: "/portal/reports", icon: BarChart3 },
+  { title: "Grant Builder", href: "/portal/grants", icon: Sparkles },
   { title: "Users", href: "/portal/admin/users", icon: Users },
   { title: "Courses", href: "/portal/admin/courses", icon: BookOpen },
   { title: "Digital Products", href: "/portal/admin/products", icon: Package },

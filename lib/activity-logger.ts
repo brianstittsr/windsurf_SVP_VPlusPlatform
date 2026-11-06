@@ -34,7 +34,10 @@ export type EntityType =
   | "capture-client"
   | "capture-opportunity"
   | "capture-task"
-  | "capture-match";
+  | "capture-match"
+  | "grant"
+  | "grant-org-profile"
+  | "grant-document";
 
 export interface LogActivityParams {
   type: ActivityType;

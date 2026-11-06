@@ -1169,7 +1169,7 @@ export interface CalendarEventDoc {
   startDate: Timestamp;
   endDate: Timestamp;
   allDay?: boolean;
-  type: 'meeting' | 'rock' | 'todo' | 'issue' | 'custom' | 'one-to-one';
+  type: 'meeting' | 'rock' | 'todo' | 'issue' | 'custom' | 'one-to-one' | 'grant-deadline';
   color?: string;
   attendees?: string[];
   location?: string;
@@ -1186,6 +1186,8 @@ export interface CalendarEventDoc {
   meetingId?: string;
   // 1-to-1 reference
   oneToOneQueueItemId?: string;
+  // Grant Builder reference
+  grantId?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -1929,6 +1931,13 @@ export const COLLECTIONS = {
   STUDY_GUIDE_VOCAB: "studyGuideVocab",
   STUDY_GUIDE_META: "studyGuideMeta",
   RATE_LIMITS: "registrationRateLimits",
+
+  // ==========================================================================
+  // Grant Builder collections
+  // ==========================================================================
+  GRANT_OPPORTUNITIES: "grantOpportunities",
+  GRANT_ORG_PROFILES: "grantOrgProfiles",
+  GRANT_DOCUMENTS: "grantDocuments",
 } as const;
 
 // ============================================================================
@@ -2635,6 +2644,100 @@ export const studentDocumentsCollection = () => getCollection<StudentDocumentDoc
 export const paymentsCollection = () => getCollection<PaymentDoc>(COLLECTIONS.PAYMENTS);
 export const discountCodesCollection = () => getCollection<DiscountCodeDoc>(COLLECTIONS.DISCOUNT_CODES);
 export const auditLogsCollection = () => getCollection<AuditLogDoc>(COLLECTIONS.AUDIT_LOGS);
+
+// ============================================================================
+// Grant Builder
+// ============================================================================
+
+export type GrantStage =
+  | "discovered"
+  | "analyzed"
+  | "drafting"
+  | "review"
+  | "submitted"
+  | "awarded"
+  | "denied";
+
+export interface GrantRequirement {
+  id: string;
+  text: string;
+  met: boolean;
+  notes?: string;
+}
+
+export type GrantQuestionStatus = "pending" | "drafted" | "accepted" | "edited";
+
+export interface GrantQuestion {
+  id: string;
+  text: string;
+  required: boolean;
+  aiDraft?: string;
+  response?: string;
+  status: GrantQuestionStatus;
+  answeredAt?: string;
+  answeredBy?: string;
+}
+
+/** A grant opportunity tracked through the build pipeline. */
+export interface GrantOpportunityDoc {
+  id: string;
+  title: string;
+  funder?: string;
+  sourceUrl?: string;
+  description?: string;
+  eligibility?: string;
+  awardMin?: number;
+  awardMax?: number;
+  deadlineAt?: Timestamp;
+  stage: GrantStage;
+  aiSummary?: string;
+  analyzedAt?: Timestamp;
+  requirements: GrantRequirement[];
+  questions: GrantQuestion[];
+  orgProfileId?: string;
+  customerId?: string;
+  calendarEventId?: string;
+  submittedAt?: Timestamp;
+  outcomeNotes?: string;
+  createdBy: string;
+  createdByName?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+/** AI-extracted profile of a company/nonprofit used as grant input. */
+export interface GrantOrgProfileDoc {
+  id: string;
+  name: string;
+  websiteUrl?: string;
+  mission?: string;
+  productsServices?: string[];
+  populationServed?: string;
+  keyPrograms?: string[];
+  extractedMarkdown?: string;
+  customerId?: string;
+  createdBy: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export type GrantDocumentStatus = "converted" | "failed" | "processing";
+
+/** An uploaded input document converted to markdown. */
+export interface GrantDocumentDoc {
+  id: string;
+  grantId?: string;
+  orgProfileId?: string;
+  fileName: string;
+  contentType: string;
+  sizeBytes: number;
+  storagePath: string;
+  markdown?: string;
+  status: GrantDocumentStatus;
+  errorMessage?: string;
+  uploadedBy: string;
+  createdAt: Timestamp;
+}
 
 // ============================================================================
 // Database Schema Documentation
