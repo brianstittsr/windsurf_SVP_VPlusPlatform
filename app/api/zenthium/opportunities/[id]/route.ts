@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase-admin";
 import { COLLECTIONS } from "@/lib/schema";
 import { Timestamp } from "firebase-admin/firestore";
+import { requireGrantStaff } from "@/lib/grants/access";
 
 function serializeTimestamp(value: unknown): unknown {
   return value instanceof Timestamp ? value.toDate().toISOString() : value ?? null;
@@ -18,9 +19,11 @@ function serializeDoc(id: string, data: Record<string, unknown>) {
 }
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const user = await requireGrantStaff(req);
+  if (user instanceof NextResponse) return user;
   if (!adminDb) return NextResponse.json({ error: "Database not initialized" }, { status: 500 });
   const { id } = await params;
   try {
@@ -37,6 +40,8 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const user = await requireGrantStaff(request);
+  if (user instanceof NextResponse) return user;
   if (!adminDb) return NextResponse.json({ error: "Database not initialized" }, { status: 500 });
   const { id } = await params;
   try {
@@ -53,9 +58,12 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const user = await requireGrantStaff(req);
+  if (user instanceof NextResponse) return user;
+  if (user.role !== "admin") return NextResponse.json({ error: "Forbidden: admin role required" }, { status: 403 });
   if (!adminDb) return NextResponse.json({ error: "Database not initialized" }, { status: 500 });
   const { id } = await params;
   try {

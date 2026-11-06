@@ -9,8 +9,10 @@ import { ClientPicker } from "@/components/capture/client-picker";
 import { captureJson } from "@/lib/capture/api-client";
 import type { CaptureOpportunity, CaptureSettingsDoc } from "@/lib/schema";
 import { Plus } from "lucide-react";
+import { useRequireAuth } from "@/lib/hooks/use-auth";
 
 export default function CaptureBoardPage() {
+  const { isLoading: authLoading, isAuthenticated } = useRequireAuth(["admin", "instructor"]);
   const [opps, setOpps] = useState<CaptureOpportunity[]>([]);
   const [settings, setSettings] = useState<CaptureSettingsDoc | null>(null);
   const [clientFilter, setClientFilter] = useState("");
@@ -35,6 +37,8 @@ export default function CaptureBoardPage() {
   if (loading || !settings) return <div className="p-6 text-muted-foreground">Loading board...</div>;
 
   const filtered = opps.filter((o) => (o.boardType || "standard") === boardType);
+
+  if (authLoading || !isAuthenticated) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (
     <div className="p-6 space-y-4 h-full flex flex-col">

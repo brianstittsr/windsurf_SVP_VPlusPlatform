@@ -260,9 +260,9 @@ service cloud.firestore {
     // Strategic Partners - read/write allowed for development
     // TODO: Restrict to authenticated users in production
     match /strategicPartners/{partnerId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
       allow delete: if isAdmin();
     }
 
@@ -273,18 +273,18 @@ service cloud.firestore {
     // Apollo Purchased Contacts - read/write allowed for development
     // TODO: Restrict to authenticated users in production
     match /apolloPurchasedContacts/{contactId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
       allow delete: if isAdmin();
     }
 
     // Apollo Saved Lists - read/write allowed for development
     // TODO: Restrict to authenticated users in production
     match /apolloSavedLists/{listId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
       allow delete: if isAdmin();
     }
 
@@ -295,19 +295,19 @@ service cloud.firestore {
     // ThomasNet Saved Suppliers - read/write allowed for development
     // TODO: Restrict to authenticated users in production
     match /thomasnetSavedSuppliers/{supplierId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // ThomasNet Saved Lists - read/write allowed for development
     // TODO: Restrict to authenticated users in production
     match /thomasnetSavedLists/{listId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // =========================================================================
@@ -317,36 +317,36 @@ service cloud.firestore {
     // Affiliate Biographies - read/write allowed for development
     // TODO: Restrict to authenticated users in production
     match /affiliateBiographies/{bioId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
       allow delete: if isAdmin();
     }
 
     // GAINS Profiles - read/write allowed for development
     // TODO: Restrict to authenticated users in production
     match /gainsProfiles/{profileId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
       allow delete: if isAdmin();
     }
 
     // Contact Spheres - read/write allowed for development
     // TODO: Restrict to authenticated users in production
     match /contactSpheres/{sphereId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
       allow delete: if isAdmin();
     }
 
     // Previous Customers - read/write allowed for development
     // TODO: Restrict to authenticated users in production
     match /previousCustomers/{customersId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
       allow delete: if isAdmin();
     }
 
@@ -405,34 +405,34 @@ service cloud.firestore {
 
     // GoHighLevel Integrations - open for development
     match /gohighlevelIntegrations/{integrationId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // GoHighLevel Sync Logs - open for development
     match /gohighlevelSyncLogs/{logId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // GoHighLevel Workflows - open for development
     match /ghlWorkflows/{workflowId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // GoHighLevel Imported Workflows - open for development
     match /ghlImportedWorkflows/{workflowId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // =========================================================================
@@ -442,50 +442,50 @@ service cloud.firestore {
 
     // Calendar Events - open for development
     match /calendarEvents/{eventId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // 1-to-1 Scheduling Queue - open for development
     match /oneToOneQueue/{queueId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // Team Member Availability - open for development
     match /teamMemberAvailability/{availabilityId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // Bookings - open for development
     match /bookings/{bookingId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // GHL Calendar Events Cache - open for development
     match /ghlCalendarEvents/{eventId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // GHL Sync Status - open for development
     match /ghlSyncStatus/{statusId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // =========================================================================
@@ -495,50 +495,50 @@ service cloud.firestore {
 
     // Traction Rocks - open for development
     match /tractionRocks/{rockId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // Traction Scorecard Metrics - open for development
     match /tractionScorecardMetrics/{metricId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // Traction Issues - open for development
     match /tractionIssues/{issueId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // Traction Todos - open for development
     match /tractionTodos/{todoId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // Traction Meetings - open for development
     match /tractionMeetings/{meetingId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // Traction Team Members - open for development
     match /tractionTeamMembers/{memberId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // =========================================================================
@@ -605,18 +605,18 @@ service cloud.firestore {
 
     // Mattermost Playbooks - open for development
     match /mattermostPlaybooks/{playbookId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // Mattermost Playbook Runs - open for development
     match /mattermostPlaybookRuns/{runId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     // Default deny

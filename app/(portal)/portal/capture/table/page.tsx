@@ -20,8 +20,10 @@ import { ExportButton } from "@/components/capture/export-button";
 import { captureJson } from "@/lib/capture/api-client";
 import type { CaptureOpportunity, CaptureSettingsDoc } from "@/lib/schema";
 import { stagesForBoard } from "@/lib/capture/stages";
+import { useRequireAuth } from "@/lib/hooks/use-auth";
 
 export default function CaptureTablePage() {
+  const { isLoading: authLoading, isAuthenticated } = useRequireAuth(["admin", "instructor"]);
   const [opps, setOpps] = useState<CaptureOpportunity[]>([]);
   const [settings, setSettings] = useState<CaptureSettingsDoc | null>(null);
   const [loading, setLoading] = useState(true);
@@ -46,6 +48,8 @@ export default function CaptureTablePage() {
 
   const allStages = useMemo(() => stagesForBoard("standard"), []);
   const hasFilters = !!(filters.clientId || filters.stage || filters.type);
+
+  if (authLoading || !isAuthenticated) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (
     <div className="p-6 space-y-6">

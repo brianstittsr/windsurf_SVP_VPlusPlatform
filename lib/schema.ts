@@ -586,7 +586,7 @@ export interface TeamMemberDoc {
   avatar?: string;
   linkedIn?: string;
   website?: string;
-  role: "admin" | "instructor" | "student";
+  role: "admin" | "instructor" | "student" | "team" | "affiliate" | "consultant";
   status: "active" | "inactive" | "pending";
   isVeteran?: boolean;
   proStatus?: "inactive" | "active" | "canceled" | "past_due";

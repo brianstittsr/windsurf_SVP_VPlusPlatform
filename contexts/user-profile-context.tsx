@@ -83,7 +83,7 @@ function mapRecordToProfile(record: TeamMemberDoc): Partial<UserProfile> {
     role:
       record.role === "admin"
         ? "admin"
-        : record.role === "instructor"
+        : record.role === "instructor" || record.role === "team"
           ? "instructor"
           : "student",
     isVeteran: recordAny.isVeteran === true,

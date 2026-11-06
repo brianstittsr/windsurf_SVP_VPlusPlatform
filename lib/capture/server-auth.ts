@@ -45,8 +45,12 @@ async function resolveTeamMember(uid: string, email: string) {
 /** Require any authenticated caller. Returns the user or a NextResponse error. */
 export async function requireUser(req: NextRequest): Promise<CaptureUser | NextResponse> {
   if (!adminAuth || !adminDb) {
-    console.warn("[capture] Admin SDK not configured — dev-mode allow. Set FIREBASE_* env vars for real auth.");
-    return DEV_USER;
+    if (process.env.NODE_ENV === "development") {
+      console.warn("[capture] Admin SDK not configured — dev-mode allow. Set FIREBASE_* env vars for real auth.");
+      return DEV_USER;
+    }
+    console.error("[capture] Admin SDK not configured — refusing unauthenticated access");
+    return NextResponse.json({ error: "Authentication service unavailable" }, { status: 503 });
   }
 
   const header = req.headers.get("authorization") || "";

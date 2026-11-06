@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase-admin";
 import { COLLECTIONS } from "@/lib/schema";
 import { Timestamp } from "firebase-admin/firestore";
+import { requireGrantStaff } from "@/lib/grants/access";
 
 function buildIntakeText(opp: Record<string, unknown>): string {
   const line = "─".repeat(60);
@@ -128,6 +129,8 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const user = await requireGrantStaff(request);
+  if (user instanceof NextResponse) return user;
   if (!adminDb) return NextResponse.json({ error: "Database not initialized" }, { status: 500 });
   const { id } = await params;
 

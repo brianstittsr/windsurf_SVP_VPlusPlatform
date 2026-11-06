@@ -21,6 +21,7 @@ import { captureJson } from "@/lib/capture/api-client";
 import type { SamNotice } from "@/lib/capture/sam-search";
 import { ArrowUpRight, BookmarkPlus, ExternalLink, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useRequireAuth } from "@/lib/hooks/use-auth";
 
 interface SavedNotice {
   id: string;
@@ -44,6 +45,7 @@ interface PromoteTarget {
 }
 
 export default function SolicitationsPage() {
+  const { isLoading: authLoading, isAuthenticated } = useRequireAuth(["admin", "instructor"]);
   const [saved, setSaved] = useState<SavedNotice[]>([]);
   const [results, setResults] = useState<SamNotice[]>([]);
   const [searching, setSearching] = useState(false);
@@ -166,6 +168,8 @@ export default function SolicitationsPage() {
       </CardContent>
     </Card>
   );
+
+  if (authLoading || !isAuthenticated) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (
     <div className="p-6 space-y-6">

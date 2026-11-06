@@ -49,3 +49,10 @@ __pycache__/
 nul
 
 .vercel
+
+# python artifacts
+__pycache__/
+*.pyc
+
+# editor workspaces
+*.code-workspace

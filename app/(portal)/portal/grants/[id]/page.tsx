@@ -25,6 +25,7 @@ import type {
 } from "@/lib/schema";
 import { ArrowLeft, Calendar, Download, ExternalLink, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useRequireAuth } from "@/lib/hooks/use-auth";
 
 interface SerializedGrant extends Omit<GrantOpportunityDoc, "deadlineAt" | "createdAt" | "updatedAt" | "analyzedAt" | "submittedAt"> {
   deadlineAt?: string;
@@ -38,6 +39,7 @@ interface DetailResponse {
 }
 
 export default function GrantDetailPage() {
+  const { isLoading: authLoading, isAuthenticated } = useRequireAuth(["admin", "instructor"]);
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
@@ -136,6 +138,8 @@ export default function GrantDetailPage() {
 
   const answered = grant.questions.filter((q) => q.response).length;
   const reqsMet = grant.requirements.filter((r) => r.met).length;
+
+  if (authLoading || !isAuthenticated) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (
     <div className="p-6 space-y-4">

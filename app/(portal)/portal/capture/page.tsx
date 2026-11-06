@@ -10,8 +10,10 @@ import { captureJson } from "@/lib/capture/api-client";
 import type { CaptureOpportunity, CaptureSettingsDoc, CustomerDoc } from "@/lib/schema";
 import { daysUntilDeadline, deadlineStatus } from "@/lib/capture/deadline-status";
 import { Briefcase, Users, Clock, AlertTriangle, Trophy, Plus, Target } from "lucide-react";
+import { useRequireAuth } from "@/lib/hooks/use-auth";
 
 export default function CaptureDashboardPage() {
+  const { isLoading: authLoading, isAuthenticated } = useRequireAuth(["admin", "instructor"]);
   const [opps, setOpps] = useState<CaptureOpportunity[]>([]);
   const [clients, setClients] = useState<CustomerDoc[]>([]);
   const [settings, setSettings] = useState<CaptureSettingsDoc | null>(null);
@@ -68,6 +70,8 @@ export default function CaptureDashboardPage() {
   }, [opps, settings]);
 
   if (loading) return <div className="p-6 text-muted-foreground">Loading capture dashboard...</div>;
+
+  if (authLoading || !isAuthenticated) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (
     <div className="p-6 space-y-6">

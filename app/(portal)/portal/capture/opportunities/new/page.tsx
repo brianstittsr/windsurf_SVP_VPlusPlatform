@@ -15,11 +15,13 @@ import { captureJson } from "@/lib/capture/api-client";
 import type { CaptureOpportunity } from "@/lib/schema";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { useRequireAuth } from "@/lib/hooks/use-auth";
 
 const SET_ASIDES = ["none", "8a", "hubzone", "sdvosb", "wosb", "mbe", "dbw", "unrestricted"];
 const TYPES = ["rfi", "sources-sought", "rfp", "rfq", "grant"];
 
 export default function NewOpportunityPage() {
+  const { isLoading: authLoading, isAuthenticated } = useRequireAuth(["admin", "instructor"]);
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -127,6 +129,8 @@ export default function NewOpportunityPage() {
       setSaving(false);
     }
   };
+
+  if (authLoading || !isAuthenticated) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (
     <div className="p-6 space-y-6 max-w-3xl">

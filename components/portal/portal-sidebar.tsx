@@ -46,6 +46,13 @@ import {
   Package,
   Database,
   Sparkles,
+  Target,
+  Kanban,
+  Briefcase,
+  Crosshair,
+  CalendarDays,
+  Building2,
+  CheckSquare,
 } from "lucide-react";
 
 const studentItems = [
@@ -64,9 +71,20 @@ const instructorItems = [
   { title: "Grading", href: "/portal/grading", icon: ClipboardList },
 ];
 
+const captureItems = [
+  { title: "Capture Dashboard", href: "/portal/capture", icon: Target },
+  { title: "Pipeline Board", href: "/portal/capture/board", icon: Kanban },
+  { title: "Opportunities", href: "/portal/capture/table", icon: Briefcase },
+  { title: "Match Queue", href: "/portal/capture/matches", icon: Crosshair },
+  { title: "Calendar", href: "/portal/capture/calendar", icon: CalendarDays },
+  { title: "Clients", href: "/portal/capture/clients", icon: Building2 },
+  { title: "My Tasks", href: "/portal/capture/tasks", icon: CheckSquare },
+  { title: "Grant Builder", href: "/portal/grants", icon: Sparkles },
+  { title: "Capture Settings", href: "/portal/capture/settings", icon: Settings },
+];
+
 const adminItems = [
   { title: "Reports", href: "/portal/reports", icon: BarChart3 },
-  { title: "Grant Builder", href: "/portal/grants", icon: Sparkles },
   { title: "Users", href: "/portal/admin/users", icon: Users },
   { title: "Courses", href: "/portal/admin/courses", icon: BookOpen },
   { title: "Digital Products", href: "/portal/admin/products", icon: Package },
@@ -96,8 +114,8 @@ export function PortalSidebar() {
         <SidebarMenuButton
           asChild
           isActive={
-            item.href === "/portal"
-              ? pathname === "/portal"
+            item.href === "/portal" || item.href === "/portal/capture"
+              ? pathname === item.href
               : pathname.startsWith(item.href)
           }
           tooltip={item.title}
@@ -145,6 +163,15 @@ export function PortalSidebar() {
             <SidebarGroupLabel>Instructor</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>{renderItems(instructorItems)}</SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {isInstructor && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Capture</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>{renderItems(captureItems)}</SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         )}

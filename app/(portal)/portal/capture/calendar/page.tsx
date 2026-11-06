@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { captureJson } from "@/lib/capture/api-client";
 import type { CaptureOpportunity } from "@/lib/schema";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useRequireAuth } from "@/lib/hooks/use-auth";
 
 interface CalItem {
   opp: CaptureOpportunity;
@@ -21,6 +22,7 @@ interface GrantCalItem {
 }
 
 export default function CaptureCalendarPage() {
+  const { isLoading: authLoading, isAuthenticated } = useRequireAuth(["admin", "instructor"]);
   const [opps, setOpps] = useState<CaptureOpportunity[]>([]);
   const [grants, setGrants] = useState<Array<{ id: string; title: string; stage: string; deadlineAt?: string }>>([]);
   const [cursor, setCursor] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
@@ -73,6 +75,8 @@ export default function CaptureCalendarPage() {
   const today = new Date();
   const isToday = (d: number) =>
     d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+
+  if (authLoading || !isAuthenticated) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (
     <div className="p-6 space-y-4">

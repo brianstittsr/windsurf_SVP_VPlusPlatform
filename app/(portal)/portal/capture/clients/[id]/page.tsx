@@ -27,10 +27,12 @@ import { useUserProfile } from "@/contexts/user-profile-context";
 import type { CustomerDoc, CaptureOpportunity } from "@/lib/schema";
 import { toast } from "sonner";
 import { ArrowLeft, Save, Upload, FileText, Trash2, ExternalLink } from "lucide-react";
+import { useRequireAuth } from "@/lib/hooks/use-auth";
 
 const CERT_KEYS = ["8a", "hubzone", "sdvosb", "vosb", "edwosb", "wosb", "mbe", "dbw"] as const;
 
 export default function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { isLoading: authLoading, isAuthenticated } = useRequireAuth(["admin", "instructor"]);
   const { id } = use(params);
   const router = useRouter();
   const { profile } = useUserProfile();
@@ -166,6 +168,8 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
   };
 
   if (!client) return <div className="p-6 text-muted-foreground">Loading client...</div>;
+
+  if (authLoading || !isAuthenticated) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (
     <div className="p-6 space-y-6">

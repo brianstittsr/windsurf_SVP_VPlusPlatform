@@ -14,12 +14,14 @@ import { GrantedSearch } from "@/components/grants/granted-search";
 import type { GrantOpportunityDoc } from "@/lib/schema";
 import { ArrowLeft, Globe, Loader2, Search, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { useRequireAuth } from "@/lib/hooks/use-auth";
 
 interface SerializedGrant extends Omit<GrantOpportunityDoc, "deadlineAt" | "createdAt" | "updatedAt" | "analyzedAt" | "submittedAt"> {
   deadlineAt?: string;
 }
 
 export default function NewGrantPage() {
+  const { isLoading: authLoading, isAuthenticated } = useRequireAuth(["admin", "instructor"]);
   const router = useRouter();
   const [url, setUrl] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
@@ -75,6 +77,8 @@ export default function NewGrantPage() {
       setCreating(false);
     }
   };
+
+  if (authLoading || !isAuthenticated) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">

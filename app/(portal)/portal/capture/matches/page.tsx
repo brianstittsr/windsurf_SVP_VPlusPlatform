@@ -23,10 +23,12 @@ import { useUserProfile } from "@/contexts/user-profile-context";
 import type { CaptureMatch, CaptureSavedSearch } from "@/lib/schema";
 import { Check, ExternalLink, RefreshCw, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
+import { useRequireAuth } from "@/lib/hooks/use-auth";
 
 type MatchRow = CaptureMatch & { opportunityId?: string };
 
 export default function MatchesPage() {
+  const { isLoading: authLoading, isAuthenticated } = useRequireAuth(["admin", "instructor"]);
   const { profile } = useUserProfile();
   const isAdmin = profile.role === "admin";
   const [matches, setMatches] = useState<MatchRow[]>([]);
@@ -136,6 +138,8 @@ export default function MatchesPage() {
       toast.error(e instanceof Error ? e.message : "Delete failed");
     }
   };
+
+  if (authLoading || !isAuthenticated) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (
     <div className="p-6 space-y-6">

@@ -11,8 +11,10 @@ import { useUserProfile } from "@/contexts/user-profile-context";
 import type { CaptureSettingsDoc } from "@/lib/schema";
 import { Save } from "lucide-react";
 import { toast } from "sonner";
+import { useRequireAuth } from "@/lib/hooks/use-auth";
 
 export default function CaptureSettingsPage() {
+  const { isLoading: authLoading, isAuthenticated } = useRequireAuth(["admin", "instructor"]);
   const { profile } = useUserProfile();
   const isAdmin = profile.role === "admin";
   const [settings, setSettings] = useState<CaptureSettingsDoc | null>(null);
@@ -117,6 +119,8 @@ export default function CaptureSettingsPage() {
   if (!settings) return <div className="p-6 text-muted-foreground">Loading settings...</div>;
 
   const disabled = !isAdmin || forbidden;
+
+  if (authLoading || !isAuthenticated) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (
     <div className="p-6 space-y-6 max-w-3xl">

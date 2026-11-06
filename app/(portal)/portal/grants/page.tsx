@@ -11,6 +11,7 @@ import { captureJson } from "@/lib/capture/api-client";
 import { GRANT_STAGES } from "@/lib/grants/stages";
 import type { GrantOpportunityDoc, GrantStage } from "@/lib/schema";
 import { LayoutGrid, List, Plus } from "lucide-react";
+import { useRequireAuth } from "@/lib/hooks/use-auth";
 
 interface SerializedGrant extends Omit<GrantOpportunityDoc, "deadlineAt" | "createdAt" | "updatedAt" | "analyzedAt" | "submittedAt"> {
   deadlineAt?: string;
@@ -22,6 +23,7 @@ const stageLabel = (id: string) => GRANT_STAGES.find((s) => s.id === id)?.label 
 const stageColor = (id: string) => GRANT_STAGES.find((s) => s.id === id)?.color || "bg-slate-500";
 
 export default function GrantsPage() {
+  const { isLoading: authLoading, isAuthenticated } = useRequireAuth(["admin", "instructor"]);
   const [grants, setGrants] = useState<SerializedGrant[]>([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"board" | "list">("board");
@@ -50,6 +52,8 @@ export default function GrantsPage() {
   };
 
   if (loading) return <div className="p-6 text-muted-foreground">Loading grants…</div>;
+
+  if (authLoading || !isAuthenticated) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (
     <div className="p-6 space-y-4 h-full flex flex-col">

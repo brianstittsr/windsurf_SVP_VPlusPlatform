@@ -37,6 +37,7 @@ import { stagesForBoard, passesBidNoBidGate, isValidTransition } from "@/lib/cap
 import { formatDualTimezone } from "@/lib/capture/dates";
 import { ArrowLeft, Sparkles, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useRequireAuth } from "@/lib/hooks/use-auth";
 
 interface DetailResponse {
   opportunity: CaptureOpportunity;
@@ -52,6 +53,7 @@ interface ActivityRow {
 }
 
 export default function OpportunityDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { isLoading: authLoading, isAuthenticated } = useRequireAuth(["admin", "instructor"]);
   const { id } = use(params);
   const { profile } = useUserProfile();
   const isAdmin = profile.role === "admin";
@@ -205,6 +207,8 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
   const stages = stagesForBoard(opp.boardType);
   const qDual = formatDualTimezone(opp.questionsDue);
   const rDual = formatDualTimezone(opp.responseDue);
+
+  if (authLoading || !isAuthenticated) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (
     <div className="p-6 space-y-6">

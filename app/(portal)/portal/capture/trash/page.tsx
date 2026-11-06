@@ -7,6 +7,7 @@ import { captureJson } from "@/lib/capture/api-client";
 import type { CaptureOpportunity, CustomerDoc } from "@/lib/schema";
 import { RotateCcw } from "lucide-react";
 import { toast } from "sonner";
+import { useRequireAuth } from "@/lib/hooks/use-auth";
 
 interface TrashResponse {
   opportunities: CaptureOpportunity[];
@@ -14,6 +15,7 @@ interface TrashResponse {
 }
 
 export default function CaptureTrashPage() {
+  const { isLoading: authLoading, isAuthenticated } = useRequireAuth(["admin", "instructor"]);
   const [trash, setTrash] = useState<TrashResponse>({ opportunities: [], clients: [] });
   const [forbidden, setForbidden] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -48,6 +50,8 @@ export default function CaptureTrashPage() {
 
   const fmtDate = (v: unknown) => (typeof v === "string" ? new Date(v).toLocaleDateString() : "—");
   const empty = trash.opportunities.length === 0 && trash.clients.length === 0;
+
+  if (authLoading || !isAuthenticated) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (
     <div className="p-6 space-y-6">

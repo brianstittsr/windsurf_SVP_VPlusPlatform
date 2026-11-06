@@ -40,10 +40,12 @@ export async function requireLmsActor(req: NextRequest): Promise<LmsApiActor> {
     .get();
   if (memberSnap.empty) throw new LmsApiError(403, "Student profile is required");
   const member = memberSnap.docs[0];
-  const role = member.get("role");
-  if (role !== "admin" && role !== "instructor" && role !== "student") {
+  const rawRole = member.get("role");
+  if (rawRole !== "admin" && rawRole !== "instructor" && rawRole !== "student" && rawRole !== "team") {
     throw new LmsApiError(403, "Access denied");
   }
+  // Capture "team" members are staff-tier — map to instructor in the LMS actor.
+  const role: LmsApiActor["role"] = rawRole === "team" ? "instructor" : rawRole;
   return {
     uid: decoded.uid,
     email: decoded.email || "",

@@ -7,8 +7,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { captureJson } from "@/lib/capture/api-client";
 import type { CaptureOpportunity, CaptureTask } from "@/lib/schema";
 import { toast } from "sonner";
+import { useRequireAuth } from "@/lib/hooks/use-auth";
 
 export default function MyTasksPage() {
+  const { isLoading: authLoading, isAuthenticated } = useRequireAuth(["admin", "instructor"]);
   const [tasks, setTasks] = useState<CaptureTask[]>([]);
   const [opps, setOpps] = useState<Map<string, CaptureOpportunity>>(new Map());
   const [loading, setLoading] = useState(true);
@@ -65,6 +67,8 @@ export default function MyTasksPage() {
       </div>
     );
   };
+
+  if (authLoading || !isAuthenticated) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (
     <div className="p-6 space-y-6 max-w-3xl">

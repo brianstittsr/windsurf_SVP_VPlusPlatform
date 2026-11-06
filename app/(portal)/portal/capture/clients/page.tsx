@@ -28,8 +28,10 @@ import { useUserProfile } from "@/contexts/user-profile-context";
 import type { CustomerDoc } from "@/lib/schema";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import { useRequireAuth } from "@/lib/hooks/use-auth";
 
 export default function CaptureClientsPage() {
+  const { isLoading: authLoading, isAuthenticated } = useRequireAuth(["admin", "instructor"]);
   const { profile } = useUserProfile();
   const isAdmin = profile.role === "admin";
   const [clients, setClients] = useState<CustomerDoc[]>([]);
@@ -75,6 +77,8 @@ export default function CaptureClientsPage() {
       setSaving(false);
     }
   };
+
+  if (authLoading || !isAuthenticated) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (
     <div className="p-6 space-y-6">

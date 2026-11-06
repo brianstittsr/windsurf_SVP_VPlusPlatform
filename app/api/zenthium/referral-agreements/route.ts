@@ -3,6 +3,7 @@ import { adminDb } from "@/lib/firebase-admin";
 import { COLLECTIONS } from "@/lib/schema";
 import { Timestamp } from "firebase-admin/firestore";
 import { z } from "zod";
+import { requireGrantStaff } from "@/lib/grants/access";
 
 const contractorSchema = z.object({
   name: z.string().min(1),
@@ -29,7 +30,9 @@ const agreementSchema = z.object({
   finalDocumentBase64: z.string().optional(),
 });
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const user = await requireGrantStaff(req);
+  if (user instanceof NextResponse) return user;
   if (!adminDb) {
     return NextResponse.json({ error: "Database not initialized" }, { status: 500 });
   }
@@ -58,6 +61,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const user = await requireGrantStaff(request);
+  if (user instanceof NextResponse) return user;
   if (!adminDb) {
     return NextResponse.json({ error: "Database not initialized" }, { status: 500 });
   }

@@ -1,0 +1,2 @@
+Vercel CLI 48.7.1
+Error: Can't deploy more than one path.

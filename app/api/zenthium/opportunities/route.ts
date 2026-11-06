@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase-admin";
 import { COLLECTIONS } from "@/lib/schema";
 import { Timestamp } from "firebase-admin/firestore";
+import { requireGrantStaff } from "@/lib/grants/access";
 
 function serializeTimestamp(value: unknown): unknown {
   return value instanceof Timestamp ? value.toDate().toISOString() : value ?? null;
@@ -17,7 +18,9 @@ function serializeDoc(id: string, data: Record<string, unknown>) {
   };
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const user = await requireGrantStaff(req);
+  if (user instanceof NextResponse) return user;
   if (!adminDb) return NextResponse.json({ error: "Database not initialized" }, { status: 500 });
   try {
     const snap = await adminDb
@@ -33,6 +36,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const user = await requireGrantStaff(request);
+  if (user instanceof NextResponse) return user;
   if (!adminDb) return NextResponse.json({ error: "Database not initialized" }, { status: 500 });
   try {
     const body = await request.json() as Record<string, unknown>;
