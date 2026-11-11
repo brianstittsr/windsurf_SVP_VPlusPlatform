@@ -11,57 +11,54 @@ export function CogContactForm() {
   const [role, setRole] = useState("CEO / Owner");
   const [interest, setInterest] = useState("AI Readiness Diagnostic");
   const [message, setMessage] = useState("");
-  const [error, setError] = useState(false);
-  const [readyText, setReadyText] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [website, setWebsite] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [sent, setSent] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) {
-      setError(true);
+      setError("Add your name and a valid work email so we can reply.");
       return;
     }
-    setError(false);
-    setReadyText(
-      `To: ${EMAIL}\nSubject: Cogniverai — ${interest} — ${company.trim() || name.trim()}\n\n` +
-        `Name: ${name.trim()}\nCompany: ${company.trim() || "—"}\nEmail: ${email.trim()}\n` +
-        `Role: ${role}\nInterested in: ${interest}\n\n${message.trim()}`
-    );
-  };
-
-  const copy = async () => {
-    if (!readyText) return;
+    setError(null);
+    setSubmitting(true);
     try {
-      await navigator.clipboard.writeText(readyText);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          formType: "cogniverai",
+          name: name.trim(),
+          email: email.trim(),
+          company: company.trim() || undefined,
+          role,
+          interest,
+          message: message.trim() || undefined,
+          website,
+        }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(data?.error || "Submission failed");
+      }
+      setSent(true);
     } catch {
-      /* clipboard unavailable */
+      setError(`Something went wrong — please email us directly at ${EMAIL}.`);
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  if (readyText !== null) {
+  if (sent) {
     return (
       <div className="ready">
-        <strong>Your message is ready to send</strong>
+        <strong>Message received</strong>
         <p style={{ color: "var(--muted)", fontSize: ".92rem" }}>
-          Copy it and email it to {EMAIL}, or{" "}
-          <a
-            href={`mailto:${EMAIL}?subject=${encodeURIComponent(`Cogniverai — ${interest} — ${company.trim() || name.trim()}`)}&body=${encodeURIComponent(readyText.split("\n\n").slice(1).join("\n\n"))}`}
-          >
-            open it in your mail app
-          </a>
-          .
+          Thanks, {name.split(" ")[0] || "there"}. A member of the team will reply
+          within one business day. If it&apos;s urgent, email {EMAIL}.
         </p>
-        <pre>{readyText}</pre>
-        <div className="acts">
-          <button className="btn primary" type="button" onClick={copy}>
-            {copied ? "Copied" : "Copy message"}
-          </button>
-          <button className="btn" type="button" onClick={() => setReadyText(null)}>
-            Edit
-          </button>
-        </div>
       </div>
     );
   }
@@ -112,12 +109,21 @@ export function CogContactForm() {
           onChange={(e) => setMessage(e.target.value)}
         />
       </label>
-      {error && (
-        <p className="err mono">Add your name and a valid work email so we can reply.</p>
-      )}
+      {/* Honeypot — hidden from humans */}
+      <input
+        type="text"
+        name="website"
+        value={website}
+        onChange={(e) => setWebsite(e.target.value)}
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0 }}
+      />
+      {error && <p className="err mono">{error}</p>}
       <div>
-        <button className="btn primary" type="submit">
-          Prepare my message
+        <button className="btn primary" type="submit" disabled={submitting}>
+          {submitting ? "Sending…" : "Send my message"}
         </button>
       </div>
     </form>

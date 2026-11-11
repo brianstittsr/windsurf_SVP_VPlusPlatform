@@ -1876,6 +1876,8 @@ export const COLLECTIONS = {
   // Mattermost Playbooks
   MATTERMOST_PLAYBOOKS: "mattermostPlaybooks",
   MATTERMOST_PLAYBOOK_RUNS: "mattermostPlaybookRuns",
+  // Website leads (V+ contact, Cogniverai, careers forms via /api/leads)
+  BOOK_CALL_LEADS: "bookCallLeads",
   // Customers (doubles as Capture Management clients)
   CUSTOMERS: "customers",
   // Capture Management

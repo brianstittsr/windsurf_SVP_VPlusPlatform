@@ -13,58 +13,57 @@ export function VPlusJoinForm() {
   const [years, setYears] = useState("10–19");
   const [certs, setCerts] = useState("");
   const [note, setNote] = useState("");
-  const [error, setError] = useState(false);
-  const [readyText, setReadyText] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [website, setWebsite] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [sent, setSent] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) {
-      setError(true);
+      setError("Add your name and a valid email so we can reach you.");
       return;
     }
-    setError(false);
-    setReadyText(
-      `To: ${EMAIL}\nSubject: V+ Resource Application — ${name.trim()} — ${area}\n\n` +
-        `Name: ${name.trim()}\nEmail: ${email.trim()}\nLocation: ${location.trim() || "—"}\n` +
-        `LinkedIn: ${linkedin.trim() || "—"}\nPrimary expertise: ${area}\nYears of experience: ${years}\n` +
-        `Certifications: ${certs.trim() || "—"}\nResume: Please attach your resume to the email\n\n${note.trim()}`
-    );
-  };
-
-  const copy = async () => {
-    if (!readyText) return;
+    setError(null);
+    setSubmitting(true);
     try {
-      await navigator.clipboard.writeText(readyText);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          formType: "careers",
+          name: name.trim(),
+          email: email.trim(),
+          location: location.trim() || undefined,
+          linkedin: linkedin.trim() || undefined,
+          expertise: area,
+          years,
+          certifications: certs.trim() || undefined,
+          message: `${note.trim()}\n\n[Applicant: please email your resume to ${EMAIL}]`.trim(),
+          website,
+        }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(data?.error || "Submission failed");
+      }
+      setSent(true);
     } catch {
-      /* clipboard unavailable */
+      setError(`Something went wrong — please email your details to ${EMAIL}.`);
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  if (readyText !== null) {
+  if (sent) {
     return (
       <div className="ready">
-        <strong>Your application is ready to send</strong>
+        <strong>Application received</strong>
         <p style={{ color: "var(--muted)", fontSize: ".92rem" }}>
-          Copy it into an email to {EMAIL} and attach your resume, or{" "}
-          <a
-            href={`mailto:${EMAIL}?subject=${encodeURIComponent(`V+ Resource Application — ${name.trim()} — ${area}`)}&body=${encodeURIComponent(readyText.split("\n\n").slice(1).join("\n\n"))}`}
-          >
-            open it in your mail app
-          </a>
-          .
+          Thanks, {name.split(" ")[0] || "there"}. We review every application
+          and will contact you if your experience fits upcoming work. Please
+          email your resume to {EMAIL} to complete your application.
         </p>
-        <pre>{readyText}</pre>
-        <div className="acts">
-          <button className="btn primary" type="button" onClick={copy}>
-            {copied ? "Copied" : "Copy application"}
-          </button>
-          <button className="btn" type="button" onClick={() => setReadyText(null)}>
-            Edit
-          </button>
-        </div>
       </div>
     );
   }
@@ -123,14 +122,25 @@ export function VPlusJoinForm() {
         Tell us about a result you&apos;re proud of
         <textarea id="j-note" placeholder="For example: led a 90-person machine shop through AS9100 certification in seven months." value={note} onChange={(e) => setNote(e.target.value)} />
       </label>
+      {/* Honeypot — hidden from humans */}
+      <input
+        type="text"
+        name="website"
+        value={website}
+        onChange={(e) => setWebsite(e.target.value)}
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0 }}
+      />
       {error && (
         <p className="mono" style={{ color: "var(--gap)", fontSize: ".85rem" }}>
-          Add your name and a valid email so we can reach you.
+          {error}
         </p>
       )}
       <div>
-        <button className="btn primary" type="submit">
-          Prepare my application
+        <button className="btn primary" type="submit" disabled={submitting}>
+          {submitting ? "Submitting…" : "Submit my application"}
         </button>
       </div>
     </form>

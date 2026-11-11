@@ -11,7 +11,9 @@ const links = [
   { title: "Partners", href: "/#partners" },
   { title: "Insights", href: "/#insights" },
   { title: "Our talent", href: "/#about" },
+  { title: "About", href: "/about" },
   { title: "Join our network", href: "/careers" },
+  { title: "Sign in", href: "/sign-in" },
 ];
 
 export function VPlusHeader() {

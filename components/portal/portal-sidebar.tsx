@@ -53,6 +53,7 @@ import {
   CalendarDays,
   Building2,
   CheckSquare,
+  Inbox,
 } from "lucide-react";
 
 const studentItems = [
@@ -85,6 +86,7 @@ const captureItems = [
 
 const adminItems = [
   { title: "Reports", href: "/portal/reports", icon: BarChart3 },
+  { title: "Leads", href: "/portal/admin/leads", icon: Inbox },
   { title: "Users", href: "/portal/admin/users", icon: Users },
   { title: "Courses", href: "/portal/admin/courses", icon: BookOpen },
   { title: "Digital Products", href: "/portal/admin/products", icon: Package },
