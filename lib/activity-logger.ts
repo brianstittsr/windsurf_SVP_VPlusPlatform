@@ -2,7 +2,7 @@
  * Activity & Audit Logger
  *
  * Writes user-facing activity entries (notifications feed) and audit log
- * entries for administrative actions on the EFVS Academy platform.
+ * entries for administrative actions on the V+ Academy platform.
  */
 
 import { collection, addDoc, Timestamp } from "firebase/firestore";
@@ -12,7 +12,7 @@ import { COLLECTIONS } from "./schema";
 export type ActivityType = "create" | "update" | "delete" | "note";
 
 export type EntityType =
-  // EFVS Academy LMS entities
+  // V+ Academy LMS entities
   | "course"
   | "enrollment"
   | "certificate"

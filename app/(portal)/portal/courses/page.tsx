@@ -53,7 +53,7 @@ export default function CourseCatalogPage() {
       <div>
         <h1 className="text-3xl font-bold font-display">Course Catalog</h1>
         <p className="text-muted-foreground">
-          EFVS Academy courses and certification programs
+          V+ Academy courses and certification programs
         </p>
       </div>
 
@@ -88,7 +88,7 @@ export default function CourseCatalogPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <Badge variant="secondary">{course.code}</Badge>
-                  <span className="font-semibold text-[#1478ac]">
+                  <span className="font-semibold text-[#8A6212]">
                     {price(course.priceCents)}
                   </span>
                 </div>
@@ -107,7 +107,7 @@ export default function CourseCatalogPage() {
                 ) : (
                   <Button
                     asChild
-                    className="w-full bg-[#1478ac] hover:bg-[#318dc1]"
+                    className="w-full bg-[#8A6212] hover:bg-[#8A6212]"
                   >
                     <Link href={`/portal/courses/${course.id}`}>
                       View Course <ArrowRight className="ml-2 h-4 w-4" />

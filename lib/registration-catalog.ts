@@ -1,7 +1,7 @@
 import type { CourseDoc } from "./schema";
 
 /**
- * Draft catalog rows transcribed from EFVS Student Registration Form Rev. 2
+ * Draft catalog rows transcribed from V+ Student Registration Form Rev. 2
  * dated 2026-10-04. Imported rows stay unpublished until reviewed by an admin.
  */
 export type RegistrationCatalogDraft = Omit<
@@ -15,7 +15,7 @@ export const REGISTRATION_COURSE_DRAFTS: RegistrationCatalogDraft[] = [
     title: "Part 107 Commercial Drone License Course",
     shortDescription: "FAA Part 107 UAS license training.",
     description:
-      "FAR Part 107 UAS license training course. Includes 15 hours of instruction, unlimited practice exams, and 20 quizzes. After passing the FAA Part 107 exam and providing proof of passing, students may qualify for access to the SkyHawk Mission Ready Network, subject to EFVS review.",
+      "FAR Part 107 UAS license training course. Includes 15 hours of instruction, unlimited practice exams, and 20 quizzes. After passing the FAA Part 107 exam and providing proof of passing, students may qualify for access to the SkyHawk Mission Ready Network, subject to V+ review.",
     category: "Part 107",
     estimatedHours: 15,
     learningOutcomes: [
@@ -37,7 +37,7 @@ export const REGISTRATION_COURSE_DRAFTS: RegistrationCatalogDraft[] = [
     badge: {
       title: "Part 107 Commercial Drone License Course — Completion",
       description:
-        "EFVS course-completion credential. It does not represent FAA certification or exam passage.",
+        "V+ course-completion credential. It does not represent FAA certification or exam passage.",
       skills: ["UAS", "Part 107 exam preparation"],
       issueOnCompletion: true,
     },
@@ -70,7 +70,7 @@ export const REGISTRATION_COURSE_DRAFTS: RegistrationCatalogDraft[] = [
     maxAttempts: 3,
     badge: {
       title: "Drone Mapping Bundle — Completion",
-      description: "EFVS course-completion credential.",
+      description: "V+ course-completion credential.",
       skills: ["Drone mapping", "3D modeling", "Drone surveying"],
       issueOnCompletion: true,
     },
@@ -95,7 +95,7 @@ export const REGISTRATION_COURSE_DRAFTS: RegistrationCatalogDraft[] = [
     displayOrder: 3,
     passingScore: 80,
     maxAttempts: 3,
-    badge: { title: "Drones Maneuvers Mastery — Completion", description: "EFVS course-completion credential.", skills: ["UAS flight maneuvers"], issueOnCompletion: true },
+    badge: { title: "Drones Maneuvers Mastery — Completion", description: "V+ course-completion credential.", skills: ["UAS flight maneuvers"], issueOnCompletion: true },
   },
   {
     code: "AC2.2",
@@ -118,7 +118,7 @@ export const REGISTRATION_COURSE_DRAFTS: RegistrationCatalogDraft[] = [
     displayOrder: 4,
     passingScore: 80,
     maxAttempts: 3,
-    badge: { title: "Drone LiDAR Made Easy — Completion", description: "EFVS course-completion credential.", skills: ["Drone LiDAR", "Geospatial data"], issueOnCompletion: true },
+    badge: { title: "Drone LiDAR Made Easy — Completion", description: "V+ course-completion credential.", skills: ["Drone LiDAR", "Geospatial data"], issueOnCompletion: true },
   },
   {
     code: "AC2.3",
@@ -140,7 +140,7 @@ export const REGISTRATION_COURSE_DRAFTS: RegistrationCatalogDraft[] = [
     displayOrder: 5,
     passingScore: 80,
     maxAttempts: 3,
-    badge: { title: "Drone Search and Rescue Essentials — Completion", description: "EFVS course-completion credential.", skills: ["Public safety UAS", "Search and rescue"], issueOnCompletion: true },
+    badge: { title: "Drone Search and Rescue Essentials — Completion", description: "V+ course-completion credential.", skills: ["Public safety UAS", "Search and rescue"], issueOnCompletion: true },
   },
   {
     code: "AC2.4",
@@ -162,7 +162,7 @@ export const REGISTRATION_COURSE_DRAFTS: RegistrationCatalogDraft[] = [
     displayOrder: 6,
     passingScore: 80,
     maxAttempts: 3,
-    badge: { title: "FAA Part 107 Waivers — Completion", description: "EFVS course-completion credential; not an FAA-issued waiver.", skills: ["FAA waiver applications", "Part 107"], issueOnCompletion: true },
+    badge: { title: "FAA Part 107 Waivers — Completion", description: "V+ course-completion credential; not an FAA-issued waiver.", skills: ["FAA waiver applications", "Part 107"], issueOnCompletion: true },
   },
   {
     code: "AC2.5",
@@ -185,7 +185,7 @@ export const REGISTRATION_COURSE_DRAFTS: RegistrationCatalogDraft[] = [
     displayOrder: 7,
     passingScore: 80,
     maxAttempts: 3,
-    badge: { title: "Visual Observer Essentials — Completion", description: "EFVS course-completion credential.", skills: ["Visual observer", "UAS crew coordination"], issueOnCompletion: true },
+    badge: { title: "Visual Observer Essentials — Completion", description: "V+ course-completion credential.", skills: ["Visual observer", "UAS crew coordination"], issueOnCompletion: true },
   },
   {
     code: "AC2.6",
@@ -207,7 +207,7 @@ export const REGISTRATION_COURSE_DRAFTS: RegistrationCatalogDraft[] = [
     displayOrder: 8,
     passingScore: 80,
     maxAttempts: 3,
-    badge: { title: "Drone Photo and Video Masterclass — Completion", description: "EFVS course-completion credential.", skills: ["Drone photography", "Aerial videography"], issueOnCompletion: true },
+    badge: { title: "Drone Photo and Video Masterclass — Completion", description: "V+ course-completion credential.", skills: ["Drone photography", "Aerial videography"], issueOnCompletion: true },
   },
   {
     code: "AC2.7",
@@ -229,7 +229,7 @@ export const REGISTRATION_COURSE_DRAFTS: RegistrationCatalogDraft[] = [
     displayOrder: 9,
     passingScore: 80,
     maxAttempts: 3,
-    badge: { title: "Real Estate Photo and Video — Completion", description: "EFVS course-completion credential.", skills: ["Real-estate media", "Aerial photography"], issueOnCompletion: true },
+    badge: { title: "Real Estate Photo and Video — Completion", description: "V+ course-completion credential.", skills: ["Real-estate media", "Aerial photography"], issueOnCompletion: true },
   },
   {
     code: "AC2.8",
@@ -251,7 +251,7 @@ export const REGISTRATION_COURSE_DRAFTS: RegistrationCatalogDraft[] = [
     displayOrder: 10,
     passingScore: 80,
     maxAttempts: 3,
-    badge: { title: "NIST Made Easy — Completion", description: "EFVS course-completion credential; not a NIST-issued certification.", skills: ["NIST UAS standards", "Public safety"], issueOnCompletion: true },
+    badge: { title: "NIST Made Easy — Completion", description: "V+ course-completion credential; not a NIST-issued certification.", skills: ["NIST UAS standards", "Public safety"], issueOnCompletion: true },
   },
   {
     code: "AC2.9",
@@ -280,13 +280,13 @@ export const REGISTRATION_COURSE_DRAFTS: RegistrationCatalogDraft[] = [
     displayOrder: 11,
     passingScore: 80,
     maxAttempts: 3,
-    badge: { title: "sUAS Thermography Level 1 — Completion", description: "EFVS course-completion credential; not a professional thermography certification unless separately awarded.", skills: ["Infrared imaging", "Thermography", "UAS"], issueOnCompletion: true },
+    badge: { title: "sUAS Thermography Level 1 — Completion", description: "V+ course-completion credential; not a professional thermography certification unless separately awarded.", skills: ["Infrared imaging", "Thermography", "UAS"], issueOnCompletion: true },
   },
   {
     code: "SG107",
     title: "Part 107 Digital Study Guide",
     shortDescription: "Interactive quizzes, flashcards, explanations, and progress tracking for the FAA Part 107 knowledge areas.",
-    description: "The EFVS digital study guide includes nine Part 107 subject categories, practice questions with explanations, a vocabulary deck, randomized review sessions, and learner progress tracking. This is a study aid and does not itself represent FAA exam passage or certification.",
+    description: "The V+ digital study guide includes nine Part 107 subject categories, practice questions with explanations, a vocabulary deck, randomized review sessions, and learner progress tracking. This is a study aid and does not itself represent FAA exam passage or certification.",
     category: "Part 107 Study Guide",
     learningOutcomes: ["Review all nine FAA Part 107 knowledge areas", "Practice with answer explanations", "Build vocabulary and track study progress"],
     prerequisiteDescription: "None.",
@@ -306,8 +306,8 @@ export const REGISTRATION_COURSE_DRAFTS: RegistrationCatalogDraft[] = [
   {
     code: "AC1-SG107",
     title: "AC1 Course + Part 107 Digital Study Guide Bundle",
-    shortDescription: "AC1 online training combined with the EFVS interactive Part 107 study guide.",
-    description: "A combined EFVS Academy package containing AC1 Part 107 Commercial Drone License Course and the Part 107 Digital Study Guide. Admin must set the bundle retail price and verify included courses before publishing.",
+    shortDescription: "AC1 online training combined with the V+ interactive Part 107 study guide.",
+    description: "A combined V+ Academy package containing AC1 Part 107 Commercial Drone License Course and the Part 107 Digital Study Guide. Admin must set the bundle retail price and verify included courses before publishing.",
     category: "Part 107 Bundle",
     learningOutcomes: ["Access AC1 training and the interactive Part 107 study tools"],
     prerequisiteDescription: "None.",
@@ -322,6 +322,6 @@ export const REGISTRATION_COURSE_DRAFTS: RegistrationCatalogDraft[] = [
     displayOrder: 13,
     passingScore: 80,
     maxAttempts: 3,
-    badge: { title: "AC1 + Part 107 Study Guide Bundle — Completion", description: "EFVS course-completion credential; not an FAA-issued certificate.", skills: ["Part 107 exam preparation", "UAS"], issueOnCompletion: true },
+    badge: { title: "AC1 + Part 107 Study Guide Bundle — Completion", description: "V+ course-completion credential; not an FAA-issued certificate.", skills: ["Part 107 exam preparation", "UAS"], issueOnCompletion: true },
   },
 ];

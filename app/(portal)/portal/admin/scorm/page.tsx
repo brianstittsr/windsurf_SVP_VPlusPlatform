@@ -149,7 +149,7 @@ export default function AdminScormPage() {
           <Button
             onClick={upload}
             disabled={!file || !courseId || uploading}
-            className="bg-[#1478ac] hover:bg-[#318dc1]"
+            className="bg-[#8A6212] hover:bg-[#8A6212]"
           >
             {uploading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

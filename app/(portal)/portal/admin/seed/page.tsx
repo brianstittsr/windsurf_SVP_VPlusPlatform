@@ -135,7 +135,7 @@ export default function AdminSeedPage() {
       </div>
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 font-display"><Database className="h-5 w-5 text-[#1478ac]" />AC1 — FAA Part 107 Sample Course</CardTitle>
+          <CardTitle className="flex items-center gap-2 font-display"><Database className="h-5 w-5 text-[#8A6212]" />AC1 — FAA Part 107 Sample Course</CardTitle>
           <CardDescription>
             Creates six lessons with imagery, five section quizzes, a randomized final exam, six mock students with enrollments, lesson progress, graded attempts, and three completion certificates. Correct answers stay server-side; mock records are tagged for removal.
           </CardDescription>
@@ -143,7 +143,7 @@ export default function AdminSeedPage() {
         <CardContent className="space-y-4">
           <div className="flex items-center gap-2"><span className="text-sm text-muted-foreground">Status:</span><Badge variant={seeded ? "default" : "outline"}>{seeded ? "Seeded" : "Not seeded"}</Badge></div>
           <div className="flex flex-wrap gap-3">
-            <Button onClick={seed} disabled={working || seeded} className="bg-[#1478ac] hover:bg-[#318dc1]">
+            <Button onClick={seed} disabled={working || seeded} className="bg-[#8A6212] hover:bg-[#8A6212]">
               {working ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
               Seed Demo Data
             </Button>
@@ -161,12 +161,12 @@ export default function AdminSeedPage() {
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 font-display"><Database className="h-5 w-5 text-[#1478ac]" />Part 107 Study Guide Content</CardTitle>
+          <CardTitle className="flex items-center gap-2 font-display"><Database className="h-5 w-5 text-[#8A6212]" />Part 107 Study Guide Content</CardTitle>
           <CardDescription>Imports the complete question bank, nine categories, explanations, and vocabulary into LMS Firestore. Correct answers remain available only to server-side grading.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap items-center justify-between gap-4">
           <Badge variant={studyGuideSeeded ? "default" : "outline"}>{studyGuideSeeded ? "Content in LMS database" : "Not imported"}</Badge>
-          <Button onClick={seedStudyGuide} disabled={working || studyGuideSeeded} className="bg-[#1478ac] hover:bg-[#318dc1]">{working ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}Import study content</Button>
+          <Button onClick={seedStudyGuide} disabled={working || studyGuideSeeded} className="bg-[#8A6212] hover:bg-[#8A6212]">{working ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}Import study content</Button>
         </CardContent>
       </Card>
     </div>

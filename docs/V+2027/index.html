@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Strategic Value+ Website</title>
+<meta name="description" content="Strategic Value+ helps small and mid-sized U.S. manufacturers get qualified, compliant and capacity-ready to win and keep OEM and defense work.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: industrial spec-sheet. Left-aligned sections on a 1180px sheet, gold "gate tags" as the recurring device, one black brand band per page. */
+:root{
+  --bg:#F3F4F6; --surface:#FFFFFF; --ink:#16191D; --muted:#555D68; --line:#D8DCE2;
+  --brass:#8A6212; --brass-fill:#C9962B; --brass-soft:#F4EAD3;
+  --band:#15181C; --band-ink:#EEF0F2; --band-muted:#A6ADB7; --band-brass:#D9AF52;
+  --ok:#2E7D4F; --warn:#A86A00; --gap:#B23B2E;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --maxw:1180px; --radius:6px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1114; --surface:#171A1F; --ink:#ECEDEF; --muted:#A0A7B1; --line:#2A3038;
+  --brass:#D9AF52; --brass-fill:#C9962B; --brass-soft:#2A2416;
+  --band:#08090B; --band-ink:#EEF0F2; --band-muted:#A6ADB7; --band-brass:#D9AF52;
+  --ok:#5FBF86; --warn:#E0A43A; --gap:#E3705F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1114; --surface:#171A1F; --ink:#ECEDEF; --muted:#A0A7B1; --line:#2A3038;
+  --brass:#D9AF52; --brass-fill:#C9962B; --brass-soft:#2A2416;
+  --band:#08090B; --band-ink:#EEF0F2; --band-muted:#A6ADB7; --band-brass:#D9AF52;
+  --ok:#5FBF86; --warn:#E0A43A; --gap:#E3705F; color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--brass-fill);outline-offset:3px;border-radius:2px}
+.wrap{max-width:var(--maxw);margin:0 auto;padding-inline:clamp(16px,4vw,40px)}
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.02;letter-spacing:.005em;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.9rem,7.2vw,5.6rem);text-transform:uppercase}
+h2{font-size:clamp(2.1rem,4.4vw,3.3rem);text-transform:uppercase}
+h3{font-size:1.55rem;font-weight:600;text-transform:uppercase;letter-spacing:.01em}
+p{margin:0;max-width:65ch}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--brass)}
+.lede{font-size:1.15rem;color:var(--muted)}
+.stack{display:grid;gap:14px}
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--body);font-weight:600;font-size:.98rem;padding:12px 20px;border-radius:var(--radius);border:1.5px solid var(--ink);text-decoration:none;cursor:pointer;background:transparent;color:var(--ink);transition:background .15s,color .15s,border-color .15s}
+.btn:hover{background:var(--ink);color:var(--bg)}
+.btn.primary{background:var(--brass-fill);border-color:var(--brass-fill);color:#16191D}
+.btn.primary:hover{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.mono{font-family:var(--mono)}
+
+/* header */
+header.site{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:68px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.mark{width:36px;height:36px;border-radius:5px;background:var(--band);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:1.25rem;color:var(--band-brass);flex:none}
+.brand b{font-family:var(--display);font-size:1.45rem;font-weight:700;letter-spacing:.01em;text-transform:uppercase}
+.brand b span{color:var(--brass)}
+.links{display:flex;gap:22px;align-items:center;font-size:.95rem}
+.links a{text-decoration:none;color:var(--muted)}
+.links a:hover{color:var(--ink)}
+.links .cog{color:var(--ink);font-weight:600}
+.menu-btn{display:none;background:none;border:1.5px solid var(--line);border-radius:var(--radius);padding:8px 12px;font:600 .9rem var(--body);color:var(--ink);cursor:pointer}
+@media (max-width:1140px){
+  .links{display:none;position:absolute;left:0;right:0;top:100%;flex-direction:column;align-items:flex-start;gap:4px;background:var(--bg);border-bottom:1px solid var(--line);padding:12px clamp(16px,4vw,40px) 20px}
+  .links.open{display:flex}
+  .links a{padding:8px 0;font-size:1.05rem}
+  .menu-btn{display:block}
+  .nav .btn.primary.hide-sm{display:none}
+}
+
+section{padding-block:clamp(56px,8vw,104px)}
+section + section{border-top:1px solid var(--line)}
+.sec-head{display:grid;gap:14px;margin-bottom:40px}
+
+/* hero */
+.hero{padding-block:clamp(40px,6vw,80px) clamp(56px,7vw,96px)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(32px,5vw,64px);align-items:center}
+@media (max-width:900px){.hero-grid{grid-template-columns:1fr}}
+.hero h1 em{font-style:normal;color:var(--brass)}
+.hero .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.for{font-family:var(--mono);font-size:.82rem;color:var(--muted);letter-spacing:.04em}
+
+/* inspection tag (example scorecard) */
+.tag{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px 22px 18px;position:relative;box-shadow:0 1px 0 var(--line)}
+.tag::before{content:"";position:absolute;top:18px;right:18px;width:14px;height:14px;border-radius:50%;border:2px solid var(--line);background:var(--bg)}
+.tag .tag-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-right:28px;border-bottom:1px dashed var(--line);padding-bottom:12px;margin-bottom:12px}
+.tag .tag-head span{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tag .tag-head strong{font-family:var(--display);font-size:1.4rem;text-transform:uppercase}
+.gate-row{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:12px;align-items:center;padding:9px 0}
+.gate-row + .gate-row{border-top:1px solid var(--line)}
+.gate-id{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.gate-name{font-weight:600;font-size:.95rem}
+.gate-name small{display:block;font-weight:400;color:var(--muted);font-size:.8rem}
+.pill{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.pill.ok{color:var(--ok)} .pill.warn{color:var(--warn)} .pill.gap{color:var(--gap)}
+.tag-foot{margin-top:10px;font-family:var(--mono);font-size:.74rem;color:var(--muted);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+/* why now band */
+.band{background:var(--band);color:var(--band-ink)}
+.band .eyebrow{color:var(--band-brass)}
+.band h2 em{font-style:normal;color:var(--band-brass)}
+.band p{color:var(--band-muted)}
+.why{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:#2A2F36;border:1px solid #2A2F36;border-radius:8px;overflow:hidden;margin-top:40px}
+.why > div{background:var(--band);padding:26px 24px;display:grid;gap:10px;align-content:start}
+.why h3{color:var(--band-ink);font-size:1.35rem}
+.why .src{font-family:var(--mono);font-size:.74rem;color:var(--band-muted)}
+@media (max-width:860px){.why{grid-template-columns:1fr}}
+
+/* four gates */
+.gates{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+@media (max-width:1000px){.gates{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.gates{grid-template-columns:1fr}}
+.gate{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:22px;display:grid;gap:12px;align-content:start}
+.gate .num{font-family:var(--mono);font-size:.78rem;color:var(--brass);letter-spacing:.1em}
+.gate ul{margin:0;padding-left:18px;color:var(--muted);font-size:.93rem;display:grid;gap:4px}
+.gate .std{font-family:var(--mono);font-size:.75rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:10px}
+.gate5{margin-top:18px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;border:1px dashed var(--brass-fill);border-radius:8px;padding:18px 22px;background:var(--brass-soft)}
+.gate5 p{max-width:70ch}
+
+/* offers ladder */
+.ladder{display:grid;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.rung{display:grid;grid-template-columns:110px minmax(0,1.3fr) minmax(0,1fr) 170px;gap:20px;padding:22px 24px;align-items:start}
+.rung + .rung{border-top:1px solid var(--line)}
+.rung .step{font-family:var(--mono);font-size:.78rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.rung h3{font-size:1.4rem}
+.rung p{color:var(--muted);font-size:.95rem}
+.rung .price{font-family:var(--display);font-size:1.6rem;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.rung .price small{display:block;font-family:var(--mono);font-size:.72rem;font-weight:400;color:var(--muted);letter-spacing:.04em}
+.rung.feature{background:var(--brass-soft)}
+.rung.feature .price{color:var(--brass)}
+@media (max-width:860px){.rung{grid-template-columns:1fr;gap:8px}.rung .price{text-align:left}}
+
+/* process */
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;counter-reset:s}
+.steps li{list-style:none;padding:0 20px 0 0;display:grid;gap:10px;align-content:start;position:relative}
+.steps li::before{counter-increment:s;content:"0" counter(s);font-family:var(--display);font-size:2.6rem;font-weight:700;color:var(--brass);line-height:1}
+.steps li::after{content:"";position:absolute;top:22px;left:56px;right:20px;height:1.5px;background:var(--line)}
+.steps li:last-child::after{display:none}
+.steps p{color:var(--muted);font-size:.95rem}
+.steps ol{margin:0;padding:0}
+@media (max-width:860px){.steps{grid-template-columns:1fr 1fr;row-gap:32px}.steps li::after{display:none}}
+@media (max-width:520px){.steps{grid-template-columns:1fr}}
+
+/* two col */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(32px,5vw,64px);align-items:start}
+@media (max-width:860px){.split{grid-template-columns:1fr}}
+.list{margin:0;padding:0;list-style:none;display:grid;gap:0;border-top:1px solid var(--line)}
+.list li{padding:16px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr);gap:4px}
+.list li strong{font-weight:600}
+.list li span{color:var(--muted);font-size:.95rem}
+
+/* partner tiers */
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+@media (max-width:860px){.tiers{grid-template-columns:1fr}}
+.tier{border:1px solid var(--line);border-radius:8px;padding:22px;display:grid;gap:10px;align-content:start;background:var(--surface)}
+.tier .who{font-family:var(--mono);font-size:.75rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.eco{margin-top:36px;display:flex;flex-wrap:wrap;gap:10px}
+.eco span{font-size:.88rem;border:1px solid var(--line);border-radius:999px;padding:6px 14px;color:var(--muted);background:var(--surface)}
+
+/* cogniverai band */
+.cog-band{background:var(--band);color:var(--band-ink)}
+.cog-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:40px;align-items:center}
+@media (max-width:860px){.cog-grid{grid-template-columns:1fr}}
+.cog-logo{font-family:var(--display);font-weight:600;font-size:clamp(3rem,7vw,5rem);letter-spacing:.01em;line-height:1;text-transform:none}
+.cog-logo span{color:#5CC2B3}
+.cog-band p{color:var(--band-muted)}
+.cog-band .btn{border-color:var(--band-ink);color:var(--band-ink)}
+.cog-band .btn:hover{background:var(--band-ink);color:var(--band)}
+.cog-dims{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#2A2F36;border:1px solid #2A2F36;border-radius:8px;overflow:hidden}
+.cog-dims div{background:var(--band);padding:18px}
+.cog-dims b{display:block;font-family:var(--display);font-size:1.3rem;text-transform:uppercase;color:var(--band-ink)}
+.cog-dims small{color:var(--band-muted);font-size:.85rem}
+
+/* insights */
+.insights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+@media (max-width:760px){.insights{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:24px;display:grid;gap:10px;align-content:start}
+.status{font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--brass)}
+
+/* about */
+.bench{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.bench-col{background:var(--surface);padding:20px;display:grid;gap:12px;align-content:start}
+.bench-col .num{font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--brass)}
+.bench-col ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.93rem}
+.bench-col li{padding-left:14px;position:relative}
+.bench-col li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:6px;background:var(--brass-fill)}
+.bench-col.wide{background:var(--brass-soft)}
+@media (max-width:1000px){.bench{grid-template-columns:repeat(2,minmax(0,1fr))}.bench-col.wide{grid-column:1/-1}}
+@media (max-width:560px){.bench{grid-template-columns:1fr}}
+.origins{margin-top:32px;display:grid;gap:12px}
+.origins .k{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.deploy{margin-top:32px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;border-top:1px solid var(--line);padding-top:24px}
+.deploy div{display:grid;gap:4px}
+.deploy strong{font-family:var(--display);font-size:1.35rem;text-transform:uppercase;font-weight:600}
+.deploy span{color:var(--muted);font-size:.95rem}
+@media (max-width:760px){.deploy{grid-template-columns:1fr}}
+.join{background:var(--surface)}
+input[type=file]{padding:9px 10px}
+
+/* contact */
+form{display:grid;gap:14px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:560px){.row2{grid-template-columns:1fr}}
+label{display:grid;gap:6px;font-size:.88rem;font-weight:500}
+input,select,textarea{font:inherit;font-size:1rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:11px 12px;width:100%}
+textarea{min-height:120px;resize:vertical}
+.contact-facts{display:grid;gap:18px}
+.fact{display:grid;gap:4px}
+.fact .k{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.fact .v{font-size:1.15rem;font-weight:600;user-select:all;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.copy{font:500 .8rem var(--mono);border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:4px;padding:3px 8px;cursor:pointer}
+.copy:hover{color:var(--ink);border-color:var(--ink)}
+.ready{border:1px solid var(--brass-fill);background:var(--brass-soft);border-radius:8px;padding:18px;display:grid;gap:10px}
+.ready pre{margin:0;white-space:pre-wrap;font:400 .85rem/1.5 var(--mono);max-height:220px;overflow:auto}
+.ready .acts{display:flex;flex-wrap:wrap;gap:10px}
+
+footer{background:var(--band);color:var(--band-muted);padding-block:48px;font-size:.9rem}
+.foot{display:grid;grid-template-columns:minmax(0,1.4fr) repeat(3,minmax(0,1fr));gap:28px}
+@media (max-width:760px){.foot{grid-template-columns:1fr 1fr}}
+footer h4{margin:0 0 10px;font-family:var(--mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--band-brass);font-weight:500}
+footer a{color:var(--band-ink);text-decoration:none;display:block;padding:3px 0}
+footer a:hover{color:var(--band-brass)}
+footer .legal{margin-top:36px;border-top:1px solid #2A2F36;padding-top:18px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-family:var(--mono);font-size:.76rem}
+
+.sub-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px;margin:48px 0 18px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.sub-head h3{font-size:1.7rem}
+.sub-head p{color:var(--muted);font-size:.95rem}
+.team{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+@media (max-width:1000px){.team{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.team{grid-template-columns:1fr}}
+.person{display:grid;grid-template-columns:56px minmax(0,1fr);gap:14px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px}
+.person h4,.expert h4{margin:0;font-family:var(--display);font-size:1.4rem;font-weight:600;text-transform:uppercase;line-height:1.1}
+.person .title{display:block;font-family:var(--mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--brass);margin:4px 0 8px}
+.person p{font-size:.9rem;color:var(--muted)}
+.todo{border-style:dashed}
+.avatar{width:56px;height:56px;border-radius:50%;background:var(--band);color:var(--band-brass);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:1.3rem;flex:none}
+.experts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+@media (max-width:900px){.experts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.experts{grid-template-columns:1fr}}
+.expert{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:20px;display:grid;gap:8px;align-content:start}
+.expert-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.expert .avatar{width:48px;height:48px}
+.gate-tag{font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--brass);text-align:right}
+.cred{font-weight:600;font-size:.95rem}
+.expert p{font-size:.9rem;color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.tags span{font-family:var(--mono);font-size:.72rem;padding:3px 8px;border-radius:4px;background:var(--brass-soft);color:var(--ink)}
+.vet{margin-top:48px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:clamp(24px,4vw,56px);align-items:start;background:var(--band);color:var(--band-ink);border-radius:10px;padding:clamp(24px,4vw,40px)}
+.vet .eyebrow{color:var(--band-brass)}
+.vet p{color:var(--band-muted)!important}
+@media (max-width:860px){.vet{grid-template-columns:1fr}}
+.checks{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:14px 24px}
+@media (max-width:560px){.checks{grid-template-columns:1fr}}
+.checks li{position:relative;padding-left:28px;font-size:.95rem}
+.checks li::before{content:"";position:absolute;left:0;top:.2em;width:16px;height:16px;border:1.5px solid var(--band-brass);border-radius:3px}
+.checks li::after{content:"";position:absolute;left:5px;top:.42em;width:5px;height:9px;border:solid var(--band-brass);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.totals,.results{margin-top:32px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+@media (max-width:760px){.totals,.results{grid-template-columns:1fr}}
+.totals div,.results div{display:grid;gap:4px;border-top:2px solid var(--brass-fill);padding-top:12px}
+.totals b,.results b{font-family:var(--display);font-size:2rem;font-weight:700;font-variant-numeric:tabular-nums}
+.totals span,.results span{color:var(--muted);font-size:.92rem}
+.teaser{margin-top:40px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding:20px 24px;border:1.5px solid var(--brass-fill);border-radius:8px;text-decoration:none;background:var(--brass-soft)}
+.teaser .go{font-weight:600;color:var(--brass)}
+.teaser:hover .go{text-decoration:underline}
+.quotes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+@media (max-width:900px){.quotes{grid-template-columns:1fr}}
+.quote{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:22px;display:grid;gap:14px;align-content:space-between}
+.quote blockquote{margin:0;font-size:1.05rem;line-height:1.55}
+.quote figcaption{font-family:var(--mono);font-size:.76rem;color:var(--muted);letter-spacing:.04em}
+.page-hero{padding-block:clamp(40px,6vw,72px)}
+</style>
+<style>html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="Strategic Value+ home"><span class="mark">V+</span><b>Strategic Value<span>+</span></b></a>
+    <nav class="links" id="links" aria-label="Main">
+      <a href="#gates">Four Gates</a>
+      <a href="#offers">Services</a>
+      <a href="#oem">For OEM buyers</a>
+      <a href="#partners">Partners</a>
+      <a href="#insights">Insights</a>
+      <a href="#about">Our talent</a>
+      <a href="careers.html">Join our network</a>
+      <a class="cog" href="cogniverai.html">Cogniverai</a>
+    </nav>
+    <div style="display:flex;gap:10px;align-items:center">
+      <a class="btn primary hide-sm" href="#contact">Book a 30-minute call</a>
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="links">Menu</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="stack" style="gap:22px">
+      <span class="eyebrow">Supplier readiness · Aerospace, defense and advanced manufacturing</span>
+      <h1>Close the gaps.<br><em>Win OEM business.</em></h1>
+      <p class="lede">We get small and mid-sized manufacturers qualified, compliant and capacity-ready to win and keep OEM and defense work. Quality, cybersecurity, flow and export compliance, closed gate by gate.</p>
+      <div class="actions">
+        <a class="btn primary" href="#contact">Book a 30-minute call</a>
+        <a class="btn" href="#offers">See the Constraint Diagnostic</a>
+      </div>
+      <p class="for">For manufacturers with 25–500 employees · North Carolina and Southern California</p>
+    </div>
+    <aside class="tag" aria-label="Example readiness scorecard">
+      <div class="tag-head"><strong>Readiness tag</strong><span>Example scorecard</span></div>
+      <div class="gate-row"><span class="gate-id">GATE 1</span><span class="gate-name">Quality<small>AS9100 / ISO 9001 system</small></span><span class="pill ok">Ready</span></div>
+      <div class="gate-row"><span class="gate-id">GATE 2</span><span class="gate-name">Cybersecurity<small>CMMC L2 · NIST 800-171 · SPRS</small></span><span class="pill gap">Gap</span></div>
+      <div class="gate-row"><span class="gate-id">GATE 3</span><span class="gate-name">Operations<small>TOC flow · on-time delivery</small></span><span class="pill warn">At risk</span></div>
+      <div class="gate-row"><span class="gate-id">GATE 4</span><span class="gate-name">Compliance<small>ITAR / EAR controls</small></span><span class="pill ok">Ready</span></div>
+      <div class="tag-foot"><span>Illustrative, not client data</span><span>2 of 4 gates cleared</span></div>
+    </aside>
+  </div>
+</section>
+
+<section class="band" id="why">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Why now</span>
+      <h2>Ready for the <em>AI-native</em> supply chain</h2>
+      <p>OEMs are building digital, AI-enabled factories and they expect the same discipline from their suppliers. The shops that can prove quality, protect data and deliver on time will win the next decade of work.</p>
+    </div>
+    <div class="why">
+      <div><span class="eyebrow">North Carolina</span><h3>A new aerospace supply base is forming</h3><p>JetZero broke ground in Greensboro in 2026 on a Z4 plant planned around Siemens, Nvidia and AWS digital platforms. Regional suppliers will be measured against that bar.</p></div>
+      <div><span class="eyebrow">Defense</span><h3>CMMC is paused, the risk is not</h3><p>Phase 2 third-party assessments are on hold, but Phase 1 self-assessments, DFARS 7012, SPRS affirmations and False Claims Act exposure all still apply. Primes set their own deadlines.</p></div>
+      <div><span class="eyebrow">Operations</span><h3>Capacity is the quiet deal-breaker</h3><p>Buyers qualify suppliers who can scale on schedule. A hidden constraint on one machine or one approval step can cap a whole plant's output.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="gates">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">The Four Gates framework</span>
+      <h2>Four gates every OEM checks</h2>
+      <p class="lede">Each gate is a question a buyer will ask before you get the purchase order. We show you where you stand on each one, then close the gaps in the order that unlocks revenue fastest.</p>
+    </div>
+    <div class="gates">
+      <article class="gate"><span class="num">GATE 1</span><h3>Quality</h3><ul><li>Gap assessment against AS9100 or ISO 9001</li><li>Document control, CAPA, internal audit</li><li>Audit preparation and first-article readiness</li></ul><span class="std">AS9100 · ISO 9001:2015 · IATF 16949</span></article>
+      <article class="gate"><span class="num">GATE 2</span><h3>Cybersecurity</h3><ul><li>CMMC Level 1 and Level 2 readiness</li><li>NIST SP 800-171 controls and SPRS score</li><li>Executive Exposure Brief on FCA risk</li></ul><span class="std">CMMC 2.0 · DFARS 252.204-7012</span></article>
+      <article class="gate"><span class="num">GATE 3</span><h3>Operations</h3><ul><li>Theory of Constraints flow analysis</li><li>On-time delivery and lead-time reduction</li><li>Faster, more accurate quoting</li></ul><span class="std">TOC · Goldratt Research Labs methods</span></article>
+      <article class="gate"><span class="num">GATE 4</span><h3>Compliance</h3><ul><li>ITAR and EAR export-control program</li><li>Section 889 and supply-chain attestations</li><li>SAM.gov and federal registration support</li></ul><span class="std">ITAR · EAR · FAR/DFARS</span></article>
+    </div>
+    <div class="gate5">
+      <p><strong>Ready for AI as well?</strong> AI readiness is delivered through Cogniverai, the AI adoption collaborative convened by Strategic Value+.</p>
+      <a class="btn" href="cogniverai.html">Visit Cogniverai</a>
+    </div>
+  </div>
+</section>
+
+<section id="offers">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Services</span>
+      <h2>Start small. Climb when it pays.</h2>
+      <p class="lede">Every engagement starts with facts about your plant. The paid diagnostic ends with a priced roadmap, and half its fee is credited if you continue.</p>
+    </div>
+    <div class="ladder">
+      <div class="rung"><span class="step">Step 1</span><div><h3>Discovery call</h3><p>Thirty minutes on your OEM targets, your current certifications and what is blocking the next award.</p></div><p>Includes the online Four Gates readiness scorecard.</p><div class="price">Free<small>No obligation</small></div></div>
+      <div class="rung feature"><span class="step">Step 2</span><div><h3>Constraint Diagnostic</h3><p>On-site and data review that finds the one constraint limiting throughput and scores you on all four gates.</p></div><p>You get a gate-by-gate scorecard, the constraint and its cost, and a priced qualification roadmap.</p><div class="price">$9,950<small>50% credited to step 3</small></div></div>
+      <div class="rung"><span class="step">Step 2b</span><div><h3>Executive Exposure Brief</h3><p>For defense suppliers: where your CMMC, DFARS 7012 and False Claims Act exposure stands today.</p></div><p>Delivered with our cybersecurity partner for leadership and counsel.</p><div class="price">Fixed fee<small>Quoted on the call</small></div></div>
+      <div class="rung"><span class="step">Step 3</span><div><h3>Four Gates engagement</h3><p>Hands-on execution of the roadmap: quality system, cyber controls, flow improvement and compliance program.</p></div><p>Specialists from our affiliate network join only where the roadmap needs them.</p><div class="price">Monthly<small>Scoped from the diagnostic</small></div></div>
+      <div class="rung"><span class="step">Step 4</span><div><h3>V+ EDGE™ and gain-share</h3><p>Keep the gains: KPI visibility and modular execution on the V+ EDGE platform.</p></div><p>Where throughput gains are measurable, we can share in them instead of charging fees.</p><div class="price">Subscription<small>or % of measured gain</small></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="process">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">How it works</span><h2>From capable to qualified</h2></div>
+    <ol class="steps">
+      <li><h3>Discover</h3><p>We learn your OEM goals and score your readiness on the four gates.</p></li>
+      <li><h3>Diagnose</h3><p>We find the constraint and the gaps that block qualification, with their cost.</p></li>
+      <li><h3>Execute</h3><p>Our team and vetted affiliates close the gaps against milestones you can track.</p></li>
+      <li><h3>Qualify</h3><p>You pass the audit, earn the approval and keep the business with stable delivery.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section id="oem">
+  <div class="wrap split">
+    <div class="stack" style="gap:18px">
+      <span class="eyebrow">For OEM and prime buyers</span>
+      <h2>More qualified suppliers in your region</h2>
+      <p class="lede">Supplier development teams use Strategic Value+ to bring promising local suppliers up to standard, faster than they could alone.</p>
+      <div><a class="btn" href="#contact">Talk about a supplier program</a></div>
+    </div>
+    <ul class="list">
+      <li><strong>Supplier readiness cohorts</strong><span>A group of regional suppliers moves through the four gates together on a shared schedule.</span></li>
+      <li><strong>Targeted supplier rescue</strong><span>A key supplier is late or failing an audit. We diagnose the constraint and fix it on site.</span></li>
+      <li><strong>Funded programs</strong><span>We deliver supplier readiness under SBA, NIST MEP, DoW and university programs, so suppliers pay little or nothing.</span></li>
+      <li><strong>New plant onboarding</strong><span>We prepare the local supply base as a new facility ramps up.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="partners">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Partner program</span>
+      <h2>Bring us in. We'll bring you in.</h2>
+      <p class="lede">Software vendors, staffing firms, integrators and consultants work with us under one simple program with three tiers.</p>
+    </div>
+    <div class="tiers">
+      <article class="tier"><span class="who">Tier 1</span><h3>Referral partner</h3><p>Introduce a manufacturer who needs readiness help. You earn a standard referral fee on first-year fees, and we refer our clients to you.</p></article>
+      <article class="tier"><span class="who">Tier 2</span><h3>Active partner</h3><p>Help close the deal with a joint call or proposal input, and earn a higher rate. Leads are registered so ownership is never in question.</p></article>
+      <article class="tier"><span class="who">Tier 3</span><h3>Delivery partner</h3><p>Deliver specialist scope inside a Strategic Value+ engagement as a vetted affiliate, paid on your scope.</p></article>
+    </div>
+    <div class="eco" aria-label="Ecosystem relationships">
+      <span>Goldratt Research Labs (TOC)</span><span>California State University, Long Beach</span><span>Reshoring Initiative</span><span>Women in Manufacturing</span><span>American Defense Alliance</span><span>HUBZone Contractors National Council</span>
+    </div>
+    <div style="margin-top:28px"><a class="btn" href="#contact">Apply to partner</a></div>
+  </div>
+</section>
+
+<section class="cog-band" id="cogniverai">
+  <div class="wrap cog-grid">
+    <div class="stack" style="gap:18px">
+      <span class="eyebrow" style="color:#5CC2B3">Home of Cogniverai</span>
+      <div class="cog-logo">cogniver<span>ai</span></div>
+      <p style="font-size:1.1rem">AI adoption for aerospace and defense manufacturers. Leadership, technology, people and security, delivered by one coordinated team of specialist firms and convened by Strategic Value+.</p>
+      <div><a class="btn" href="cogniverai.html">Explore Cogniverai</a></div>
+    </div>
+    <div class="cog-dims">
+      <div><b>Leadership</b><small>Executive alignment and an AI roadmap</small></div>
+      <div><b>Technology</b><small>Diagnostics, integration, digital twins</small></div>
+      <div><b>People</b><small>Workforce skills and immersive training</small></div>
+      <div><b>Security</b><small>Private, DoD-grade AI infrastructure</small></div>
+    </div>
+  </div>
+</section>
+
+<section id="insights">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Insights</span><h2>What we're seeing on the shop floor</h2></div>
+    <div class="insights">
+      <article class="card"><span class="status">Quarterly · First edition Q1 2027</span><h3>Supplier Readiness Index</h3><p>A short quarterly brief on how small and mid-sized suppliers score across the four gates, built from anonymized readiness scorecards.</p><a class="btn" href="#contact" style="justify-self:start">Get it when it's published</a></article>
+      <article class="card"><span class="status">Webinar series · Monthly</span><h3>False Claims Act exposure while CMMC is paused</h3><p>What still applies to your SPRS score and annual affirmations, and what primes are asking of their suppliers right now.</p><a class="btn" href="#contact" style="justify-self:start">Request the next session</a></article>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">About Strategic Value+ · Our talent pool</span>
+      <h2>A bench built on the plant floor</h2>
+      <p class="lede">Strategic Value+ is a network of transformational manufacturing talent: practitioners who have run lines, passed audits, secured networks and turned around suppliers. We match the right people to each gap, under one accountable engagement lead.</p>
+    </div>
+
+    <div class="sub-head"><h3>Core team</h3><p>The people accountable for every engagement.</p></div>
+    <div class="team">
+      <article class="person"><span class="avatar" aria-hidden="true">NV</span><div><h4>Nel Varenas</h4><span class="title">CEO &amp; Co-Founder</span><p>Plant-floor roots at Toyota and Northrop Grumman. ISO 9001:2015 Certified Auditor. MBA, Finance and Accounting, UC Davis.</p></div></article>
+      <article class="person todo"><span class="avatar" aria-hidden="true">—</span><div><h4>[Name]</h4><span class="title">[Title]</span><p>[One line on background and the gate or region this person leads.]</p></div></article>
+      <article class="person todo"><span class="avatar" aria-hidden="true">—</span><div><h4>[Name]</h4><span class="title">[Title]</span><p>[One line on background and the gate or region this person leads.]</p></div></article>
+      <article class="person todo"><span class="avatar" aria-hidden="true">—</span><div><h4>[Name]</h4><span class="title">[Title]</span><p>[One line on background and the gate or region this person leads.]</p></div></article>
+    </div>
+
+    <div class="sub-head"><h3>Featured experts</h3><p>A sample of the specialists on our bench. Every profile is shared with the expert's permission.</p></div>
+    <div class="experts">
+      <article class="expert"><div class="expert-top"><span class="avatar" aria-hidden="true">·</span><span class="gate-tag">Gate 1 · Quality</span></div><h4>[Name]</h4><span class="cred">AS9100 Lead Auditor</span><p>[Years] years · Former [OEM or supplier]</p><div class="tags"><span>AS9100</span><span>First article</span><span>CAPA</span></div></article>
+      <article class="expert"><div class="expert-top"><span class="avatar" aria-hidden="true">·</span><span class="gate-tag">Gate 2 · Cyber</span></div><h4>[Name]</h4><span class="cred">CMMC Certified Professional</span><p>[Years] years · Former [employer]</p><div class="tags"><span>CMMC L2</span><span>NIST 800-171</span><span>SPRS</span></div></article>
+      <article class="expert"><div class="expert-top"><span class="avatar" aria-hidden="true">·</span><span class="gate-tag">Gate 3 · Operations</span></div><h4>[Name]</h4><span class="cred">Theory of Constraints practitioner</span><p>[Years] years · Former [employer]</p><div class="tags"><span>TOC</span><span>Flow</span><span>Quoting</span></div></article>
+      <article class="expert"><div class="expert-top"><span class="avatar" aria-hidden="true">·</span><span class="gate-tag">Gate 3 · Operations</span></div><h4>[Name]</h4><span class="cred">Plant operations leader, Lean / TPS</span><p>[Years] years · Former [employer]</p><div class="tags"><span>Lean</span><span>TPS</span><span>OTD</span></div></article>
+      <article class="expert"><div class="expert-top"><span class="avatar" aria-hidden="true">·</span><span class="gate-tag">Gate 4 · Compliance</span></div><h4>[Name]</h4><span class="cred">ITAR / EAR program lead</span><p>[Years] years · Former [employer]</p><div class="tags"><span>ITAR</span><span>EAR</span><span>Section 889</span></div></article>
+      <article class="expert"><div class="expert-top"><span class="avatar" aria-hidden="true">·</span><span class="gate-tag">Growth</span></div><h4>[Name]</h4><span class="cred">Supply chain and digital twin analyst</span><p>[Years] years · Former [employer]</p><div class="tags"><span>Digital twin</span><span>Sourcing</span><span>Risk</span></div></article>
+    </div>
+
+    <div class="sub-head"><h3>The full bench</h3><p>Specialist roles across the network, organized by the gate they help you clear.</p></div>
+    <div class="bench">
+      <div class="bench-col"><span class="num">Gate 1 · Quality</span><ul><li>AS9100 and ISO 9001 lead auditors</li><li>Quality engineers and managers</li><li>APQP, PPAP and first-article specialists</li><li>Six Sigma and root-cause practitioners</li></ul></div>
+      <div class="bench-col"><span class="num">Gate 2 · Cyber</span><ul><li>CMMC and NIST 800-171 specialists</li><li>DFARS and SPRS compliance advisors</li><li>Secure IT and OT architects</li><li>Policy and evidence writers</li></ul></div>
+      <div class="bench-col"><span class="num">Gate 3 · Operations</span><ul><li>Theory of Constraints practitioners</li><li>Lean and Toyota Production System veterans</li><li>Plant and operations leaders</li><li>Estimating and quoting experts</li></ul></div>
+      <div class="bench-col"><span class="num">Gate 4 · Compliance</span><ul><li>ITAR and EAR program builders</li><li>Federal contracting and capture professionals</li><li>Supply-chain and trade compliance</li><li>SAM.gov and registration support</li></ul></div>
+      <div class="bench-col wide"><span class="num">Growth and transformation</span><ul><li>Supply-chain and digital twin analysts</li><li>AI and data specialists, through Cogniverai</li><li>Workforce development and immersive training</li><li>Finance, ESOP and succession advisors</li><li>Program managers for funded cohorts</li></ul></div>
+    </div>
+    <div class="origins">
+      <span class="k">Where our people come from</span>
+      <div class="eco" style="margin-top:0"><span>Commercial aerospace OEMs</span><span>Defense primes</span><span>Tier 1–3 suppliers</span><span>Automotive and the Toyota Production System</span><span>Federal programs and agencies</span><span>Manufacturing extension and universities</span></div>
+    </div>
+
+    <div class="vet">
+      <div class="stack" style="gap:12px"><span class="eyebrow">How we vet every resource</span><h3 style="font-size:2rem">Checked before anyone meets a client</h3><p style="color:var(--muted)">Defense and aerospace work demands people you can trust with your floor and your data. Every V+ resource clears the same standard.</p></div>
+      <ul class="checks">
+        <li>Credentials and certifications verified with the issuing body</li>
+        <li>Two professional references checked</li>
+        <li>NDA and V+ code of conduct signed before any client contact</li>
+        <li>Professional liability insurance in place</li>
+        <li>U.S.-person status confirmed for ITAR and CUI work</li>
+        <li>Security clearance status recorded where a program requires it</li>
+      </ul>
+    </div>
+
+    <div class="deploy">
+      <div><strong>Matched to the gap</strong><span>Each specialist is chosen for the gate and the stage your roadmap is in.</span></div>
+      <div><strong>Vetted before assignment</strong><span>Every resource meets the standard above before an assignment starts.</span></div>
+      <div><strong>One accountable lead</strong><span>A Strategic Value+ engagement lead owns the plan, the milestones and the result.</span></div>
+    </div>
+
+    <!-- READY TO ADD once figures are verified: uncomment and fill.
+    <div class="totals">
+      <div><b>[N]+</b><span>combined years of manufacturing experience</span></div>
+      <div><b>[N]</b><span>certified auditors in the network</span></div>
+      <div><b>[N]</b><span>certifications and qualifications led</span></div>
+    </div>
+    -->
+
+    <!-- READY TO ADD once clients approve: uncomment and fill.
+    <div class="results">
+      <div><span class="eyebrow">Gate 1 · Quality</span><b>AS9100 in [N] months</b><span>[Client type, size, region]</span></div>
+      <div><span class="eyebrow">Gate 3 · Operations</span><b>On-time delivery from [N]% to [N]%</b><span>[Client type, size, region]</span></div>
+      <div><span class="eyebrow">Gate 2 · Cyber</span><b>SPRS score from [N] to [N]</b><span>[Client type, size, region]</span></div>
+    </div>
+    -->
+
+    <a class="teaser" href="careers.html"><span><b>Are you a manufacturing expert?</b> Join the V+ resource network.</span><span class="go">Become a V+ resource →</span></a>
+    <p style="color:var(--muted);margin-top:28px">Strategic Value Plus Solutions, LLC is registered in Delaware, with our office in Dover. We deliver across North Carolina and Southern California.</p>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap split">
+    <div class="stack" style="gap:24px">
+      <div class="stack" style="gap:14px">
+        <span class="eyebrow">Contact</span>
+        <h2>Book a 30-minute call</h2>
+        <p class="lede">Tell us which OEM or program you're chasing. We'll tell you, plainly, which gate stands in the way.</p>
+      </div>
+      <div class="contact-facts">
+        <div class="fact"><span class="k">Email</span><span class="v"><span id="emailText">info@strategicvalueplus.com</span><button class="copy" type="button" data-copy="info@strategicvalueplus.com">Copy</button></span></div>
+        <div class="fact"><span class="k">Phone</span><span class="v"><span>(302) 215-4700</span><button class="copy" type="button" data-copy="(302) 215-4700">Copy</button></span></div>
+        <div class="fact"><span class="k">Office</span><span class="v" style="font-weight:500">Dover, Delaware</span></div>
+      </div>
+    </div>
+    <div>
+      <form id="contactForm" novalidate>
+        <div class="row2">
+          <label for="f-name">Name<input id="f-name" name="name" autocomplete="name" required></label>
+          <label for="f-company">Company<input id="f-company" name="company" autocomplete="organization"></label>
+        </div>
+        <div class="row2">
+          <label for="f-email">Work email<input id="f-email" name="email" type="email" autocomplete="email" required></label>
+          <label for="f-size">Employees<select id="f-size" name="size"><option>Under 25</option><option selected>25–100</option><option>101–250</option><option>251–500</option><option>Over 500</option></select></label>
+        </div>
+        <label for="f-interest">I'm interested in<select id="f-interest" name="interest">
+          <option>Constraint Diagnostic</option><option>Four Gates engagement</option><option>CMMC / Executive Exposure Brief</option><option>Supplier program (OEM buyer)</option><option>Partner program</option><option>Cogniverai AI adoption</option></select></label>
+        <label for="f-msg">What are you working toward?<textarea id="f-msg" name="message" placeholder="For example: we quote for a tier 1 aerospace prime and need AS9100 within 9 months."></textarea></label>
+        <p id="formError" class="mono" style="color:var(--gap);font-size:.85rem" hidden>Add your name and a valid work email so we can reply.</p>
+        <div><button class="btn primary" type="submit">Prepare my message</button></div>
+      </form>
+      <div class="ready" id="ready" hidden>
+        <strong>Your message is ready to send</strong>
+        <p style="color:var(--muted);font-size:.92rem">Copy it and email it to info@strategicvalueplus.com.</p>
+        <pre id="readyText"></pre>
+        <div class="acts"><button class="btn primary" type="button" id="copyMsg">Copy message</button><button class="btn" type="button" id="editMsg">Edit</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div class="stack" style="gap:10px"><a class="brand" href="#top" style="color:var(--band-ink)"><span class="mark">V+</span><b>Strategic Value<span style="color:var(--band-brass)">+</span></b></a><p>Helping small and mid-sized U.S. manufacturers win OEM and defense contracts through supplier qualification, compliance and operational readiness.</p></div>
+      <div><h4>Services</h4><a href="#gates">Four Gates</a><a href="#offers">Constraint Diagnostic</a><a href="#offers">V+ EDGE™</a><a href="#oem">For OEM buyers</a></div>
+      <div><h4>Company</h4><a href="#about">Our talent</a><a href="careers.html">Become a V+ resource</a><a href="#partners">Partner program</a><a href="#insights">Insights</a><a href="cogniverai.html">Cogniverai</a></div>
+      <div><h4>Contact</h4><a href="#contact">Book a call</a><span style="display:block;padding:3px 0;color:var(--band-ink)">info@strategicvalueplus.com</span><span style="display:block;padding:3px 0;color:var(--band-ink)">(302) 215-4700</span></div>
+    </div>
+    <div class="legal"><span>© <span id="yr">2026</span> Strategic Value Plus Solutions, LLC · strategicvalueplus.com</span><span>V+ EDGE™ is a trademark of Strategic Value Plus Solutions, LLC</span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var btn=document.getElementById('menuBtn'), links=document.getElementById('links');
+  btn.addEventListener('click',function(){var o=links.classList.toggle('open');btn.setAttribute('aria-expanded',o?'true':'false');});
+  links.addEventListener('click',function(e){if(e.target.tagName==='A'){links.classList.remove('open');btn.setAttribute('aria-expanded','false');}});
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  function copy(text,el){
+    var done=function(){var t=el.textContent;el.textContent='Copied';setTimeout(function(){el.textContent=t;},1500);};
+    try{navigator.clipboard.writeText(text).then(done,function(){sel(el);});}catch(e){sel(el);}
+  }
+  function sel(el){var t=el.previousElementSibling||document.getElementById('readyText');if(!t)return;var r=document.createRange();r.selectNodeContents(t);var s=window.getSelection();s.removeAllRanges();s.addRange(r);el.textContent='Press Ctrl+C';}
+  document.querySelectorAll('[data-copy]').forEach(function(b){b.addEventListener('click',function(){copy(b.getAttribute('data-copy'),b);});});
+  var form=document.getElementById('contactForm'), ready=document.getElementById('ready'), out=document.getElementById('readyText'), err=document.getElementById('formError');
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var v=function(id){return document.getElementById(id).value.trim();};
+    var email=v('f-email');
+    if(!v('f-name')||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){err.hidden=false;return;}
+    err.hidden=true;
+    out.textContent='To: info@strategicvalueplus.com\nSubject: '+v('f-interest')+' — '+(v('f-company')||v('f-name'))+'\n\nName: '+v('f-name')+'\nCompany: '+(v('f-company')||'—')+'\nEmail: '+email+'\nEmployees: '+v('f-size')+'\nInterested in: '+v('f-interest')+'\n\n'+(v('f-msg')||'');
+    form.hidden=true; ready.hidden=false;
+  });
+  document.getElementById('editMsg').addEventListener('click',function(){ready.hidden=true;form.hidden=false;});
+  document.getElementById('copyMsg').addEventListener('click',function(){copy(out.textContent,this);});
+})();
+</script>
+
+</body>
+</html>

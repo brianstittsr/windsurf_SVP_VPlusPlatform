@@ -122,7 +122,7 @@ export default function AdminDiscountsPage() {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-[#1478ac] hover:bg-[#318dc1]">
+            <Button className="bg-[#8A6212] hover:bg-[#8A6212]">
               <Plus className="mr-2 h-4 w-4" /> New Code
             </Button>
           </DialogTrigger>
@@ -178,7 +178,7 @@ export default function AdminDiscountsPage() {
               </div>
               <div className="flex items-center justify-between">
                 <Label className="font-normal flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-[#1478ac]" />
+                  <ShieldCheck className="h-4 w-4 text-[#8A6212]" />
                   Military veterans only
                 </Label>
                 <Switch
@@ -197,7 +197,7 @@ export default function AdminDiscountsPage() {
               </div>
               <Button
                 onClick={save}
-                className="w-full bg-[#1478ac] hover:bg-[#318dc1]"
+                className="w-full bg-[#8A6212] hover:bg-[#8A6212]"
               >
                 Save Code
               </Button>
@@ -239,7 +239,7 @@ export default function AdminDiscountsPage() {
                     <TableCell>{c.percentOff}% off</TableCell>
                     <TableCell>
                       {c.militaryOnly ? (
-                        <Badge className="bg-[#1478ac]">Veterans only</Badge>
+                        <Badge className="bg-[#8A6212]">Veterans only</Badge>
                       ) : (
                         <Badge variant="secondary">Everyone</Badge>
                       )}

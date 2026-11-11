@@ -316,7 +316,7 @@ export async function POST(req: NextRequest) {
       await registrationRef.update({ status: "checkout_pending", orderId: orderRef.id, updatedAt: now });
     }
 
-    const origin = new URL(process.env.NEXT_PUBLIC_APP_URL || "https://academy.efvertical.com").origin;
+    const origin = new URL(process.env.NEXT_PUBLIC_APP_URL || "https://strategicvalueplus.com").origin;
     const session = await stripe.checkout.sessions.create({
       mode,
       line_items: lineItems,

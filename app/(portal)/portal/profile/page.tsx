@@ -87,7 +87,7 @@ export default function ProfilePage() {
           {profile.role}
         </Badge>
         {profile.isVeteran && (
-          <Badge className="bg-[#1478ac]">
+          <Badge className="bg-[#8A6212]">
             <ShieldCheck className="h-3 w-3 mr-1" /> Veteran
           </Badge>
         )}
@@ -132,7 +132,7 @@ export default function ProfilePage() {
           <Button
             onClick={save}
             disabled={saving}
-            className="bg-[#1478ac] hover:bg-[#318dc1]"
+            className="bg-[#8A6212] hover:bg-[#8A6212]"
           >
             {saving ? "Saving…" : "Save Profile"}
           </Button>

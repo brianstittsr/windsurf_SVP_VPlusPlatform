@@ -2,14 +2,14 @@ import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "EFVS UAS Training Academy",
-    short_name: "EFVS Academy",
+    name: "V+ Academy",
+    short_name: "V+ Academy",
     description:
-      "FAA Part 107 Remote Pilot certification preparation and specialized UAS training from Eagle Flight Vertical Solutions.",
+      "Strategic Value+ — supplier readiness, quality systems, cybersecurity and training for U.S. manufacturers.",
     start_url: "/",
     display: "standalone",
-    background_color: "#071628",
-    theme_color: "#071628",
+    background_color: "#15181C",
+    theme_color: "#15181C",
     orientation: "portrait-primary",
     icons: [
       {
@@ -25,9 +25,9 @@ export default function manifest(): MetadataRoute.Manifest {
         purpose: "any",
       },
       {
-        src: "/images/efvs-mark-light.png",
+        src: "/VPlus_logo.jpg",
         sizes: "any",
-        type: "image/png",
+        type: "image/jpeg",
       },
     ],
     categories: ["education"],

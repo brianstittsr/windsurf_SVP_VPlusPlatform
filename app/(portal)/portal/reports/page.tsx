@@ -41,7 +41,7 @@ import {
 import { jsPDF } from "jspdf";
 import { Download, FileText } from "lucide-react";
 
-const COLORS = ["#1478ac", "#d3ac63", "#56b8e8", "#318dc1", "#9a7135"];
+const COLORS = ["#8A6212", "#C9962B", "#D9AF52", "#8A6212", "#8A6212"];
 
 export default function ReportsPage() {
   const { isLoading, isAuthenticated } = useRequireAuth([
@@ -143,7 +143,7 @@ export default function ReportsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `efvs-training-records-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `vplus-training-records-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -152,7 +152,7 @@ export default function ReportsPage() {
     const doc = new jsPDF();
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
-    doc.text("EFVS Academy — Training Report", 14, 18);
+    doc.text("V+ Academy — Training Report", 14, 18);
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 26);
@@ -173,7 +173,7 @@ export default function ReportsPage() {
     doc.text(`Exam pass rate: ${stats.passRate}%`, 14, y);
     y += 6;
     doc.text(`Revenue (paid invoices): $${(stats.revenue / 100).toFixed(2)}`, 14, y);
-    doc.save(`efvs-report-${new Date().toISOString().slice(0, 10)}.pdf`);
+    doc.save(`vplus-report-${new Date().toISOString().slice(0, 10)}.pdf`);
   };
 
   if (isLoading || !isAuthenticated || loading) {
@@ -233,8 +233,8 @@ export default function ReportsPage() {
                 <XAxis dataKey="name" />
                 <YAxis allowDecimals={false} />
                 <Tooltip />
-                <Bar dataKey="enrollments" fill="#1478ac" name="Enrolled" />
-                <Bar dataKey="completions" fill="#d3ac63" name="Completed" />
+                <Bar dataKey="enrollments" fill="#8A6212" name="Enrolled" />
+                <Bar dataKey="completions" fill="#C9962B" name="Completed" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -287,7 +287,7 @@ export default function ReportsPage() {
                 <XAxis type="number" domain={[0, 100]} unit="%" />
                 <YAxis type="category" dataKey="name" width={80} />
                 <Tooltip />
-                <Bar dataKey="avgProgress" fill="#1478ac" name="Avg %" />
+                <Bar dataKey="avgProgress" fill="#8A6212" name="Avg %" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

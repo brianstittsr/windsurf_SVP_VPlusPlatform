@@ -1,5 +1,5 @@
 /**
- * Firestore Database Schema for the EFVS UAS Training Academy Platform
+ * Firestore Database Schema for the V+ Academy Platform
  * 
  * This file defines the database collections, document structures,
  * and helper types for Firestore integration.
@@ -1338,7 +1338,7 @@ export type ToolType =
 export interface SoftwareKeyDoc {
   id: string;
   // Key details
-  key: string;                    // The actual license key (e.g., "EFVS-XXXX-XXXX-XXXX")
+  key: string;                    // The actual license key (e.g., "VP-XXXX-XXXX-XXXX")
   name: string;                   // Friendly name for the key
   description?: string;
   // Tool access
@@ -1876,8 +1876,6 @@ export const COLLECTIONS = {
   // Mattermost Playbooks
   MATTERMOST_PLAYBOOKS: "mattermostPlaybooks",
   MATTERMOST_PLAYBOOK_RUNS: "mattermostPlaybookRuns",
-  // Book a Call Leads
-  BOOK_CALL_LEADS: "bookCallLeads",
   // Customers (doubles as Capture Management clients)
   CUSTOMERS: "customers",
   // Capture Management
@@ -1902,7 +1900,7 @@ export const COLLECTIONS = {
   ZENTHIUM_OPPORTUNITIES: "zenthiumOpportunities",
 
   // ==========================================================================
-  // EFVS Academy LMS collections
+  // V+ Academy LMS collections
   // ==========================================================================
   COURSES: "courses",
   PRODUCTS: "products",
@@ -2053,7 +2051,7 @@ export const generateId = (collectionName: string): string | null => {
 };
 
 // ============================================================================
-// EFVS Academy LMS Document Types
+// V+ Academy LMS Document Types
 // ============================================================================
 
 /** LMS user roles */
@@ -2246,7 +2244,7 @@ export interface ExamAttemptDoc {
 /** An issued completion certificate */
 export interface CertificateDoc {
   id: string;
-  certificateNumber: string; // e.g. "EFVS-2026-000123"
+  certificateNumber: string; // e.g. "VP-2026-000123"
   studentId: string;
   firebaseUid?: string;
   studentName: string;

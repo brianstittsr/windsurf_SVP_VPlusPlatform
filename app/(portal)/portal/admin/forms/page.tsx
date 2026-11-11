@@ -196,11 +196,11 @@ export default function AdminFormsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-3xl font-bold">Form Builder</h1>
-          <p className="text-muted-foreground">Create versioned forms and publish them in the EFVS Academy theme.</p>
+          <p className="text-muted-foreground">Create versioned forms and publish them in the V+ Academy theme.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" disabled={busy} onClick={seedStudentRegistration}>Student registration template</Button>
-          <Button className="bg-[#1478ac] hover:bg-[#318dc1]" onClick={reset}><FilePlus2 className="mr-2 h-4 w-4" />New Form</Button>
+          <Button className="bg-[#8A6212] hover:bg-[#8A6212]" onClick={reset}><FilePlus2 className="mr-2 h-4 w-4" />New Form</Button>
         </div>
       </div>
 
@@ -209,7 +209,7 @@ export default function AdminFormsPage() {
           <CardHeader><CardTitle className="font-display">Forms</CardTitle><CardDescription>Drafts and published versions</CardDescription></CardHeader>
           <CardContent className="space-y-2">
             {forms.map((form) => (
-              <button key={form.id} type="button" onClick={() => selectForm(form)} className={`w-full rounded-md border p-3 text-left ${selectedId === form.id ? "border-[#1478ac] bg-[#e9f3f8]" : "hover:bg-muted/50"}`}>
+              <button key={form.id} type="button" onClick={() => selectForm(form)} className={`w-full rounded-md border p-3 text-left ${selectedId === form.id ? "border-[#8A6212] bg-[#F4EAD3]" : "hover:bg-muted/50"}`}>
                 <span className="block font-medium">{form.name}</span>
                 <span className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
                   <Badge variant={form.status === "published" ? "default" : "outline"}>{form.status}</Badge>
@@ -260,7 +260,7 @@ export default function AdminFormsPage() {
                   </div>
                   {field.type === "consent" && (
                     <div className="grid gap-3 md:grid-cols-2">
-                      <div className="space-y-2"><Label>Linked policy label (optional)</Label><Input value={field.helpLink?.label || ""} onChange={(e) => updateField(index, { helpLink: e.target.value ? { label: e.target.value, url: field.helpLink?.url || "https://www.efvertical.com" } : undefined })} /></div>
+                      <div className="space-y-2"><Label>Linked policy label (optional)</Label><Input value={field.helpLink?.label || ""} onChange={(e) => updateField(index, { helpLink: e.target.value ? { label: e.target.value, url: field.helpLink?.url || "https://strategicvalueplus.com" } : undefined })} /></div>
                       <div className="space-y-2"><Label>Policy URL (HTTPS)</Label><Input type="url" value={field.helpLink?.url || ""} onChange={(e) => updateField(index, { helpLink: field.helpLink ? { ...field.helpLink, url: e.target.value } : { label: "View policy", url: e.target.value } })} /></div>
                     </div>
                   )}
@@ -301,7 +301,7 @@ export default function AdminFormsPage() {
               <p className="self-center text-xs text-muted-foreground">Current draft version: v{version} · {status}</p>
               <div className="flex gap-2">
                 <Button variant="outline" disabled={busy || fields.length === 0} onClick={save}><Save className="mr-2 h-4 w-4" />Save draft</Button>
-                <Button disabled={busy || !selectedId} onClick={publish} className="bg-[#1478ac] hover:bg-[#318dc1]">Publish version</Button>
+                <Button disabled={busy || !selectedId} onClick={publish} className="bg-[#8A6212] hover:bg-[#8A6212]">Publish version</Button>
               </div>
             </div>
           </CardContent>

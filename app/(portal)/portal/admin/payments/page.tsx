@@ -173,7 +173,7 @@ export default function AdminPaymentsPage() {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-[#1478ac] hover:bg-[#318dc1]">
+            <Button className="bg-[#8A6212] hover:bg-[#8A6212]">
               <Landmark className="mr-2 h-4 w-4" /> New ACH Invoice
             </Button>
           </DialogTrigger>
@@ -261,7 +261,7 @@ export default function AdminPaymentsPage() {
               </div>
               <Button
                 onClick={createAchInvoice}
-                className="w-full bg-[#1478ac] hover:bg-[#318dc1]"
+                className="w-full bg-[#8A6212] hover:bg-[#8A6212]"
               >
                 Create Invoice
               </Button>

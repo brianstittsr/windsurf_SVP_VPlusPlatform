@@ -172,7 +172,7 @@ export default function LearnPage() {
           {enrollment.status === "cancelled"
             ? "Learning access to this course is unavailable because the enrollment was cancelled."
             : "Learning access to this course is unavailable because the enrollment period has ended."}
-          {" "}Contact EFVS support if you believe this is an error.
+          {" "}Contact V+ support if you believe this is an error.
         </p>
         <Button variant="link" asChild>
           <Link href="/portal/my-courses">Back to My Courses</Link>
@@ -202,7 +202,7 @@ export default function LearnPage() {
             </span>
           </div>
           {enrollment.status === "completed" && (
-            <Badge className="bg-[#1478ac]">
+            <Badge className="bg-[#8A6212]">
               <Award className="h-3 w-3 mr-1" /> Completed
             </Badge>
           )}
@@ -212,7 +212,7 @@ export default function LearnPage() {
       {course.format === "scorm" && !pkg ? (
         <Card>
           <CardContent className="py-10 text-center text-muted-foreground">
-            This course&apos;s training package has not been published yet. Please check back later or contact EFVS.
+            This course&apos;s training package has not been published yet. Please check back later or contact V+.
           </CardContent>
         </Card>
       ) : course.format === "scorm" && pkg ? (
@@ -247,7 +247,7 @@ export default function LearnPage() {
                     onClick={() => setActiveModule(m)}
                     className={`w-full text-left px-3 py-2 rounded-md text-sm flex items-center gap-2 transition-colors ${
                       activeModule?.id === m.id
-                        ? "bg-[#1478ac]/10 text-[#1478ac] font-medium"
+                        ? "bg-[#8A6212]/10 text-[#8A6212] font-medium"
                         : "hover:bg-muted"
                     }`}
                   >
@@ -309,7 +309,7 @@ export default function LearnPage() {
                     ))}
                   <Button
                     onClick={() => markModuleComplete(activeModule)}
-                    className="bg-[#1478ac] hover:bg-[#318dc1]"
+                    className="bg-[#8A6212] hover:bg-[#8A6212]"
                   >
                     <CheckCircle className="mr-2 h-4 w-4" /> Mark Complete
                   </Button>

@@ -1,11 +1,13 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://academy.efvertical.com";
+  const baseUrl = "https://strategicvalueplus.com";
 
   const staticPages = [
     "",
     "/pricing",
+    "/careers",
+    "/cogniverai",
     "/sign-in",
     "/sign-up",
     "/privacy",

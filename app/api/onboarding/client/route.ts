@@ -87,8 +87,8 @@ function esc(value: string | undefined): string {
 }
 
 function notifyRecipients(): string[] {
-  const fromEnv = process.env.LEAD_NOTIFY_EMAILS?.split(",").map((s) => s.trim()).filter(Boolean);
-  return fromEnv?.length ? fromEnv : ["info@efvertical.com"];
+  const fromEnv = process.env.ONBOARDING_NOTIFY_EMAILS?.split(",").map((s) => s.trim()).filter(Boolean);
+  return fromEnv?.length ? fromEnv : ["info@strategicvalueplus.com"];
 }
 
 function notifyAdmin(companyName: string, contactEmail: string, user: CaptureUser): void {
@@ -97,7 +97,7 @@ function notifyAdmin(companyName: string, contactEmail: string, user: CaptureUse
     <p><b>Company:</b> ${esc(companyName)}<br/>
     <b>Contact:</b> ${esc(contactEmail)}<br/>
     <b>Account:</b> ${esc(user.email)} (${esc(user.displayName)})</p>
-    <p><a href="https://academy.efvertical.com/portal/capture/clients">Open capture clients</a></p>`;
+    <p><a href="https://strategicvalueplus.com/portal/capture/clients">Open capture clients</a></p>`;
   sendEmail({ to: notifyRecipients(), subject, html }).catch((e) =>
     console.error("[onboarding] notification email failed:", e)
   );

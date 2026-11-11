@@ -16,7 +16,7 @@ export const SCORM_SESSION_TTL_SECONDS = 4 * 60 * 60;
 const secret = (): string =>
   process.env.SCORM_SESSION_SECRET ||
   process.env.STRIPE_SECRET_KEY ||
-  "efvs-dev-scorm-secret";
+  "vplus-dev-scorm-secret";
 
 export interface ScormSession {
   uid: string;

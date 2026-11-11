@@ -1,5 +1,5 @@
 /**
- * EFVS Academy LMS client-side data layer.
+ * V+ Academy LMS client-side data layer.
  * All functions degrade gracefully when Firebase is not configured.
  */
 
@@ -377,11 +377,11 @@ export async function getCertificateForEnrollment(
   return { id: d.id, ...d.data() } as CertificateDoc;
 }
 
-/** Generate a unique certificate number: EFVS-YYYY-XXXXXX */
+/** Generate a unique certificate number: VP-YYYY-XXXXXX */
 export function generateCertificateNumber(): string {
   const year = new Date().getFullYear();
   const rand = Math.floor(100000 + Math.random() * 900000);
-  return `EFVS-${year}-${rand}`;
+  return `VP-${year}-${rand}`;
 }
 
 

@@ -19,9 +19,9 @@ export async function POST(req: NextRequest) {
     }
     const now = Timestamp.now();
     const ref = await adminDb.collection(COLLECTIONS.REGISTRATION_FORMS).add({
-      name: "EFVS Student Registration",
+      name: "V+ Student Registration",
       slug: REGISTRATION_FORM_SLUG,
-      description: "Student and course registration based on the EFVS registration form.",
+      description: "Student and course registration based on the V+ registration form.",
       status: "draft",
       version: 1,
       fields: DEFAULT_STUDENT_REGISTRATION_FIELDS,

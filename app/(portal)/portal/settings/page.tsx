@@ -29,7 +29,7 @@ export default function SettingsPage() {
     setSaving(true);
     // Preferences persist client-side for now; server persistence can be
     // added when notification templates are configured.
-    localStorage.setItem("efvs_notification_prefs", JSON.stringify(prefs));
+    localStorage.setItem("vplus_notification_prefs", JSON.stringify(prefs));
     setTimeout(() => {
       setSaving(false);
       toast.success("Preferences saved");
@@ -59,7 +59,7 @@ export default function SettingsPage() {
             {profile.role}
           </Badge>
           {profile.isVeteran && (
-            <Badge className="bg-[#1478ac]">Veteran</Badge>
+            <Badge className="bg-[#8A6212]">Veteran</Badge>
           )}
         </CardContent>
       </Card>
@@ -95,7 +95,7 @@ export default function SettingsPage() {
           <Button
             onClick={save}
             disabled={saving}
-            className="bg-[#1478ac] hover:bg-[#318dc1]"
+            className="bg-[#8A6212] hover:bg-[#8A6212]"
           >
             {saving ? "Saving…" : "Save Preferences"}
           </Button>

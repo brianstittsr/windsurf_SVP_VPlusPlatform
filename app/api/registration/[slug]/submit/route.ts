@@ -311,11 +311,11 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: stri
     };
     await submissionRef.set(submission);
 
-    const noticeHtml = `<p>A new signed EFVS Academy registration is ready for review.</p><p>Submission ID: ${submissionRef.id}</p><p>Applicant: ${fullName.replace(/[<>]/g, "")}</p><p>Selected courses: ${selectedCoursesSnapshot.map((course) => `${course.code} — ${course.title}`).join(", ")}</p>`;
-    const confirmationHtml = `<p>Thank you, ${fullName.replace(/[<>]/g, "")}. EFVS received your signed course registration and will review it. If approved, you will receive a secure invitation and checkout instructions. Course access is granted after payment or approved sponsorship is confirmed.</p>`;
+    const noticeHtml = `<p>A new signed V+ Academy registration is ready for review.</p><p>Submission ID: ${submissionRef.id}</p><p>Applicant: ${fullName.replace(/[<>]/g, "")}</p><p>Selected courses: ${selectedCoursesSnapshot.map((course) => `${course.code} — ${course.title}`).join(", ")}</p>`;
+    const confirmationHtml = `<p>Thank you, ${fullName.replace(/[<>]/g, "")}. V+ received your signed course registration and will review it. If approved, you will receive a secure invitation and checkout instructions. Course access is granted after payment or approved sponsorship is confirmed.</p>`;
     await Promise.allSettled([
-      sendEmail({ to: [process.env.EFVS_REGISTRATION_EMAIL || "efvsflight@efvertical.com"], subject: "EFVS student registration received", html: noticeHtml }),
-      sendEmail({ to: [email], subject: "EFVS Academy registration received", html: confirmationHtml }),
+      sendEmail({ to: [process.env.SVP_REGISTRATION_EMAIL || "info@strategicvalueplus.com"], subject: "V+ student registration received", html: noticeHtml }),
+      sendEmail({ to: [email], subject: "V+ Academy registration received", html: confirmationHtml }),
     ]);
 
     return NextResponse.json({ data: { submissionId: submissionRef.id, status: "submitted" } }, { status: 201 });

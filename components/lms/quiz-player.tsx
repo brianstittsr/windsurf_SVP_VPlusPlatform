@@ -146,7 +146,7 @@ export function QuizPlayer({
           {attemptsLeft <= 0 && !result?.passed ? (
             <Alert variant="destructive">
               <AlertDescription>
-                You have used all {attemptsAllowed} attempts. Contact EFVS
+                You have used all {attemptsAllowed} attempts. Contact V+
                 support for assistance.
               </AlertDescription>
             </Alert>
@@ -154,7 +154,7 @@ export function QuizPlayer({
             !result?.passed && (
               <Button
                 onClick={startQuiz}
-                className="bg-[#1478ac] hover:bg-[#318dc1]"
+                className="bg-[#8A6212] hover:bg-[#8A6212]"
               >
                 Start {bank.type === "exam" ? "Exam" : "Quiz"} (
                 {bank.questions.length} questions)
@@ -269,7 +269,7 @@ export function QuizPlayer({
                 submitting ||
                 Object.keys(answers).length !== questions.length
               }
-              className="bg-[#1478ac] hover:bg-[#318dc1]"
+              className="bg-[#8A6212] hover:bg-[#8A6212]"
             >
               Submit Answers
             </Button>

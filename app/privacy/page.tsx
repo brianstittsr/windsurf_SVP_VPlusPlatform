@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
 export const metadata = {
-  title: "Privacy Policy | EFVS Academy",
-  description: "Privacy Policy for EFVS Academy platform, applications, and connected services.",
+  title: "Privacy Policy | V+ Academy",
+  description: "Privacy Policy for V+ Academy platform, applications, and connected services.",
 };
 
 export default function PrivacyPage() {
@@ -28,14 +28,14 @@ export default function PrivacyPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
             <p>
-              Aviante HWC, Inc. dba Eagle Flight Vertical Solutions (&quot;EFVS&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) respects your privacy and is committed to protecting your personal data. This privacy policy explains how we collect, use, and safeguard your information when you use our platform, applications, and connected services.
+              Strategic Value Plus Solutions, LLC (&quot;V+&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) respects your privacy and is committed to protecting your personal data. This privacy policy explains how we collect, use, and safeguard your information when you use our platform, applications, and connected services.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">2. Scope of This Policy</h2>
             <p>
-              This Privacy Policy applies to the EFVS Academy website, web applications, mobile applications, and any connected services or integrations that reference this policy (collectively, the &quot;Services&quot;).
+              This Privacy Policy applies to the V+ Academy website, web applications, mobile applications, and any connected services or integrations that reference this policy (collectively, the &quot;Services&quot;).
             </p>
           </section>
 
@@ -68,7 +68,7 @@ export default function PrivacyPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">5. Connected Apps and Third-Party Integrations</h2>
             <p>
-              When you connect your EFVS Academy account to third-party applications or services, we may exchange information with those providers as authorized by you. Each connected service is governed by its own privacy policy and terms. We encourage you to review those policies before connecting an integration.
+              When you connect your V+ Academy account to third-party applications or services, we may exchange information with those providers as authorized by you. Each connected service is governed by its own privacy policy and terms. We encourage you to review those policies before connecting an integration.
             </p>
           </section>
 
@@ -126,9 +126,9 @@ export default function PrivacyPage() {
               If you have any questions about this Privacy Policy, please contact us at:
             </p>
             <p className="mt-2">
-              <strong>Aviante HWC, Inc. dba Eagle Flight Vertical Solutions</strong><br />
-              Email: info@efvertical.com<br />
-              Website: <Link href="https://www.efvertical.com" className="text-primary hover:underline">efvertical.com</Link>
+              <strong>Strategic Value Plus Solutions, LLC</strong><br />
+              Email: info@strategicvalueplus.com<br />
+              Website: <Link href="https://strategicvalueplus.com" className="text-primary hover:underline">strategicvalueplus.com</Link>
             </p>
           </section>
         </div>

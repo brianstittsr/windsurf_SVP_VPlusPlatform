@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       ]);
       if (memberSnap.exists) {
         const member = memberSnap.data() as TeamMemberDoc;
-        if (member.firebaseUid !== decoded.uid) throw new LmsApiError(409, "A profile conflict requires EFVS administrator review");
+        if (member.firebaseUid !== decoded.uid) throw new LmsApiError(409, "A profile conflict requires V+ administrator review");
         const role = member.role === "admin" || member.role === "instructor" ? member.role : "student";
         result = { id: memberSnap.id, role };
         if (!roleSnap.exists) transaction.create(roleRef, { role, firebaseUid: decoded.uid, createdAt: now, updatedAt: now });
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
           result = { id: linked.id, role: linked.get("role") === "admin" || linked.get("role") === "instructor" ? linked.get("role") : "student" };
           return;
         }
-        throw new LmsApiError(409, "This email is already associated with an EFVS profile. Contact EFVS support to link your account.");
+        throw new LmsApiError(409, "This email is already associated with an V+ profile. Contact V+ support to link your account.");
       }
       const role = roleSnap.exists && ["admin", "instructor", "student"].includes(String(roleSnap.get("role")))
         ? roleSnap.get("role") as "admin" | "instructor" | "student"

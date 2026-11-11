@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cogniverai</title>
+<meta name="description" content="Cogniverai: AI adoption for aerospace and defense manufacturers, delivered by a coordinated team of specialist firms and convened by Strategic Value+.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a signal board. Dark command-room hero, then calm spec sections; verdigris marks only what is "live" (the team, the active step). */
+:root{
+  --bg:#F2F5F5; --surface:#FFFFFF; --ink:#141A1C; --muted:#56636A; --line:#D5DDE0;
+  --signal:#1F7A6E; --signal-fill:#2F9C8C; --signal-soft:#DDEFEC;
+  --deck:#0E1517; --deck-2:#152024; --deck-ink:#E7EFEF; --deck-muted:#98AAAE; --deck-line:#24343A; --deck-signal:#5CC2B3;
+  --brass:#8A6212;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --maxw:1180px; --radius:6px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B1113; --surface:#121B1E; --ink:#E7EFEF; --muted:#9AACB0; --line:#22323A;
+  --signal:#5CC2B3; --signal-fill:#2F9C8C; --signal-soft:#16302D;
+  --deck:#070B0C; --deck-2:#101A1D; --brass:#D9AF52; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B1113; --surface:#121B1E; --ink:#E7EFEF; --muted:#9AACB0; --line:#22323A;
+  --signal:#5CC2B3; --signal-fill:#2F9C8C; --signal-soft:#16302D;
+  --deck:#070B0C; --deck-2:#101A1D; --brass:#D9AF52; color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6}
+img{max-width:100%}
+[hidden]{display:none!important}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--signal-fill);outline-offset:3px;border-radius:2px}
+.wrap{max-width:var(--maxw);margin:0 auto;padding-inline:clamp(16px,4vw,40px)}
+h1,h2,h3{font-family:var(--display);line-height:1.02;text-wrap:balance;margin:0}
+h1{font-size:clamp(3rem,7.6vw,6rem);font-weight:500;letter-spacing:-.005em}
+h2{font-size:clamp(2.1rem,4.4vw,3.3rem);font-weight:500}
+h3{font-size:1.5rem;font-weight:600}
+p{margin:0;max-width:65ch}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--signal)}
+.lede{font-size:1.15rem;color:var(--muted)}
+.stack{display:grid;gap:14px}
+.btn{display:inline-flex;align-items:center;gap:8px;font:600 .98rem var(--body);padding:12px 20px;border-radius:var(--radius);border:1.5px solid var(--ink);text-decoration:none;cursor:pointer;background:transparent;color:var(--ink);transition:background .15s,color .15s,border-color .15s}
+.btn:hover{background:var(--ink);color:var(--bg)}
+.btn.primary{background:var(--deck-signal);border-color:var(--deck-signal);color:#0E1517}
+.btn.primary:hover{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.mono{font-family:var(--mono)}
+.logo{font-family:var(--display);font-weight:600;letter-spacing:.01em;text-decoration:none;font-size:1.7rem;line-height:1}
+.logo span{color:var(--signal)}
+
+header.site{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--deck);color:var(--deck-ink);border-bottom:1px solid var(--deck-line)}
+header.site .logo span{color:var(--deck-signal)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:66px}
+.links{display:flex;gap:22px;align-items:center;font-size:.95rem}
+.links a{text-decoration:none;color:var(--deck-muted)}
+.links a:hover{color:var(--deck-ink)}
+.links .home{font-family:var(--mono);font-size:.78rem;letter-spacing:.06em;border:1px solid var(--deck-line);border-radius:999px;padding:5px 12px}
+.menu-btn{display:none;background:none;border:1.5px solid var(--deck-line);border-radius:var(--radius);padding:8px 12px;font:600 .9rem var(--body);color:var(--deck-ink);cursor:pointer}
+@media (max-width:900px){
+  .links{display:none;position:absolute;left:0;right:0;top:100%;flex-direction:column;align-items:flex-start;gap:4px;background:var(--deck);border-bottom:1px solid var(--deck-line);padding:12px clamp(16px,4vw,40px) 20px}
+  .links.open{display:flex}
+  .links a{padding:8px 0;font-size:1.05rem}
+  .menu-btn{display:block}
+}
+
+section{padding-block:clamp(56px,8vw,104px)}
+section + section{border-top:1px solid var(--line)}
+.sec-head{display:grid;gap:14px;margin-bottom:40px}
+
+/* hero deck */
+.deck{background:var(--deck);color:var(--deck-ink);border-top:0}
+.deck .lede{color:var(--deck-muted)}
+.deck .eyebrow{color:var(--deck-signal)}
+.deck .btn{border-color:var(--deck-ink);color:var(--deck-ink)}
+.deck .btn:hover{background:var(--deck-ink);color:var(--deck)}
+.deck .btn.primary{color:#0E1517}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(32px,5vw,64px);align-items:center}
+@media (max-width:900px){.hero-grid{grid-template-columns:1fr}}
+.hero h1 em{font-style:normal;color:var(--deck-signal)}
+.actions{display:flex;flex-wrap:wrap;gap:12px}
+.endorse{font-family:var(--mono);font-size:.8rem;color:var(--deck-muted)}
+.endorse a{color:var(--deck-ink)}
+
+/* team board */
+.board{background:var(--deck-2);border:1px solid var(--deck-line);border-radius:10px;padding:20px}
+.board-head{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--deck-muted);border-bottom:1px dashed var(--deck-line);padding-bottom:10px;margin-bottom:14px}
+.client{border:1.5px solid var(--deck-signal);border-radius:8px;padding:12px 14px;margin-bottom:14px;display:grid;gap:2px}
+.client b{font-family:var(--display);font-size:1.3rem;font-weight:600}
+.client small{color:var(--deck-muted);font-size:.84rem}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chip{border:1px solid var(--deck-line);border-radius:6px;padding:9px 10px;font-size:.84rem;color:var(--deck-muted);display:flex;justify-content:space-between;gap:8px;align-items:center;min-width:0}
+.chip span{min-width:0;overflow-wrap:anywhere}
+.chip.on{border-color:var(--deck-signal);color:var(--deck-ink);background:rgba(92,194,179,.08)}
+.chip i{font-style:normal;font-family:var(--mono);font-size:.68rem;color:var(--deck-signal);white-space:nowrap}
+.board-foot{margin-top:12px;font-family:var(--mono);font-size:.72rem;color:var(--deck-muted)}
+
+/* dimensions */
+.dims{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+@media (max-width:1000px){.dims{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.dims{grid-template-columns:1fr}}
+.dim{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:22px;display:grid;gap:10px;align-content:start}
+.dim .q{font-family:var(--mono);font-size:.8rem;color:var(--signal)}
+.dim p{color:var(--muted);font-size:.95rem}
+
+/* steps */
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:0;padding:0;counter-reset:s}
+.flow li{list-style:none;padding-right:20px;display:grid;gap:10px;align-content:start;position:relative}
+.flow li::before{counter-increment:s;content:"0" counter(s);font-family:var(--display);font-size:2.6rem;font-weight:500;color:var(--signal);line-height:1}
+.flow li::after{content:"";position:absolute;top:22px;left:56px;right:20px;height:1.5px;background:var(--line)}
+.flow li:last-child::after{display:none}
+.flow p{color:var(--muted);font-size:.95rem}
+@media (max-width:860px){.flow{grid-template-columns:1fr 1fr;row-gap:32px}.flow li::after{display:none}}
+@media (max-width:520px){.flow{grid-template-columns:1fr}}
+
+/* offers */
+.offers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+@media (max-width:1000px){.offers{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.offers{grid-template-columns:1fr}}
+.offer{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:22px;display:grid;gap:12px;grid-template-rows:auto auto 1fr auto}
+.offer.feature{border:2px solid var(--signal-fill);background:var(--signal-soft)}
+.offer .kind{font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.offer p{color:var(--muted);font-size:.95rem}
+.offer .terms{font-family:var(--display);font-size:1.35rem;font-weight:600;border-top:1px dashed var(--line);padding-top:10px}
+.offer .terms small{display:block;font-family:var(--mono);font-size:.72rem;font-weight:400;color:var(--muted)}
+
+/* members */
+.members{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+@media (max-width:1000px){.members{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.members{grid-template-columns:1fr}}
+.member{background:var(--surface);padding:22px;display:grid;gap:8px;align-content:start}
+.member .role{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--signal)}
+.member h3{font-size:1.4rem}
+.member p{color:var(--muted);font-size:.92rem}
+.member .site{font-family:var(--mono);font-size:.78rem;color:var(--muted);overflow-wrap:anywhere}
+.member.convener{background:var(--signal-soft)}
+
+/* principles + region */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(32px,5vw,64px);align-items:start}
+@media (max-width:860px){.split{grid-template-columns:1fr}}
+.list{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.list li{padding:16px 0;border-bottom:1px solid var(--line);display:grid;gap:4px}
+.list li strong{font-weight:600}
+.list li span{color:var(--muted);font-size:.95rem}
+.region{display:grid;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.region div{display:grid;grid-template-columns:120px minmax(0,1fr);gap:16px;padding:18px 20px;align-items:baseline}
+.region div + div{border-top:1px solid var(--line)}
+.region .when{font-family:var(--mono);font-size:.8rem;color:var(--signal);letter-spacing:.04em}
+.region b{font-weight:600}
+.region span{color:var(--muted);font-size:.92rem;display:block}
+@media (max-width:480px){.region div{grid-template-columns:1fr;gap:4px}}
+
+/* contact */
+form{display:grid;gap:14px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:560px){.row2{grid-template-columns:1fr}}
+label{display:grid;gap:6px;font-size:.88rem;font-weight:500}
+input,select,textarea{font:inherit;font-size:1rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:11px 12px;width:100%}
+textarea{min-height:120px;resize:vertical}
+.fact{display:grid;gap:4px}
+.fact .k{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.fact .v{font-size:1.15rem;font-weight:600;display:flex;flex-wrap:wrap;gap:10px;align-items:center;overflow-wrap:anywhere}
+.copy{font:500 .8rem var(--mono);border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:4px;padding:3px 8px;cursor:pointer}
+.copy:hover{color:var(--ink);border-color:var(--ink)}
+.ready{border:1px solid var(--signal-fill);background:var(--signal-soft);border-radius:8px;padding:18px;display:grid;gap:10px}
+.ready pre{margin:0;white-space:pre-wrap;font:400 .85rem/1.5 var(--mono);max-height:220px;overflow:auto}
+.ready .acts{display:flex;flex-wrap:wrap;gap:10px}
+.err{color:#C0473A;font-size:.85rem}
+
+footer{background:var(--deck);color:var(--deck-muted);padding-block:44px;font-size:.9rem}
+footer .logo{color:var(--deck-ink)}
+footer .logo span{color:var(--deck-signal)}
+.foot{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:flex-start}
+footer a{color:var(--deck-ink)}
+footer .legal{margin-top:28px;border-top:1px solid var(--deck-line);padding-top:16px;font-family:var(--mono);font-size:.76rem;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="wrap nav">
+    <a class="logo" href="#top" aria-label="Cogniverai home">cogniver<span>ai</span></a>
+    <nav class="links" id="links" aria-label="Main">
+      <a href="#approach">Approach</a>
+      <a href="#offers">Offers</a>
+      <a href="#members">Founding members</a>
+      <a href="#region">Where we start</a>
+      <a href="#contact">Contact</a>
+      <a class="home" href="index.html">Strategic Value+</a>
+    </nav>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="links">Menu</button>
+  </div>
+</header>
+
+<main id="top">
+<section class="deck hero">
+  <div class="wrap hero-grid">
+    <div class="stack" style="gap:22px">
+      <span class="eyebrow">AI adoption for aerospace and defense manufacturers</span>
+      <h1>Adopt AI.<br><em>Keep control.</em></h1>
+      <p class="lede">Your OEMs, your board and your vendors all expect AI progress. Cogniverai gives you one coordinated team for the whole job: leadership alignment, the right technology, a ready workforce and security you can defend in an audit.</p>
+      <div class="actions">
+        <a class="btn primary" href="#contact">Request an AI Readiness Diagnostic</a>
+        <a class="btn" href="#members">Meet the founding members</a>
+      </div>
+      <p class="endorse">Convened by <a href="index.html">Strategic Value+</a> · cogniverai.com</p>
+    </div>
+    <aside class="board" aria-label="Example: a team assembled for one client">
+      <div class="board-head"><span>Team assembled per client</span><span>Example</span></div>
+      <div class="client"><b>Tier 2 aerostructures supplier, 180 people</b><small>Goal: AI-assisted quoting and quality data an OEM can trust</small></div>
+      <div class="chips">
+        <div class="chip on"><span>Strategic Value+</span><i>LEAD</i></div>
+        <div class="chip on"><span>Semantic OS</span><i>ON TEAM</i></div>
+        <div class="chip on"><span>AI Agility</span><i>ON TEAM</i></div>
+        <div class="chip on"><span>E3S</span><i>ON TEAM</i></div>
+        <div class="chip"><span>LogiCore</span></div>
+        <div class="chip"><span>BizzTech</span></div>
+        <div class="chip"><span>AthenaMind.io</span></div>
+        <div class="chip"><span>AOCyber.ai</span></div>
+      </div>
+      <p class="board-foot">Illustrative engagement. Each client gets only the members its goals require.</p>
+    </aside>
+  </div>
+</section>
+
+<section id="approach">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Why AI stalls in manufacturing</span>
+      <h2>AI fails on four fronts at once</h2>
+      <p class="lede">Most pilots stall for reasons that have nothing to do with the model. We work all four fronts together, so a pilot becomes how the plant runs.</p>
+    </div>
+    <div class="dims">
+      <article class="dim"><span class="q">Leadership</span><h3>Where should AI pay first?</h3><p>Executive alignment on a short list of use cases tied to throughput, quality and margin, with owners and a roadmap.</p></article>
+      <article class="dim"><span class="q">Technology</span><h3>What do we connect, and how?</h3><p>Opportunity diagnostics, systems integration, digital twins and decision automation with a full audit trail.</p></article>
+      <article class="dim"><span class="q">People</span><h3>Will the floor actually use it?</h3><p>Change readiness, role-based skills and immersive training so operators, planners and quality staff adopt the tools.</p></article>
+      <article class="dim"><span class="q">Security</span><h3>Can we defend it to a prime?</h3><p>Private, controlled AI infrastructure built for CUI, CMMC and ITAR environments, up to DoD-grade builds.</p></article>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">How an engagement runs</span><h2>From first scan to working AI in 90 days</h2></div>
+    <ol class="flow">
+      <li><h3>Scan</h3><p>A quick AI opportunity scan shows where AI could save time or money in your operation.</p></li>
+      <li><h3>Diagnose</h3><p>Two or three members assess leadership, data, security and workforce readiness, and price the work.</p></li>
+      <li><h3>Assemble</h3><p>Strategic Value+ builds the team from the founding members your goals need, under one contract.</p></li>
+      <li><h3>Sprint</h3><p>A 90-day sprint puts the first use cases into daily operation, with measures agreed up front.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section id="offers">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Offers</span>
+      <h2>Four ways to start</h2>
+    </div>
+    <div class="offers">
+      <article class="offer"><span class="kind">Entry</span><h3>AI Opportunity Scan</h3><p>A fast scan of where AI fits in your operation, plus an executive briefing for your leadership team.</p><div class="terms">No cost<small>For qualified manufacturers</small></div></article>
+      <article class="offer feature"><span class="kind">Recommended first step</span><h3>AI Readiness Diagnostic</h3><p>Leadership, data, security and workforce readiness, scored and turned into a priced sprint plan.</p><div class="terms">Fixed fee<small>50% credited to the sprint</small></div></article>
+      <article class="offer"><span class="kind">Core engagement</span><h3>90-day AI Transformation Sprint</h3><p>A team assembled for your goals delivers the first use cases, trains your people and secures the stack.</p><div class="terms">Scoped per client<small>From the diagnostic</small></div></article>
+      <article class="offer"><span class="kind">Ongoing</span><h3>Platforms and training</h3><p>Vendor-matching cockpit, immersive workforce training and managed secure AI infrastructure.</p><div class="terms">Subscription<small>or per-seat training</small></div></article>
+    </div>
+  </div>
+</section>
+
+<section id="members">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Founding members</span>
+      <h2>Eight specialist firms, one accountable team</h2>
+      <p class="lede">Each member is independent and best in its field. Strategic Value+ convenes the collaborative, holds the contract and runs the program.</p>
+    </div>
+    <div class="members">
+      <article class="member convener"><span class="role">Convener · Orchestration</span><h3>Strategic Value+</h3><p>Program leadership, manufacturing readiness and the Four Gates framework.</p><span class="site">strategicvalueplus.com</span></article>
+      <article class="member"><span class="role">AI opportunity diagnostics</span><h3>Semantic OS</h3><p>AI opportunity scans and the vendor-matching cockpit.</p></article>
+      <article class="member"><span class="role">Leadership and culture</span><h3>AI Agility</h3><p>Executive alignment, culture-change readiness and workforce capability.</p><span class="site">leadingaiagility.com</span></article>
+      <article class="member"><span class="role">Secure AI engineering</span><h3>E3S</h3><p>Secure AI engineering, digital twins and compliance.</p><span class="site">eecomputing.com</span></article>
+      <article class="member"><span class="role">Systems and logistics</span><h3>LogiCore Corporation</h3><p>Systems engineering and logistics.</p></article>
+      <article class="member"><span class="role">Immersive training</span><h3>BizzTech</h3><p>Immersive, AI-powered workforce training.</p></article>
+      <article class="member"><span class="role">Decision execution</span><h3>AthenaMind.io</h3><p>Autonomous decision execution and integration across enterprise systems, with an audit trail.</p><span class="site">athenamind.io</span></article>
+      <article class="member"><span class="role">Secure infrastructure</span><h3>AOCyber.ai</h3><p>Private AI infrastructure for DoD- and IC-grade builds.</p><span class="site">aocyber.ai</span></article>
+    </div>
+  </div>
+</section>
+
+<section id="region">
+  <div class="wrap split">
+    <div class="stack" style="gap:18px">
+      <span class="eyebrow">Where we start</span>
+      <h2>North Carolina first, then Southern California</h2>
+      <p class="lede">The Piedmont Triad is becoming one of the country's newest aerospace hubs, with a digitally planned aircraft plant under construction in Greensboro. Its suppliers are where AI readiness matters first.</p>
+    </div>
+    <div class="region">
+      <div><span class="when">Q1 2027</span><p><b>Piedmont Triad launch</b><span>Launch event with a founding member and a local manufacturer.</span></p></div>
+      <div><span class="when">H1 2027</span><p><b>North Carolina A&amp;D suppliers</b><span>Charlotte, the Triad and the Research Triangle.</span></p></div>
+      <div><span class="when">H2 2027</span><p><b>Southern California</b><span>Long Beach and the Los Angeles aerospace base.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section id="principles">
+  <div class="wrap split">
+    <div class="stack" style="gap:18px">
+      <span class="eyebrow">How we work</span>
+      <h2>What you can count on</h2>
+    </div>
+    <ul class="list">
+      <li><strong>Vendor-neutral</strong><span>We recommend tools for fit, not commission. Any software relationship is disclosed up front.</span></li>
+      <li><strong>One contract, one owner</strong><span>Strategic Value+ holds the contract and answers for the whole team's delivery.</span></li>
+      <li><strong>Your data stays yours</strong><span>We build for CUI and export-controlled environments, and your data is never used to train shared models.</span></li>
+      <li><strong>Only the team you need</strong><span>You pay for the members your goals require, not a standing bench.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap split">
+    <div class="stack" style="gap:24px">
+      <div class="stack" style="gap:14px">
+        <span class="eyebrow">Contact</span>
+        <h2>Start with a diagnostic</h2>
+        <p class="lede">Tell us what your customers and leadership are asking for. We'll tell you which front to work first.</p>
+      </div>
+      <div class="fact"><span class="k">Email</span><span class="v"><span>info@strategicvalueplus.com</span><button class="copy" type="button" data-copy="info@strategicvalueplus.com">Copy</button></span></div>
+      <div class="fact"><span class="k">Phone</span><span class="v"><span>(302) 215-4700</span><button class="copy" type="button" data-copy="(302) 215-4700">Copy</button></span></div>
+    </div>
+    <div>
+      <form id="contactForm" novalidate>
+        <div class="row2">
+          <label for="c-name">Name<input id="c-name" autocomplete="name" required></label>
+          <label for="c-company">Company<input id="c-company" autocomplete="organization"></label>
+        </div>
+        <div class="row2">
+          <label for="c-email">Work email<input id="c-email" type="email" autocomplete="email" required></label>
+          <label for="c-role">Your role<select id="c-role"><option>CEO / Owner</option><option>COO / Operations</option><option>CTO / IT</option><option>Quality</option><option>Other</option></select></label>
+        </div>
+        <label for="c-interest">I'm interested in<select id="c-interest"><option>AI Readiness Diagnostic</option><option>AI Opportunity Scan</option><option>90-day AI Transformation Sprint</option><option>Becoming a member or partner</option></select></label>
+        <label for="c-msg">What would AI need to do for you?<textarea id="c-msg" placeholder="For example: cut quoting time in half without exposing CUI."></textarea></label>
+        <p id="formError" class="err mono" hidden>Add your name and a valid work email so we can reply.</p>
+        <div><button class="btn primary" type="submit">Prepare my message</button></div>
+      </form>
+      <div class="ready" id="ready" hidden>
+        <strong>Your message is ready to send</strong>
+        <p style="color:var(--muted);font-size:.92rem">Copy it and email it to info@strategicvalueplus.com.</p>
+        <pre id="readyText"></pre>
+        <div class="acts"><button class="btn primary" type="button" id="copyMsg">Copy message</button><button class="btn" type="button" id="editMsg">Edit</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div class="stack" style="gap:10px"><span class="logo">cogniver<span>ai</span></span><p>An AI adoption collaborative for aerospace and defense manufacturing, convened by Strategic Value Plus Solutions, LLC.</p></div>
+      <div class="stack" style="gap:6px"><a href="index.html">Strategic Value+</a><a href="#members">Founding members</a><a href="#contact">Contact</a></div>
+    </div>
+    <div class="legal"><span>© <span id="yr">2026</span> Strategic Value Plus Solutions, LLC · cogniverai.com</span><span>Member names are the property of their respective firms.</span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var btn=document.getElementById('menuBtn'), links=document.getElementById('links');
+  btn.addEventListener('click',function(){var o=links.classList.toggle('open');btn.setAttribute('aria-expanded',o?'true':'false');});
+  links.addEventListener('click',function(e){if(e.target.tagName==='A'){links.classList.remove('open');btn.setAttribute('aria-expanded','false');}});
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  function sel(node,el){if(!node)return;var r=document.createRange();r.selectNodeContents(node);var s=window.getSelection();s.removeAllRanges();s.addRange(r);el.textContent='Press Ctrl+C';}
+  function copy(text,el,node){
+    var done=function(){var t=el.textContent;el.textContent='Copied';setTimeout(function(){el.textContent=t;},1500);};
+    try{navigator.clipboard.writeText(text).then(done,function(){sel(node,el);});}catch(e){sel(node,el);}
+  }
+  document.querySelectorAll('[data-copy]').forEach(function(b){b.addEventListener('click',function(){copy(b.getAttribute('data-copy'),b,b.previousElementSibling);});});
+  var form=document.getElementById('contactForm'), ready=document.getElementById('ready'), out=document.getElementById('readyText'), err=document.getElementById('formError');
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var v=function(id){return document.getElementById(id).value.trim();};
+    var email=v('c-email');
+    if(!v('c-name')||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){err.hidden=false;return;}
+    err.hidden=true;
+    out.textContent='To: info@strategicvalueplus.com\nSubject: Cogniverai — '+v('c-interest')+' — '+(v('c-company')||v('c-name'))+'\n\nName: '+v('c-name')+'\nCompany: '+(v('c-company')||'—')+'\nEmail: '+email+'\nRole: '+v('c-role')+'\nInterested in: '+v('c-interest')+'\n\n'+(v('c-msg')||'');
+    form.hidden=true; ready.hidden=false;
+  });
+  document.getElementById('editMsg').addEventListener('click',function(){ready.hidden=true;form.hidden=false;});
+  document.getElementById('copyMsg').addEventListener('click',function(){copy(out.textContent,this,out);});
+})();
+</script>
+</body>
+</html>

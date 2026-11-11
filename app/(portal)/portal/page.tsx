@@ -73,7 +73,7 @@ export default function PortalDashboard() {
           Welcome back{profile.firstName ? `, ${profile.firstName}` : ""}
         </h1>
         <p className="text-muted-foreground">
-          EFVS UAS Training Academy student dashboard
+          V+ Academy student dashboard
         </p>
       </div>
 
@@ -86,7 +86,7 @@ export default function PortalDashboard() {
             <CardTitle className="text-sm font-medium">
               Active Courses
             </CardTitle>
-            <BookOpen className="h-4 w-4 text-[#1478ac]" />
+            <BookOpen className="h-4 w-4 text-[#8A6212]" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{active.length}</div>
@@ -95,7 +95,7 @@ export default function PortalDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Completed</CardTitle>
-            <GraduationCap className="h-4 w-4 text-[#1478ac]" />
+            <GraduationCap className="h-4 w-4 text-[#8A6212]" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{completed.length}</div>
@@ -104,7 +104,7 @@ export default function PortalDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Certificates</CardTitle>
-            <Award className="h-4 w-4 text-[#d3ac63]" />
+            <Award className="h-4 w-4 text-[#C9962B]" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{certificates.length}</div>
@@ -169,7 +169,7 @@ export default function PortalDashboard() {
                       </p>
                     )}
                   </div>
-                  <Button asChild className="bg-[#1478ac] hover:bg-[#318dc1]">
+                  <Button asChild className="bg-[#8A6212] hover:bg-[#8A6212]">
                     <Link href={`/portal/learn/${enrollment.id}`}>
                       Resume <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>

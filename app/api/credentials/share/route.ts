@@ -11,7 +11,7 @@ const bodySchema = z.object({
   enabled: z.boolean(),
   publicNameConsent: z.boolean(),
 });
-const PUBLIC_CONSENT_VERSION = "efvs-credential-share-v1";
+const PUBLIC_CONSENT_VERSION = "vplus-credential-share-v1";
 
 export async function POST(req: NextRequest) {
   try {

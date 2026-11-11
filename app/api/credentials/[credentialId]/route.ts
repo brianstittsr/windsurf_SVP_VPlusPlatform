@@ -26,10 +26,10 @@ export async function GET(
       courseCode: cert.courseCode,
       courseTitle: cert.courseTitle,
       badgeTitle: cert.badgeTitle || `${cert.courseCode} — Completion`,
-      issuer: "Eagle Flight Vertical Solutions · EFVS UAS Training Academy",
+      issuer: "Strategic Value Plus Solutions, LLC · V+ Academy",
       issuedAt: cert.issuedAt?.toDate?.().toISOString() || null,
       verificationStatus: "verified",
-      credentialUrl: `${new URL(process.env.NEXT_PUBLIC_APP_URL || "https://academy.efvertical.com").origin}/credentials/${cert.publicCredentialId}`,
+      credentialUrl: `${new URL(process.env.NEXT_PUBLIC_APP_URL || "https://strategicvalueplus.com").origin}/credentials/${cert.publicCredentialId}`,
     } });
   } catch (error) {
     console.error("[credentials/verify] failed:", error);

@@ -235,7 +235,7 @@ export default function AdminCoursesPage() {
           </Button>
           <Button
             onClick={() => openEdit()}
-            className="bg-[#1478ac] hover:bg-[#318dc1]"
+            className="bg-[#8A6212] hover:bg-[#8A6212]"
           >
             <Plus className="mr-2 h-4 w-4" /> New Course
           </Button>
@@ -608,7 +608,7 @@ export default function AdminCoursesPage() {
               </div>
               <Button
                 onClick={save}
-                className="w-full bg-[#1478ac] hover:bg-[#318dc1]"
+                className="w-full bg-[#8A6212] hover:bg-[#8A6212]"
               >
                 Save Course
               </Button>

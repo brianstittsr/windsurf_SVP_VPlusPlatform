@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Become a V+ Resource</title>
+<meta name="description" content="Apply to join the Strategic Value+ network of manufacturing consultants, auditors and operations leaders.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: industrial spec-sheet. Left-aligned sections on a 1180px sheet, gold "gate tags" as the recurring device, one black brand band per page. */
+:root{
+  --bg:#F3F4F6; --surface:#FFFFFF; --ink:#16191D; --muted:#555D68; --line:#D8DCE2;
+  --brass:#8A6212; --brass-fill:#C9962B; --brass-soft:#F4EAD3;
+  --band:#15181C; --band-ink:#EEF0F2; --band-muted:#A6ADB7; --band-brass:#D9AF52;
+  --ok:#2E7D4F; --warn:#A86A00; --gap:#B23B2E;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --maxw:1180px; --radius:6px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1114; --surface:#171A1F; --ink:#ECEDEF; --muted:#A0A7B1; --line:#2A3038;
+  --brass:#D9AF52; --brass-fill:#C9962B; --brass-soft:#2A2416;
+  --band:#08090B; --band-ink:#EEF0F2; --band-muted:#A6ADB7; --band-brass:#D9AF52;
+  --ok:#5FBF86; --warn:#E0A43A; --gap:#E3705F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1114; --surface:#171A1F; --ink:#ECEDEF; --muted:#A0A7B1; --line:#2A3038;
+  --brass:#D9AF52; --brass-fill:#C9962B; --brass-soft:#2A2416;
+  --band:#08090B; --band-ink:#EEF0F2; --band-muted:#A6ADB7; --band-brass:#D9AF52;
+  --ok:#5FBF86; --warn:#E0A43A; --gap:#E3705F; color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--brass-fill);outline-offset:3px;border-radius:2px}
+.wrap{max-width:var(--maxw);margin:0 auto;padding-inline:clamp(16px,4vw,40px)}
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.02;letter-spacing:.005em;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.9rem,7.2vw,5.6rem);text-transform:uppercase}
+h2{font-size:clamp(2.1rem,4.4vw,3.3rem);text-transform:uppercase}
+h3{font-size:1.55rem;font-weight:600;text-transform:uppercase;letter-spacing:.01em}
+p{margin:0;max-width:65ch}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--brass)}
+.lede{font-size:1.15rem;color:var(--muted)}
+.stack{display:grid;gap:14px}
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--body);font-weight:600;font-size:.98rem;padding:12px 20px;border-radius:var(--radius);border:1.5px solid var(--ink);text-decoration:none;cursor:pointer;background:transparent;color:var(--ink);transition:background .15s,color .15s,border-color .15s}
+.btn:hover{background:var(--ink);color:var(--bg)}
+.btn.primary{background:var(--brass-fill);border-color:var(--brass-fill);color:#16191D}
+.btn.primary:hover{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.mono{font-family:var(--mono)}
+
+/* header */
+header.site{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:68px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.mark{width:36px;height:36px;border-radius:5px;background:var(--band);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:1.25rem;color:var(--band-brass);flex:none}
+.brand b{font-family:var(--display);font-size:1.45rem;font-weight:700;letter-spacing:.01em;text-transform:uppercase}
+.brand b span{color:var(--brass)}
+.links{display:flex;gap:22px;align-items:center;font-size:.95rem}
+.links a{text-decoration:none;color:var(--muted)}
+.links a:hover{color:var(--ink)}
+.links .cog{color:var(--ink);font-weight:600}
+.menu-btn{display:none;background:none;border:1.5px solid var(--line);border-radius:var(--radius);padding:8px 12px;font:600 .9rem var(--body);color:var(--ink);cursor:pointer}
+@media (max-width:1140px){
+  .links{display:none;position:absolute;left:0;right:0;top:100%;flex-direction:column;align-items:flex-start;gap:4px;background:var(--bg);border-bottom:1px solid var(--line);padding:12px clamp(16px,4vw,40px) 20px}
+  .links.open{display:flex}
+  .links a{padding:8px 0;font-size:1.05rem}
+  .menu-btn{display:block}
+  .nav .btn.primary.hide-sm{display:none}
+}
+
+section{padding-block:clamp(56px,8vw,104px)}
+section + section{border-top:1px solid var(--line)}
+.sec-head{display:grid;gap:14px;margin-bottom:40px}
+
+/* hero */
+.hero{padding-block:clamp(40px,6vw,80px) clamp(56px,7vw,96px)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(32px,5vw,64px);align-items:center}
+@media (max-width:900px){.hero-grid{grid-template-columns:1fr}}
+.hero h1 em{font-style:normal;color:var(--brass)}
+.hero .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.for{font-family:var(--mono);font-size:.82rem;color:var(--muted);letter-spacing:.04em}
+
+/* inspection tag (example scorecard) */
+.tag{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px 22px 18px;position:relative;box-shadow:0 1px 0 var(--line)}
+.tag::before{content:"";position:absolute;top:18px;right:18px;width:14px;height:14px;border-radius:50%;border:2px solid var(--line);background:var(--bg)}
+.tag .tag-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-right:28px;border-bottom:1px dashed var(--line);padding-bottom:12px;margin-bottom:12px}
+.tag .tag-head span{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tag .tag-head strong{font-family:var(--display);font-size:1.4rem;text-transform:uppercase}
+.gate-row{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:12px;align-items:center;padding:9px 0}
+.gate-row + .gate-row{border-top:1px solid var(--line)}
+.gate-id{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.gate-name{font-weight:600;font-size:.95rem}
+.gate-name small{display:block;font-weight:400;color:var(--muted);font-size:.8rem}
+.pill{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.pill.ok{color:var(--ok)} .pill.warn{color:var(--warn)} .pill.gap{color:var(--gap)}
+.tag-foot{margin-top:10px;font-family:var(--mono);font-size:.74rem;color:var(--muted);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+/* why now band */
+.band{background:var(--band);color:var(--band-ink)}
+.band .eyebrow{color:var(--band-brass)}
+.band h2 em{font-style:normal;color:var(--band-brass)}
+.band p{color:var(--band-muted)}
+.why{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:#2A2F36;border:1px solid #2A2F36;border-radius:8px;overflow:hidden;margin-top:40px}
+.why > div{background:var(--band);padding:26px 24px;display:grid;gap:10px;align-content:start}
+.why h3{color:var(--band-ink);font-size:1.35rem}
+.why .src{font-family:var(--mono);font-size:.74rem;color:var(--band-muted)}
+@media (max-width:860px){.why{grid-template-columns:1fr}}
+
+/* four gates */
+.gates{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+@media (max-width:1000px){.gates{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.gates{grid-template-columns:1fr}}
+.gate{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:22px;display:grid;gap:12px;align-content:start}
+.gate .num{font-family:var(--mono);font-size:.78rem;color:var(--brass);letter-spacing:.1em}
+.gate ul{margin:0;padding-left:18px;color:var(--muted);font-size:.93rem;display:grid;gap:4px}
+.gate .std{font-family:var(--mono);font-size:.75rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:10px}
+.gate5{margin-top:18px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;border:1px dashed var(--brass-fill);border-radius:8px;padding:18px 22px;background:var(--brass-soft)}
+.gate5 p{max-width:70ch}
+
+/* offers ladder */
+.ladder{display:grid;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.rung{display:grid;grid-template-columns:110px minmax(0,1.3fr) minmax(0,1fr) 170px;gap:20px;padding:22px 24px;align-items:start}
+.rung + .rung{border-top:1px solid var(--line)}
+.rung .step{font-family:var(--mono);font-size:.78rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.rung h3{font-size:1.4rem}
+.rung p{color:var(--muted);font-size:.95rem}
+.rung .price{font-family:var(--display);font-size:1.6rem;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.rung .price small{display:block;font-family:var(--mono);font-size:.72rem;font-weight:400;color:var(--muted);letter-spacing:.04em}
+.rung.feature{background:var(--brass-soft)}
+.rung.feature .price{color:var(--brass)}
+@media (max-width:860px){.rung{grid-template-columns:1fr;gap:8px}.rung .price{text-align:left}}
+
+/* process */
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;counter-reset:s}
+.steps li{list-style:none;padding:0 20px 0 0;display:grid;gap:10px;align-content:start;position:relative}
+.steps li::before{counter-increment:s;content:"0" counter(s);font-family:var(--display);font-size:2.6rem;font-weight:700;color:var(--brass);line-height:1}
+.steps li::after{content:"";position:absolute;top:22px;left:56px;right:20px;height:1.5px;background:var(--line)}
+.steps li:last-child::after{display:none}
+.steps p{color:var(--muted);font-size:.95rem}
+.steps ol{margin:0;padding:0}
+@media (max-width:860px){.steps{grid-template-columns:1fr 1fr;row-gap:32px}.steps li::after{display:none}}
+@media (max-width:520px){.steps{grid-template-columns:1fr}}
+
+/* two col */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(32px,5vw,64px);align-items:start}
+@media (max-width:860px){.split{grid-template-columns:1fr}}
+.list{margin:0;padding:0;list-style:none;display:grid;gap:0;border-top:1px solid var(--line)}
+.list li{padding:16px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr);gap:4px}
+.list li strong{font-weight:600}
+.list li span{color:var(--muted);font-size:.95rem}
+
+/* partner tiers */
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+@media (max-width:860px){.tiers{grid-template-columns:1fr}}
+.tier{border:1px solid var(--line);border-radius:8px;padding:22px;display:grid;gap:10px;align-content:start;background:var(--surface)}
+.tier .who{font-family:var(--mono);font-size:.75rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.eco{margin-top:36px;display:flex;flex-wrap:wrap;gap:10px}
+.eco span{font-size:.88rem;border:1px solid var(--line);border-radius:999px;padding:6px 14px;color:var(--muted);background:var(--surface)}
+
+/* cogniverai band */
+.cog-band{background:var(--band);color:var(--band-ink)}
+.cog-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:40px;align-items:center}
+@media (max-width:860px){.cog-grid{grid-template-columns:1fr}}
+.cog-logo{font-family:var(--display);font-weight:600;font-size:clamp(3rem,7vw,5rem);letter-spacing:.01em;line-height:1;text-transform:none}
+.cog-logo span{color:#5CC2B3}
+.cog-band p{color:var(--band-muted)}
+.cog-band .btn{border-color:var(--band-ink);color:var(--band-ink)}
+.cog-band .btn:hover{background:var(--band-ink);color:var(--band)}
+.cog-dims{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#2A2F36;border:1px solid #2A2F36;border-radius:8px;overflow:hidden}
+.cog-dims div{background:var(--band);padding:18px}
+.cog-dims b{display:block;font-family:var(--display);font-size:1.3rem;text-transform:uppercase;color:var(--band-ink)}
+.cog-dims small{color:var(--band-muted);font-size:.85rem}
+
+/* insights */
+.insights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+@media (max-width:760px){.insights{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:24px;display:grid;gap:10px;align-content:start}
+.status{font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--brass)}
+
+/* about */
+.bench{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.bench-col{background:var(--surface);padding:20px;display:grid;gap:12px;align-content:start}
+.bench-col .num{font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--brass)}
+.bench-col ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:.93rem}
+.bench-col li{padding-left:14px;position:relative}
+.bench-col li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:6px;background:var(--brass-fill)}
+.bench-col.wide{background:var(--brass-soft)}
+@media (max-width:1000px){.bench{grid-template-columns:repeat(2,minmax(0,1fr))}.bench-col.wide{grid-column:1/-1}}
+@media (max-width:560px){.bench{grid-template-columns:1fr}}
+.origins{margin-top:32px;display:grid;gap:12px}
+.origins .k{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.deploy{margin-top:32px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;border-top:1px solid var(--line);padding-top:24px}
+.deploy div{display:grid;gap:4px}
+.deploy strong{font-family:var(--display);font-size:1.35rem;text-transform:uppercase;font-weight:600}
+.deploy span{color:var(--muted);font-size:.95rem}
+@media (max-width:760px){.deploy{grid-template-columns:1fr}}
+.join{background:var(--surface)}
+input[type=file]{padding:9px 10px}
+
+/* contact */
+form{display:grid;gap:14px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:560px){.row2{grid-template-columns:1fr}}
+label{display:grid;gap:6px;font-size:.88rem;font-weight:500}
+input,select,textarea{font:inherit;font-size:1rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:11px 12px;width:100%}
+textarea{min-height:120px;resize:vertical}
+.contact-facts{display:grid;gap:18px}
+.fact{display:grid;gap:4px}
+.fact .k{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.fact .v{font-size:1.15rem;font-weight:600;user-select:all;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.copy{font:500 .8rem var(--mono);border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:4px;padding:3px 8px;cursor:pointer}
+.copy:hover{color:var(--ink);border-color:var(--ink)}
+.ready{border:1px solid var(--brass-fill);background:var(--brass-soft);border-radius:8px;padding:18px;display:grid;gap:10px}
+.ready pre{margin:0;white-space:pre-wrap;font:400 .85rem/1.5 var(--mono);max-height:220px;overflow:auto}
+.ready .acts{display:flex;flex-wrap:wrap;gap:10px}
+
+footer{background:var(--band);color:var(--band-muted);padding-block:48px;font-size:.9rem}
+.foot{display:grid;grid-template-columns:minmax(0,1.4fr) repeat(3,minmax(0,1fr));gap:28px}
+@media (max-width:760px){.foot{grid-template-columns:1fr 1fr}}
+footer h4{margin:0 0 10px;font-family:var(--mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--band-brass);font-weight:500}
+footer a{color:var(--band-ink);text-decoration:none;display:block;padding:3px 0}
+footer a:hover{color:var(--band-brass)}
+footer .legal{margin-top:36px;border-top:1px solid #2A2F36;padding-top:18px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-family:var(--mono);font-size:.76rem}
+
+.sub-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px;margin:48px 0 18px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.sub-head h3{font-size:1.7rem}
+.sub-head p{color:var(--muted);font-size:.95rem}
+.team{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+@media (max-width:1000px){.team{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.team{grid-template-columns:1fr}}
+.person{display:grid;grid-template-columns:56px minmax(0,1fr);gap:14px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px}
+.person h4,.expert h4{margin:0;font-family:var(--display);font-size:1.4rem;font-weight:600;text-transform:uppercase;line-height:1.1}
+.person .title{display:block;font-family:var(--mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--brass);margin:4px 0 8px}
+.person p{font-size:.9rem;color:var(--muted)}
+.todo{border-style:dashed}
+.avatar{width:56px;height:56px;border-radius:50%;background:var(--band);color:var(--band-brass);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:1.3rem;flex:none}
+.experts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+@media (max-width:900px){.experts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.experts{grid-template-columns:1fr}}
+.expert{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:20px;display:grid;gap:8px;align-content:start}
+.expert-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.expert .avatar{width:48px;height:48px}
+.gate-tag{font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--brass);text-align:right}
+.cred{font-weight:600;font-size:.95rem}
+.expert p{font-size:.9rem;color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.tags span{font-family:var(--mono);font-size:.72rem;padding:3px 8px;border-radius:4px;background:var(--brass-soft);color:var(--ink)}
+.vet{margin-top:48px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:clamp(24px,4vw,56px);align-items:start;background:var(--band);color:var(--band-ink);border-radius:10px;padding:clamp(24px,4vw,40px)}
+.vet .eyebrow{color:var(--band-brass)}
+.vet p{color:var(--band-muted)!important}
+@media (max-width:860px){.vet{grid-template-columns:1fr}}
+.checks{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:14px 24px}
+@media (max-width:560px){.checks{grid-template-columns:1fr}}
+.checks li{position:relative;padding-left:28px;font-size:.95rem}
+.checks li::before{content:"";position:absolute;left:0;top:.2em;width:16px;height:16px;border:1.5px solid var(--band-brass);border-radius:3px}
+.checks li::after{content:"";position:absolute;left:5px;top:.42em;width:5px;height:9px;border:solid var(--band-brass);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.totals,.results{margin-top:32px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+@media (max-width:760px){.totals,.results{grid-template-columns:1fr}}
+.totals div,.results div{display:grid;gap:4px;border-top:2px solid var(--brass-fill);padding-top:12px}
+.totals b,.results b{font-family:var(--display);font-size:2rem;font-weight:700;font-variant-numeric:tabular-nums}
+.totals span,.results span{color:var(--muted);font-size:.92rem}
+.teaser{margin-top:40px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding:20px 24px;border:1.5px solid var(--brass-fill);border-radius:8px;text-decoration:none;background:var(--brass-soft)}
+.teaser .go{font-weight:600;color:var(--brass)}
+.teaser:hover .go{text-decoration:underline}
+.quotes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+@media (max-width:900px){.quotes{grid-template-columns:1fr}}
+.quote{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:22px;display:grid;gap:14px;align-content:space-between}
+.quote blockquote{margin:0;font-size:1.05rem;line-height:1.55}
+.quote figcaption{font-family:var(--mono);font-size:.76rem;color:var(--muted);letter-spacing:.04em}
+.page-hero{padding-block:clamp(40px,6vw,72px)}
+</style>
+<style>html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="index.html" aria-label="Strategic Value+ home"><span class="mark">V+</span><b>Strategic Value<span>+</span></b></a>
+    <nav class="links" id="links" aria-label="Main">
+      <a href="index.html#gates">Four Gates</a>
+      <a href="index.html#offers">Services</a>
+      <a href="index.html#oem">For OEM buyers</a>
+      <a href="index.html#partners">Partners</a>
+      <a href="index.html#insights">Insights</a>
+      <a href="index.html#about">Our talent</a>
+      <a href="careers.html">Join our network</a>
+      <a class="cog" href="cogniverai.html">Cogniverai</a>
+    </nav>
+    <div style="display:flex;gap:10px;align-items:center">
+      <a class="btn primary hide-sm" href="index.html#contact">Book a 30-minute call</a>
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="links">Menu</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+<section class="page-hero">
+  <div class="wrap stack" style="gap:20px">
+    <span class="eyebrow">Careers · V+ resource network</span>
+    <h1 style="font-size:clamp(2.6rem,6vw,4.6rem)">Do the work you're best at.<br><em style="font-style:normal;color:var(--brass)">We'll bring the clients.</em></h1>
+    <p class="lede">Strategic Value+ matches seasoned manufacturing experts to U.S. manufacturers working to qualify, comply and grow. You bring the expertise; we bring the client, the scope and the engagement lead.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px"><a class="btn primary" href="#apply">Apply now</a><a class="btn" href="index.html#about">See our bench</a></div>
+  </div>
+</section>
+
+<section id="voices">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">From the V+ network</span><h2>What our resources say</h2><p class="lede">In their own words, shared with permission.</p></div>
+    <div class="quotes">
+      <figure class="quote"><blockquote>[Quote from a V+ resource about how assignments match their expertise.]</blockquote><figcaption>[Name] · [Specialty] · V+ resource since [year]</figcaption></figure>
+      <figure class="quote"><blockquote>[Quote about the support from the engagement lead and having a defined scope.]</blockquote><figcaption>[Name] · [Specialty] · V+ resource since [year]</figcaption></figure>
+      <figure class="quote"><blockquote>[Quote about a client result they delivered through V+.]</blockquote><figcaption>[Name] · [Specialty] · V+ resource since [year]</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="standard">
+  <div class="wrap">
+    <div class="vet" style="margin-top:0">
+      <div class="stack" style="gap:12px"><span class="eyebrow">Our standard</span><h3 style="font-size:2rem">What we'll ask of you</h3><p>Clients trust us with their floor and their data. Before your first assignment, we will confirm:</p></div>
+      <ul class="checks">
+        <li>Your credentials and certifications, with the issuing body</li>
+        <li>Two professional references</li>
+        <li>A signed NDA and the V+ code of conduct</li>
+        <li>Professional liability insurance</li>
+        <li>U.S.-person status, for ITAR and CUI work</li>
+        <li>Security clearance status, where a program requires it</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="apply" class="join">
+  <div class="wrap split">
+    <div class="stack" style="gap:22px">
+      <div class="stack" style="gap:14px">
+        <span class="eyebrow">Join our talent network</span>
+        <h2>Become a V+ resource</h2>
+        <p class="lede">Are you a manufacturing consultant, auditor or operations leader who gets results on the floor? Apply to join the Strategic Value+ resource network and work on qualification, compliance and transformation projects with U.S. manufacturers.</p>
+      </div>
+      <ul class="list">
+        <li><strong>Who we're looking for</strong><span>Independent consultants and seasoned practitioners in quality, cybersecurity, operations, export compliance, supply chain, workforce and AI.</span></li>
+        <li><strong>What you get</strong><span>Assignments matched to your expertise, a defined scope and milestones, and an engagement lead who handles the client relationship.</span></li>
+        <li><strong>How it works</strong><span>Submit your details and resume. We review every application and contact those whose experience fits upcoming work.</span></li>
+      </ul>
+    </div>
+    <div>
+      <form id="joinForm" novalidate>
+        <div class="row2">
+          <label for="j-name">Full name<input id="j-name" autocomplete="name" required></label>
+          <label for="j-email">Email<input id="j-email" type="email" autocomplete="email" required></label>
+        </div>
+        <div class="row2">
+          <label for="j-location">City and state<input id="j-location" autocomplete="address-level2" placeholder="Greensboro, NC"></label>
+          <label for="j-linkedin">LinkedIn profile<input id="j-linkedin" type="url" placeholder="https://linkedin.com/in/…"></label>
+        </div>
+        <div class="row2">
+          <label for="j-area">Primary expertise<select id="j-area"><option>Quality (AS9100 / ISO 9001)</option><option>Cybersecurity (CMMC / NIST 800-171)</option><option>Operations (TOC / Lean / Six Sigma)</option><option>Export compliance (ITAR / EAR)</option><option>Federal contracting and capture</option><option>Supply chain and digital twins</option><option>Workforce and training</option><option>AI and data</option><option>Finance, ESOP and succession</option></select></label>
+          <label for="j-years">Years of experience<select id="j-years"><option>5–9</option><option selected>10–19</option><option>20+</option></select></label>
+        </div>
+        <label for="j-certs">Certifications<input id="j-certs" placeholder="For example: RABQSA AS9100 Lead Auditor, CMMC CCP, Six Sigma Black Belt"></label>
+        <label for="j-resume">Resume (PDF or Word)<input id="j-resume" type="file" accept=".pdf,.doc,.docx"></label>
+        <label for="j-note">Tell us about a result you're proud of<textarea id="j-note" placeholder="For example: led a 90-person machine shop through AS9100 certification in seven months."></textarea></label>
+        <p id="joinError" class="mono" style="color:var(--gap);font-size:.85rem" hidden>Add your name and a valid email so we can reach you.</p>
+        <div><button class="btn primary" type="submit">Prepare my application</button></div>
+      </form>
+      <div class="ready" id="joinReady" hidden>
+        <strong>Your application is ready to send</strong>
+        <p style="color:var(--muted);font-size:.92rem">Copy it into an email to info@strategicvalueplus.com and attach your resume.</p>
+        <pre id="joinText"></pre>
+        <div class="acts"><button class="btn primary" type="button" id="copyJoin">Copy application</button><button class="btn" type="button" id="editJoin">Edit</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div class="stack" style="gap:10px"><a class="brand" href="index.html" style="color:var(--band-ink)"><span class="mark">V+</span><b>Strategic Value<span style="color:var(--band-brass)">+</span></b></a><p>Helping small and mid-sized U.S. manufacturers win OEM and defense contracts through supplier qualification, compliance and operational readiness.</p></div>
+      <div><h4>Services</h4><a href="index.html#gates">Four Gates</a><a href="index.html#offers">Constraint Diagnostic</a><a href="index.html#offers">V+ EDGE™</a><a href="index.html#oem">For OEM buyers</a></div>
+      <div><h4>Company</h4><a href="index.html#about">Our talent</a><a href="careers.html">Become a V+ resource</a><a href="index.html#partners">Partner program</a><a href="index.html#insights">Insights</a><a href="cogniverai.html">Cogniverai</a></div>
+      <div><h4>Contact</h4><a href="index.html#contact">Book a call</a><span style="display:block;padding:3px 0;color:var(--band-ink)">info@strategicvalueplus.com</span><span style="display:block;padding:3px 0;color:var(--band-ink)">(302) 215-4700</span></div>
+    </div>
+    <div class="legal"><span>© <span id="yr">2026</span> Strategic Value Plus Solutions, LLC · strategicvalueplus.com</span><span>V+ EDGE™ is a trademark of Strategic Value Plus Solutions, LLC</span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var btn=document.getElementById('menuBtn'), links=document.getElementById('links');
+  btn.addEventListener('click',function(){var o=links.classList.toggle('open');btn.setAttribute('aria-expanded',o?'true':'false');});
+  links.addEventListener('click',function(e){if(e.target.tagName==='A'){links.classList.remove('open');btn.setAttribute('aria-expanded','false');}});
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  var jf=document.getElementById('joinForm');
+  if(jf){var jr=document.getElementById('joinReady'), jt=document.getElementById('joinText'), je=document.getElementById('joinError');
+  jf.addEventListener('submit',function(e){
+    e.preventDefault();
+    var v=function(id){return document.getElementById(id).value.trim();};
+    var email=v('j-email');
+    if(!v('j-name')||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){je.hidden=false;return;}
+    je.hidden=true;
+    var f=document.getElementById('j-resume').files;
+    var resume=f&&f.length?f[0].name+' (attach this file)':'Please attach your resume';
+    jt.textContent='To: info@strategicvalueplus.com\nSubject: V+ Resource Application — '+v('j-name')+' — '+v('j-area')+'\n\nName: '+v('j-name')+'\nEmail: '+email+'\nLocation: '+(v('j-location')||'—')+'\nLinkedIn: '+(v('j-linkedin')||'—')+'\nPrimary expertise: '+v('j-area')+'\nYears of experience: '+v('j-years')+'\nCertifications: '+(v('j-certs')||'—')+'\nResume: '+resume+'\n\n'+(v('j-note')||'');
+    jf.hidden=true; jr.hidden=false;
+  });
+  document.getElementById('editJoin').addEventListener('click',function(){jr.hidden=true;jf.hidden=false;});
+  document.getElementById('copyJoin').addEventListener('click',function(){var b=this;try{navigator.clipboard.writeText(jt.textContent).then(function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy application';},1500);},function(){selJ(b);});}catch(e){selJ(b);}});
+  function selJ(b){var r=document.createRange();r.selectNodeContents(jt);var s=window.getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Press Ctrl+C';}
+  }
+})();
+</script>
+</body>
+</html>

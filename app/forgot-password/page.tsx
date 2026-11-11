@@ -47,15 +47,15 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8f7f1] p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F3F4F6] p-4">
       <div className="relative z-10 w-full max-w-md">
         {/* Logo and Branding */}
         <div className="flex flex-col items-center mb-8">
           <Link href="/" className="flex flex-col items-center gap-3">
-            <div className="bg-[#071628] rounded-xl px-6 py-4">
+            <div className="bg-[#15181C] rounded-xl px-6 py-4">
               <Image
-                src="/images/efvs-logo-transparent.png"
-                alt="Eagle Flight Vertical Solutions"
+                src="/VPlus_logo.jpg"
+                alt="Strategic Value Plus Solutions, LLC"
                 width={200}
                 height={60}
                 className="h-14 w-auto"
@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
               />
             </div>
             <div className="text-center mt-2">
-              <p className="text-sm font-semibold tracking-[0.2em] text-[#1478ac] font-display">
+              <p className="text-sm font-semibold tracking-[0.2em] text-[#8A6212] font-display">
                 UAS TRAINING ACADEMY
               </p>
             </div>
@@ -71,7 +71,7 @@ export default function ForgotPasswordPage() {
         </div>
 
         {/* Forgot Password Card */}
-        <Card className="shadow-xl border-[#d9d8ce]">
+        <Card className="shadow-xl border-[#D8DCE2]">
           {!isSubmitted ? (
             <>
               <CardHeader className="space-y-1 pb-4">
@@ -107,7 +107,7 @@ export default function ForgotPasswordPage() {
 
                   <Button
                     type="submit"
-                    className="w-full h-11 bg-[#1478ac] hover:bg-[#318dc1] text-white font-semibold"
+                    className="w-full h-11 bg-[#8A6212] hover:bg-[#8A6212] text-white font-semibold"
                     disabled={isLoading}
                   >
                     {isLoading ? (

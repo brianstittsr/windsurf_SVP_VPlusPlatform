@@ -51,7 +51,7 @@ export function createCertificatePdfBytes(cert: CertificateDoc): Uint8Array {
   pdf.setFontSize(9);
   pdf.setTextColor(89, 101, 109);
   pdf.text(
-    "This certificate documents completion of EFVS training. It does not constitute an FAA Remote Pilot Certificate, guarantee an FAA examination result, or replace the applicable FAA certification process.",
+    "This certificate documents completion of V+ training. It does not constitute an FAA Remote Pilot Certificate, guarantee an FAA examination result, or replace the applicable FAA certification process.",
     width / 2,
     height - 56,
     { align: "center", maxWidth: width - 160 }

@@ -38,7 +38,7 @@ export async function enrollmentIsComplete(enrollment: EnrollmentDoc, courseId: 
 async function certificateNumber(): Promise<string> {
   if (!adminDb) throw new Error("Certificate service unavailable");
   for (let attempt = 0; attempt < 5; attempt++) {
-    const value = `EFVS-${new Date().getFullYear()}-${randomInt(100000, 1000000)}`;
+    const value = `VP-${new Date().getFullYear()}-${randomInt(100000, 1000000)}`;
     const duplicate = await adminDb.collection(COLLECTIONS.CERTIFICATES).where("certificateNumber", "==", value).limit(1).get();
     if (duplicate.empty) return value;
   }
@@ -84,7 +84,7 @@ export async function tryIssueCertificate(enrollmentId: string, actorId: string,
     courseTitle: course.title,
     enrollmentId: enrollment.id,
     issuedAt: now,
-    issuedBy: "EFVS Academy",
+    issuedBy: "V+ Academy",
     publicCredentialId: randomUUID().replaceAll("-", ""),
     publicSharingEnabled: false,
     publicNameConsent: false,
@@ -111,7 +111,7 @@ export async function tryIssueCertificate(enrollmentId: string, actorId: string,
     courseId: enrollment.courseId,
     enrollmentId: enrollment.id,
     certificateId: certRef.id,
-    uploadedBy: "EFVS Academy",
+    uploadedBy: "V+ Academy",
     createdAt: now as unknown as StudentDocumentDoc["createdAt"],
   };
   await certRef.set(certData);

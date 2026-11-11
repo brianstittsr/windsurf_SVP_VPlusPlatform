@@ -107,7 +107,7 @@ export default function RosterPage() {
                           r.status === "completed" ? "default" : "secondary"
                         }
                         className={
-                          r.status === "completed" ? "bg-[#1478ac]" : ""
+                          r.status === "completed" ? "bg-[#8A6212]" : ""
                         }
                       >
                         {r.status}

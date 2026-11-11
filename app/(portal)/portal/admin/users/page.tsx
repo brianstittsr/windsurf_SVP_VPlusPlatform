@@ -109,7 +109,7 @@ export default function AdminUsersPage() {
                   <TableCell>{u.company || "—"}</TableCell>
                   <TableCell>
                     {(u as unknown as { isVeteran?: boolean }).isVeteran ? (
-                      <Badge className="bg-[#1478ac]">Veteran</Badge>
+                      <Badge className="bg-[#8A6212]">Veteran</Badge>
                     ) : (
                       "—"
                     )}

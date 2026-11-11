@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase-admin";
 import { lmsApiError, requireLmsAdmin } from "@/lib/lms-api-auth";
-import { EFVS_PRO_PRODUCTS } from "@/lib/pro-products";
+import { VPLUS_PRO_PRODUCTS } from "@/lib/pro-products";
 import { COLLECTIONS } from "@/lib/schema";
 
 export async function POST(req: NextRequest) {
@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     if (!adminDb) return NextResponse.json({ error: "Product catalog unavailable" }, { status: 503 });
     const created: string[] = [];
     const existing: string[] = [];
-    for (const product of EFVS_PRO_PRODUCTS) {
+    for (const product of VPLUS_PRO_PRODUCTS) {
       const matches = await adminDb.collection(COLLECTIONS.PRODUCTS).where("code", "==", product.code).limit(1).get();
       if (!matches.empty) { existing.push(product.code); continue; }
       const now = Timestamp.now();

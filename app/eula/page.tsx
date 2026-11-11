@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
 export const metadata = {
-  title: "End-User License Agreement | EFVS Academy",
-  description: "End-User License Agreement for EFVS Academy applications and connected services.",
+  title: "End-User License Agreement | V+ Academy",
+  description: "End-User License Agreement for V+ Academy applications and connected services.",
 };
 
 export default function EulaPage() {
@@ -28,7 +28,7 @@ export default function EulaPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
             <p>
-              This End-User License Agreement (&quot;EULA&quot;, &quot;Agreement&quot;) is a legal agreement between you and Aviante HWC, Inc. dba Eagle Flight Vertical Solutions (&quot;EFVS&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) governing your use of the EFVS Academy applications, web platform, and connected services (collectively, the &quot;Apps&quot;).
+              This End-User License Agreement (&quot;EULA&quot;, &quot;Agreement&quot;) is a legal agreement between you and Strategic Value Plus Solutions, LLC (&quot;V+&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) governing your use of the V+ Academy applications, web platform, and connected services (collectively, the &quot;Apps&quot;).
             </p>
             <p className="mt-2">
               By downloading, installing, accessing, or using any of the Apps, you agree to be bound by this EULA. If you do not agree, do not download, install, access, or use the Apps.
@@ -38,7 +38,7 @@ export default function EulaPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">2. License Grant</h2>
             <p>
-              Subject to your compliance with this EULA, EFVS grants you a limited, non-exclusive, non-transferable, revocable license to download, install, and use the Apps for your personal or internal business use, solely in connection with your authorized use of the EFVS Academy platform.
+              Subject to your compliance with this EULA, V+ grants you a limited, non-exclusive, non-transferable, revocable license to download, install, and use the Apps for your personal or internal business use, solely in connection with your authorized use of the V+ Academy platform.
             </p>
             <p className="mt-2">
               This license does not allow you to use the Apps on any device that you do not own or control, and you may not distribute or make the Apps available over a network where they could be used by multiple devices at the same time.
@@ -69,7 +69,7 @@ export default function EulaPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">5. Connected Services and Third-Party Integrations</h2>
             <p>
-              The Apps may connect to or integrate with third-party services, platforms, or data sources. Your use of such connected services is subject to their respective terms and privacy policies. EFVS is not responsible for the availability, accuracy, or practices of these third-party services.
+              The Apps may connect to or integrate with third-party services, platforms, or data sources. Your use of such connected services is subject to their respective terms and privacy policies. V+ is not responsible for the availability, accuracy, or practices of these third-party services.
             </p>
           </section>
 
@@ -83,21 +83,21 @@ export default function EulaPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">7. Intellectual Property</h2>
             <p>
-              The Apps, including all content, features, designs, code, trademarks, and other materials, are owned by EFVS or its licensors and are protected by intellectual property laws. This EULA does not grant you any ownership interest in the Apps or any related intellectual property rights.
+              The Apps, including all content, features, designs, code, trademarks, and other materials, are owned by V+ or its licensors and are protected by intellectual property laws. This EULA does not grant you any ownership interest in the Apps or any related intellectual property rights.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">8. Updates and Modifications</h2>
             <p>
-              EFVS may, at its discretion, update or modify the Apps, including this EULA, at any time. Continued use of the Apps after such changes constitutes your acceptance of the revised terms.
+              V+ may, at its discretion, update or modify the Apps, including this EULA, at any time. Continued use of the Apps after such changes constitutes your acceptance of the revised terms.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">9. Termination</h2>
             <p>
-              This EULA is effective until terminated by you or EFVS. Your rights under this EULA will terminate automatically if you fail to comply with any of its terms. Upon termination, you must cease all use of the Apps and destroy all copies in your possession.
+              This EULA is effective until terminated by you or V+. Your rights under this EULA will terminate automatically if you fail to comply with any of its terms. Upon termination, you must cease all use of the Apps and destroy all copies in your possession.
             </p>
           </section>
 
@@ -111,7 +111,7 @@ export default function EulaPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">11. Limitation of Liability</h2>
             <p>
-              To the maximum extent permitted by law, EFVS shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or related to your use of the Apps, even if advised of the possibility of such damages.
+              To the maximum extent permitted by law, V+ shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or related to your use of the Apps, even if advised of the possibility of such damages.
             </p>
           </section>
 
@@ -128,9 +128,9 @@ export default function EulaPage() {
               If you have any questions about this End-User License Agreement, please contact us at:
             </p>
             <p className="mt-2">
-              <strong>Aviante HWC, Inc. dba Eagle Flight Vertical Solutions</strong><br />
-              Email: info@efvertical.com<br />
-              Website: <Link href="https://www.efvertical.com" className="text-primary hover:underline">efvertical.com</Link>
+              <strong>Strategic Value Plus Solutions, LLC</strong><br />
+              Email: info@strategicvalueplus.com<br />
+              Website: <Link href="https://strategicvalueplus.com" className="text-primary hover:underline">strategicvalueplus.com</Link>
             </p>
           </section>
         </div>

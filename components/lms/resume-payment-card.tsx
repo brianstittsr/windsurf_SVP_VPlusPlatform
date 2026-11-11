@@ -72,10 +72,10 @@ export function ResumePaymentCard() {
   if (!loaded || pending.length === 0) return null;
 
   return (
-    <Card className="border-[#d3ac63]">
+    <Card className="border-[#C9962B]">
       <CardHeader>
         <CardTitle className="font-display flex items-center gap-2">
-          <CreditCard className="h-5 w-5 text-[#d3ac63]" /> Registration awaiting payment
+          <CreditCard className="h-5 w-5 text-[#C9962B]" /> Registration awaiting payment
         </CardTitle>
         <CardDescription>
           Your registration was approved. Complete secure checkout to activate your course access.
@@ -91,7 +91,7 @@ export function ResumePaymentCard() {
               <p className="text-sm text-muted-foreground">Total due: {money(registration.totalCents, registration.currency)}</p>
             </div>
             <Button
-              className="bg-[#1478ac] hover:bg-[#318dc1]"
+              className="bg-[#8A6212] hover:bg-[#8A6212]"
               onClick={() => void resume(registration.id)}
               disabled={resuming !== null}
             >

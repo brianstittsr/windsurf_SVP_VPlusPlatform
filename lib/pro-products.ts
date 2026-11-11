@@ -2,11 +2,11 @@ import type { LmsProductDoc } from "@/lib/schema";
 
 export type ProProductDraft = Omit<LmsProductDoc, "id" | "createdAt" | "updatedAt">;
 
-export const EFVS_PRO_PRODUCTS: ProProductDraft[] = [
+export const VPLUS_PRO_PRODUCTS: ProProductDraft[] = [
   {
     code: "pro-monthly",
     title: "Part 107 Pro — Month-to-Month",
-    description: "Pro access to the EFVS Part 107 digital study guide and learner analytics. Cancel anytime.",
+    description: "Pro access to the V+ Part 107 digital study guide and learner analytics. Cancel anytime.",
     kind: "pro_access",
     billingMode: "subscription",
     priceCents: 9700,

@@ -130,7 +130,7 @@ export function ScormPlayer({ enrollment, pkg }: ScormPlayerProps) {
     <div className="relative w-full">
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-muted/50 rounded-lg min-h-[400px]">
-          <Loader2 className="h-8 w-8 animate-spin text-[#1478ac]" />
+          <Loader2 className="h-8 w-8 animate-spin text-[#8A6212]" />
         </div>
       )}
       {error ? (

@@ -133,15 +133,15 @@ export function PortalSidebar() {
       <SidebarHeader className="border-b border-sidebar-border">
         <Link href="/portal" className="flex items-center gap-2 px-2 py-4">
           <NextImage
-            src="/images/efvs-mark-light.png"
-            alt="EFVS"
+            src="/VPlus_logo.jpg"
+            alt="V+"
             width={36}
             height={36}
             style={{ width: "auto", height: "auto" }}
           />
           <div className="flex flex-col">
             <span className="text-lg font-bold leading-none font-display tracking-wide">
-              EFVS ACADEMY
+              V+ ACADEMY
             </span>
             <span className="text-xs text-sidebar-foreground/60">
               Student Portal

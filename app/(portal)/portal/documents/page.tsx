@@ -128,16 +128,16 @@ export default function StudentDocumentsPage() {
 
   return (
     <div className="max-w-5xl space-y-6">
-      <div><h1 className="font-display text-3xl font-bold">Purchases & Documents</h1><p className="text-muted-foreground">Your EFVS purchase, enrollment, completion, and credential history.</p></div>
+      <div><h1 className="font-display text-3xl font-bold">Purchases & Documents</h1><p className="text-muted-foreground">Your V+ purchase, enrollment, completion, and credential history.</p></div>
       <ResumePaymentCard />
       <Card>
-        <CardHeader><CardTitle className="font-display">Upload a credential document</CardTitle><CardDescription>Private to your LMS account and authorized EFVS staff. Accepted files: PDF, JPEG, PNG, or WebP up to 12 MB.</CardDescription></CardHeader>
+        <CardHeader><CardTitle className="font-display">Upload a credential document</CardTitle><CardDescription>Private to your LMS account and authorized V+ staff. Accepted files: PDF, JPEG, PNG, or WebP up to 12 MB.</CardDescription></CardHeader>
         <CardContent>
           <form onSubmit={upload} className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2"><Label>Document type</Label><Select value={kind} onValueChange={setKind}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="faa_certificate_proof">FAA Part 107 certificate / exam proof</SelectItem><SelectItem value="training_credential">Training credential</SelectItem><SelectItem value="other">Other course document</SelectItem></SelectContent></Select></div>
             <div className="space-y-2"><Label>Display name (optional)</Label><Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="FAA Remote Pilot Certificate" /></div>
             <div className="space-y-2"><Label>File</Label><Input type="file" accept="application/pdf,image/jpeg,image/png,image/webp" onChange={(e) => setFile(e.target.files?.[0] || null)} /></div>
-            <div className="flex items-end"><Button type="submit" disabled={!file || uploading} className="bg-[#1478ac] hover:bg-[#318dc1]">{uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}Upload privately</Button></div>
+            <div className="flex items-end"><Button type="submit" disabled={!file || uploading} className="bg-[#8A6212] hover:bg-[#8A6212]">{uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}Upload privately</Button></div>
           </form>
         </CardContent>
       </Card>
@@ -148,8 +148,8 @@ export default function StudentDocumentsPage() {
 
       <Card><CardHeader><CardTitle className="font-display">Course history</CardTitle></CardHeader><CardContent className="space-y-3">{data.enrollments.length ? data.enrollments.map((enrollment) => <div key={enrollment.id} className="flex flex-wrap items-center justify-between gap-3 rounded border p-3"><div><p className="font-medium">{enrollment.courseName}</p><p className="text-xs text-muted-foreground">Enrolled {enrollment.enrolledAt ? new Date(enrollment.enrolledAt).toLocaleDateString() : "—"}{enrollment.completedAt ? ` · Completed ${new Date(enrollment.completedAt).toLocaleDateString()}` : ""}</p></div><Badge variant={enrollment.status === "completed" ? "default" : "secondary"}>{enrollment.status} · {enrollment.progressPercent}%</Badge></div>) : <p className="text-sm text-muted-foreground">No course enrollments are linked to this account yet.</p>}</CardContent></Card>
 
-      <Card><CardHeader><CardTitle className="font-display">My documents</CardTitle><CardDescription>Signed registration records, receipts, and uploaded credentials.</CardDescription></CardHeader><CardContent className="space-y-2">{data.documents.length ? data.documents.map((item) => <div key={item.id} className="flex flex-wrap items-center justify-between gap-2 rounded border p-3"><div className="flex items-center gap-3"><FileText className="h-4 w-4 text-[#1478ac]" /><div><p className="font-medium">{item.displayName}</p><p className="text-xs text-muted-foreground">{item.kind.replaceAll("_", " ")} · {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ""} · {(item.sizeBytes / 1024).toFixed(0)} KB</p></div></div><Button size="sm" variant="outline" onClick={() => void download(item.id, item.fileName)}><Download className="mr-2 h-4 w-4" />Download</Button></div>) : <p className="text-sm text-muted-foreground">Your signed forms and uploaded documents will appear here.</p>}</CardContent></Card>
-      <p className="text-xs text-muted-foreground">Signed forms and student documents are private and visible only to you and authorized EFVS staff. LinkedIn credential pages never expose these files.</p>
+      <Card><CardHeader><CardTitle className="font-display">My documents</CardTitle><CardDescription>Signed registration records, receipts, and uploaded credentials.</CardDescription></CardHeader><CardContent className="space-y-2">{data.documents.length ? data.documents.map((item) => <div key={item.id} className="flex flex-wrap items-center justify-between gap-2 rounded border p-3"><div className="flex items-center gap-3"><FileText className="h-4 w-4 text-[#8A6212]" /><div><p className="font-medium">{item.displayName}</p><p className="text-xs text-muted-foreground">{item.kind.replaceAll("_", " ")} · {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ""} · {(item.sizeBytes / 1024).toFixed(0)} KB</p></div></div><Button size="sm" variant="outline" onClick={() => void download(item.id, item.fileName)}><Download className="mr-2 h-4 w-4" />Download</Button></div>) : <p className="text-sm text-muted-foreground">Your signed forms and uploaded documents will appear here.</p>}</CardContent></Card>
+      <p className="text-xs text-muted-foreground">Signed forms and student documents are private and visible only to you and authorized V+ staff. LinkedIn credential pages never expose these files.</p>
     </div>
   );
 }

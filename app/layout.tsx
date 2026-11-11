@@ -1,58 +1,61 @@
 import type { Metadata } from "next";
-import { Manrope, DM_Sans, Barlow_Condensed } from "next/font/google";
+import { IBM_Plex_Sans, IBM_Plex_Mono, Barlow_Condensed } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { AccessibilityWidget } from "@/components/shared/accessibility-widget";
 import "./globals.css";
 
-const manrope = Manrope({
-  variable: "--font-manrope",
+const plexSans = IBM_Plex_Sans({
+  variable: "--font-plex-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
-const dmSans = DM_Sans({
-  variable: "--font-dmsans",
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500"],
 });
 
 const barlowCondensed = Barlow_Condensed({
   variable: "--font-barlow",
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
+  weight: ["500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://academy.efvertical.com"),
+  metadataBase: new URL("https://strategicvalueplus.com"),
   title: {
-    default: "EFVS UAS Training Academy | FAA Part 107 Training",
-    template: "%s | EFVS Academy",
+    default: "Strategic Value+ | Supplier Readiness for OEM & Defense Manufacturing",
+    template: "%s | Strategic Value+",
   },
   description:
-    "The EFVS UAS Training Academy delivers FAA Part 107 Remote Pilot certification preparation and specialized UAS training for aspiring pilots, veterans, public agencies, and organizations.",
+    "Strategic Value+ helps small and mid-sized U.S. manufacturers get qualified, compliant and capacity-ready to win and keep OEM and defense work. Quality, cybersecurity, flow and export compliance, closed gate by gate.",
   keywords: [
-    "FAA Part 107",
-    "remote pilot certificate",
-    "UAS training",
-    "drone pilot training",
-    "Part 107 test prep",
-    "uncrewed aircraft systems",
-    "advanced air mobility",
-    "UAS training academy",
-    "Eagle Flight Vertical Solutions",
-    "EFVS",
+    "supplier readiness",
+    "AS9100",
+    "ISO 9001",
+    "CMMC",
+    "NIST 800-171",
+    "ITAR",
+    "EAR",
+    "Theory of Constraints",
+    "OEM supplier qualification",
+    "defense manufacturing",
+    "Strategic Value+",
+    "Cogniverai",
   ],
   authors: [
-    { name: "Eagle Flight Vertical Solutions", url: "https://www.efvertical.com" },
+    { name: "Strategic Value Plus Solutions, LLC", url: "https://strategicvalueplus.com" },
   ],
-  creator: "Eagle Flight Vertical Solutions",
-  publisher: "Aviante HWC, Inc. dba Eagle Flight Vertical Solutions",
+  creator: "Strategic Value Plus Solutions, LLC",
+  publisher: "Strategic Value Plus Solutions, LLC",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
   alternates: {
-    canonical: "https://academy.efvertical.com",
+    canonical: "https://strategicvalueplus.com",
   },
   robots: {
     index: true,
@@ -68,28 +71,28 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://academy.efvertical.com",
-    siteName: "EFVS UAS Training Academy",
-    title: "EFVS UAS Training Academy | FAA Part 107 Training",
+    url: "https://strategicvalueplus.com",
+    siteName: "Strategic Value+",
+    title: "Strategic Value+ | Supplier Readiness for OEM & Defense Manufacturing",
     description:
-      "FAA Part 107 Remote Pilot certification preparation and specialized UAS training from Eagle Flight Vertical Solutions.",
+      "We get small and mid-sized manufacturers qualified, compliant and capacity-ready to win and keep OEM and defense work.",
     images: [
       {
-        url: "/images/hero.jpg",
-        width: 1672,
-        height: 941,
-        alt: "EFVS UAS Training Academy",
+        url: "/VPlus_logo.jpg",
+        width: 468,
+        height: 427,
+        alt: "Strategic Value+",
       },
     ],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "EFVS UAS Training Academy | FAA Part 107 Training",
+    card: "summary",
+    title: "Strategic Value+ | Supplier Readiness for OEM & Defense Manufacturing",
     description:
-      "FAA Part 107 Remote Pilot certification preparation and specialized UAS training from Eagle Flight Vertical Solutions.",
-    images: ["/images/hero.jpg"],
+      "We get small and mid-sized manufacturers qualified, compliant and capacity-ready to win and keep OEM and defense work.",
+    images: ["/VPlus_logo.jpg"],
   },
-  category: "education",
+  category: "business",
 };
 
 export default function RootLayout({
@@ -104,7 +107,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body
-        className={`${manrope.variable} ${dmSans.variable} ${barlowCondensed.variable} font-sans antialiased`}
+        className={`${plexSans.variable} ${plexMono.variable} ${barlowCondensed.variable} font-sans antialiased`}
       >
         {/* Skip to main content link - WCAG 2.4.1 Bypass Blocks */}
         <a

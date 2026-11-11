@@ -113,8 +113,8 @@ function RegistrationClaimContent() {
     <div className="container max-w-xl py-10 md:py-14">
       <Card>
         <CardHeader>
-          <div className="mx-auto rounded-full bg-[#e9f3f8] p-3"><ShieldCheck className="h-7 w-7 text-[#1478ac]" /></div>
-          <CardTitle className="text-center font-display text-2xl">Continue your EFVS registration</CardTitle>
+          <div className="mx-auto rounded-full bg-[#F4EAD3] p-3"><ShieldCheck className="h-7 w-7 text-[#8A6212]" /></div>
+          <CardTitle className="text-center font-display text-2xl">Continue your V+ registration</CardTitle>
           <CardDescription className="text-center">Approved for {invite.fullName}. Create an Academy account or sign in to claim your registration.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -126,8 +126,8 @@ function RegistrationClaimContent() {
             <div className="space-y-2"><Label htmlFor="claim-password">{mode === "create" ? "Create password" : "Password"}</Label><Input id="claim-password" type="password" autoComplete={mode === "create" ? "new-password" : "current-password"} minLength={8} required value={password} onChange={(e) => setPassword(e.target.value)} /></div>
             {mode === "create" && <div className="space-y-2"><Label htmlFor="claim-confirm">Confirm password</Label><Input id="claim-confirm" type="password" autoComplete="new-password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} /></div>}
             {!invite.sponsorshipApproved && <div className="space-y-2"><Label htmlFor="claim-promo">Discount code (optional)</Label><Input id="claim-promo" value={promoCode} onChange={(e) => setPromoCode(e.target.value)} autoComplete="off" placeholder="Enter a veteran or promotional code" /></div>}
-            <Button type="submit" disabled={busy} className="w-full bg-[#1478ac] hover:bg-[#318dc1]">{busy ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Continuing…</> : invite.sponsorshipApproved ? "Claim sponsored enrollment" : "Continue to secure checkout"}</Button>
-            <p className="text-center text-xs text-muted-foreground">Invitation expires {new Date(invite.expiresAt).toLocaleString()}. Payment is collected securely by Stripe; card and bank details are not stored by EFVS.</p>
+            <Button type="submit" disabled={busy} className="w-full bg-[#8A6212] hover:bg-[#8A6212]">{busy ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Continuing…</> : invite.sponsorshipApproved ? "Claim sponsored enrollment" : "Continue to secure checkout"}</Button>
+            <p className="text-center text-xs text-muted-foreground">Invitation expires {new Date(invite.expiresAt).toLocaleString()}. Payment is collected securely by Stripe; card and bank details are not stored by V+.</p>
           </form>
         </CardContent>
       </Card>

@@ -42,8 +42,8 @@ export async function sendEmail(params: SendEmailParams): Promise<void> {
     const tenantId = process.env.AZURE_TENANT_ID;
     const clientId = process.env.AZURE_CLIENT_ID;
     const clientSecret = process.env.AZURE_CLIENT_SECRET;
-    const fromEmail = process.env.SMTP_FROM_EMAIL || "noreply@efvertical.com";
-    const fromName = process.env.SMTP_FROM_NAME || "EFVS Academy";
+    const fromEmail = process.env.SMTP_FROM_EMAIL || "noreply@strategicvalueplus.com";
+    const fromName = process.env.SMTP_FROM_NAME || "V+ Academy";
 
     // Get access token
     const tokenResponse = await fetch(

@@ -30,7 +30,7 @@ const COLLECTIONS = {
 } as const;
 
 function generateCertificateNumber(): string {
-  return `EFVS-${new Date().getFullYear()}-${randomBytes(4).toString("hex").toUpperCase()}`;
+  return `VP-${new Date().getFullYear()}-${randomBytes(4).toString("hex").toUpperCase()}`;
 }
 
 export const AC1_DEMO_TAG = "ac1-demo";
@@ -636,7 +636,7 @@ export async function removeAc1DemoData(): Promise<Record<string, number>> {
   if (!adminDb) return {};
   const importedCourses = await adminDb.collection(COLLECTIONS.COURSES)
     .where("demoSeed", "==", AC1_DEMO_TAG)
-    .where("importedFrom", "==", "EFVS_Student_Registration_Form_Rev2_2026-10-04")
+    .where("importedFrom", "==", "VPLUS_Student_Registration_Form_Rev2_2026-10-04")
     .get();
   const protectedCourseIds = new Set(importedCourses.docs.map((document) => document.id));
   const counts: Record<string, number> = {};

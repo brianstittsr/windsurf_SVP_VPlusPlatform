@@ -87,14 +87,14 @@ export async function POST(
       });
       inviteId = inviteRef.id;
       inviteToken = invite.token;
-      const origin = process.env.NEXT_PUBLIC_APP_URL || "https://academy.efvertical.com";
+      const origin = process.env.NEXT_PUBLIC_APP_URL || "https://strategicvalueplus.com";
       inviteUrl = `${origin}/registration/claim?token=${encodeURIComponent(invite.token)}`;
       if (isEmailConfigured()) {
         try {
           await sendEmail({
             to: [submissionUpdate.email],
-            subject: "EFVS Academy registration approved",
-            html: `<p>Hello ${escapeHtml(submissionUpdate.fullName)},</p><p>Your EFVS Academy registration has been approved. Use the secure link below within 7 days to create or access your student account and continue to ${input.decision === "sponsor" ? "activate your sponsored enrollment" : "secure checkout"}.</p><p><a href="${inviteUrl}">Continue registration</a></p><p>This invitation can only be used once. If you did not request it, contact efvsflight@efvertical.com.</p>`,
+            subject: "V+ Academy registration approved",
+            html: `<p>Hello ${escapeHtml(submissionUpdate.fullName)},</p><p>Your V+ Academy registration has been approved. Use the secure link below within 7 days to create or access your student account and continue to ${input.decision === "sponsor" ? "activate your sponsored enrollment" : "secure checkout"}.</p><p><a href="${inviteUrl}">Continue registration</a></p><p>This invitation can only be used once. If you did not request it, contact info@strategicvalueplus.com.</p>`,
           });
           inviteUrl = undefined;
         } catch (emailError) {
@@ -105,15 +105,15 @@ export async function POST(
       const status = input.decision === "reject" ? "rejected" : "needs_information";
       await submissionRef.update({ status, reviewerId: actor.uid, reviewerNotes: notes, reviewedAt: now, updatedAt: now });
       if (isEmailConfigured()) {
-        const subject = status === "rejected" ? "EFVS Academy registration update" : "Additional information needed for EFVS registration";
+        const subject = status === "rejected" ? "V+ Academy registration update" : "Additional information needed for V+ registration";
         const message = status === "rejected"
-          ? "EFVS is unable to approve your registration at this time. Contact EFVS Flight School if you have questions."
-          : "EFVS needs additional information before completing the review of your registration. Please reply to this email or contact EFVS Flight School.";
+          ? "V+ is unable to approve your registration at this time. Contact V+ Flight School if you have questions."
+          : "V+ needs additional information before completing the review of your registration. Please reply to this email or contact V+ Flight School.";
         try {
           await sendEmail({
             to: [submission.email],
             subject,
-            html: `<p>Hello ${escapeHtml(submission.fullName)},</p><p>${message}</p><p>EFVS Flight School: efvsflight@efvertical.com</p>`,
+            html: `<p>Hello ${escapeHtml(submission.fullName)},</p><p>${message}</p><p>V+ Flight School: info@strategicvalueplus.com</p>`,
           });
         } catch (emailError) {
           console.error("[registration/review] applicant notification failed:", emailError);

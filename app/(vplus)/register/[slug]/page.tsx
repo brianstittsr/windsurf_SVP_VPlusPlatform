@@ -47,9 +47,9 @@ function RegistrationPageContent() {
       <div className="container max-w-2xl py-14">
         <Card>
           <CardHeader className="text-center">
-            <div className="mx-auto rounded-full bg-[#e9f3f8] p-4"><ShieldCheck className="h-8 w-8 text-[#1478ac]" /></div>
+            <div className="mx-auto rounded-full bg-[#F4EAD3] p-4"><ShieldCheck className="h-8 w-8 text-[#8A6212]" /></div>
             <CardTitle className="mt-3 font-display text-3xl">Registration received</CardTitle>
-            <CardDescription>EFVS will review your signed registration. If approved, you will receive a secure link to create your student account and complete payment.</CardDescription>
+            <CardDescription>V+ will review your signed registration. If approved, you will receive a secure link to create your student account and complete payment.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-center">
             <p className="font-mono text-xs text-muted-foreground">Reference: {submissionId}</p>
@@ -64,8 +64,8 @@ function RegistrationPageContent() {
   return (
     <div className="container max-w-3xl space-y-6 py-10 md:py-14">
       <div>
-        <p className="font-display text-sm font-semibold tracking-[0.2em] text-[#1478ac]">EFVS UAS TRAINING ACADEMY</p>
-        <h1 className="mt-2 font-display text-4xl font-bold text-[#071628]">Student registration</h1>
+        <p className="font-display text-sm font-semibold tracking-[0.2em] text-[#8A6212]">V+ UAS TRAINING ACADEMY</p>
+        <h1 className="mt-2 font-display text-4xl font-bold text-[#15181C]">Student registration</h1>
         <p className="mt-3 text-muted-foreground">Complete the form for staff review. Approved applicants receive a secure account and checkout link.</p>
       </div>
       <RegistrationFormRenderer
@@ -73,7 +73,7 @@ function RegistrationPageContent() {
         initialCourseId={searchParams.get("course") || undefined}
         onSubmitted={setSubmissionId}
       />
-      <p className="text-center text-xs text-muted-foreground">Questions? Contact <a className="text-[#1478ac] hover:underline" href="mailto:efvsflight@efvertical.com">efvsflight@efvertical.com</a>.</p>
+      <p className="text-center text-xs text-muted-foreground">Questions? Contact <a className="text-[#8A6212] hover:underline" href="mailto:info@strategicvalueplus.com">info@strategicvalueplus.com</a>.</p>
     </div>
   );
 }

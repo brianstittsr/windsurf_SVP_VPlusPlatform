@@ -71,7 +71,7 @@ export default function MyCoursesPage() {
             const isComplete = enrollment.status === "completed";
             const isInactive = enrollment.status === "cancelled" || enrollment.status === "expired";
             const statusBadge = isComplete ? (
-              <Badge variant="default" className="bg-[#1478ac]">
+              <Badge variant="default" className="bg-[#8A6212]">
                 <span className="flex items-center gap-1">
                   <CheckCircle className="h-3 w-3" /> Completed
                 </span>
@@ -122,8 +122,8 @@ export default function MyCoursesPage() {
                     <>
                       <p className="text-sm text-muted-foreground">
                         {enrollment.status === "cancelled"
-                          ? "This enrollment was cancelled. Contact EFVS support if you believe this is an error."
-                          : "This enrollment has expired. Contact EFVS to discuss re-enrollment."}
+                          ? "This enrollment was cancelled. Contact V+ support if you believe this is an error."
+                          : "This enrollment has expired. Contact V+ to discuss re-enrollment."}
                       </p>
                       <Button asChild variant="outline" className="w-full">
                         <Link href={`/portal/courses/${enrollment.courseId}`}>
@@ -134,7 +134,7 @@ export default function MyCoursesPage() {
                   ) : (
                     <Button
                       asChild
-                      className="w-full bg-[#1478ac] hover:bg-[#318dc1]"
+                      className="w-full bg-[#8A6212] hover:bg-[#8A6212]"
                     >
                       <Link href={`/portal/learn/${enrollment.id}`}>
                         {isComplete ? "Review Course" : "Continue Course"}{" "}

@@ -79,14 +79,14 @@ function CheckoutSuccessInner() {
     <div className="mx-auto max-w-lg py-16">
       <Card>
         <CardHeader className="text-center">
-          {paid ? <CheckCircle className="mx-auto h-14 w-14 text-green-600" /> : failed ? <XCircle className="mx-auto h-14 w-14 text-destructive" /> : <Loader2 className="mx-auto h-10 w-10 animate-spin text-[#1478ac]" />}
+          {paid ? <CheckCircle className="mx-auto h-14 w-14 text-green-600" /> : failed ? <XCircle className="mx-auto h-14 w-14 text-destructive" /> : <Loader2 className="mx-auto h-10 w-10 animate-spin text-[#8A6212]" />}
           <CardTitle className="mt-4 font-display text-2xl">{paid ? "Payment confirmed" : failed ? "Payment not completed" : "Confirming your payment"}</CardTitle>
           <CardDescription>{paid ? purchaseKind === "pro-access" ? "Your Pro study-guide access is active." : "Your order is confirmed and course access is being finalized." : failed ? "This checkout was not completed. Your registration remains available for another attempt." : "Stripe is confirming the payment. This can take a few seconds for some payment methods."}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 text-center">
           {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
           {confirmation === "timed_out" && <p className="text-sm text-muted-foreground">Payment is still processing. Check My Courses shortly; access appears after Stripe confirms the payment.</p>}
-          {paid ? <Button asChild className="bg-[#1478ac] hover:bg-[#318dc1]"><Link href={purchaseKind === "pro-access" ? "/portal/pro" : "/portal/my-courses"}>{purchaseKind === "pro-access" ? "Open Pro Access" : "Go to My Courses"}<ArrowRight className="ml-2 h-4 w-4" /></Link></Button> : failed ? <Button asChild variant="outline"><Link href="/portal/documents">View registration and purchase history</Link></Button> : null}
+          {paid ? <Button asChild className="bg-[#8A6212] hover:bg-[#8A6212]"><Link href={purchaseKind === "pro-access" ? "/portal/pro" : "/portal/my-courses"}>{purchaseKind === "pro-access" ? "Open Pro Access" : "Go to My Courses"}<ArrowRight className="ml-2 h-4 w-4" /></Link></Button> : failed ? <Button asChild variant="outline"><Link href="/portal/documents">View registration and purchase history</Link></Button> : null}
           <p className="text-xs text-muted-foreground">Session {sessionId.slice(0, 24)}… · Receipts are sent by Stripe.</p>
         </CardContent>
       </Card>

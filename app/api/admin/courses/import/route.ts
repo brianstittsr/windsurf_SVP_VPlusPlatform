@@ -5,7 +5,7 @@ import { lmsApiError, requireLmsAdmin } from "@/lib/lms-api-auth";
 import { REGISTRATION_COURSE_DRAFTS } from "@/lib/registration-catalog";
 import { COLLECTIONS } from "@/lib/schema";
 
-const IMPORT_SOURCE = "EFVS_Student_Registration_Form_Rev2_2026-10-04";
+const IMPORT_SOURCE = "VPLUS_Student_Registration_Form_Rev2_2026-10-04";
 
 /** Idempotently imports registration-PDF courses and study-guide products as unpublished drafts. */
 export async function POST(req: NextRequest) {

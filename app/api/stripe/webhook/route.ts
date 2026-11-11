@@ -308,9 +308,9 @@ async function handleLegacyCourseCheckout(session: Stripe.Checkout.Session): Pro
 async function syncProSubscription(subscription: Stripe.Subscription, fallbackUid = ""): Promise<void> {
   if (!adminDb) throw new Error("Database unavailable for subscription sync");
   const uid = subscription.metadata.firebaseUid || fallbackUid;
-  if (!uid) throw new Error("Stripe subscription has no EFVS user metadata");
+  if (!uid) throw new Error("Stripe subscription has no V+ user metadata");
   const members = await adminDb.collection(COLLECTIONS.TEAM_MEMBERS).where("firebaseUid", "==", uid).limit(1).get();
-  if (members.empty) throw new Error("EFVS profile not found for Stripe subscription");
+  if (members.empty) throw new Error("V+ profile not found for Stripe subscription");
   const memberRef = members.docs[0].ref;
   const status = subscription.status === "active" || subscription.status === "trialing"
     ? "active"

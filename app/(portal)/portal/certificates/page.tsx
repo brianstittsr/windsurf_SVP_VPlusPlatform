@@ -105,7 +105,7 @@ export default function CertificatesPage() {
     const credentialUrl = `${window.location.origin}/credentials/${certificate.publicCredentialId}`;
     const text = [
       `Certification: ${certificate.badgeTitle || `${certificate.courseCode} — Course Completion`}`,
-      "Issuing organization: Eagle Flight Vertical Solutions · EFVS UAS Training Academy",
+      "Issuing organization: Strategic Value Plus Solutions, LLC · V+ Academy",
       `Issue date: ${certificate.issuedAt ? new Date(certificate.issuedAt).toLocaleDateString() : ""}`,
       `Credential ID: ${certificate.certificateNumber}`,
       `Credential URL: ${credentialUrl}`,
@@ -124,7 +124,7 @@ export default function CertificatesPage() {
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl font-bold">My Certificates</h1>
-        <p className="text-muted-foreground">EFVS course-completion credentials and shareable verification links.</p>
+        <p className="text-muted-foreground">V+ course-completion credentials and shareable verification links.</p>
       </div>
       {certificates.length === 0 ? (
         <Card><CardContent className="py-12 text-center"><Award className="mx-auto h-12 w-12 text-muted-foreground/40" /><p className="mt-4 text-muted-foreground">No certificates yet. Complete an eligible course to earn one.</p></CardContent></Card>
@@ -132,21 +132,21 @@ export default function CertificatesPage() {
         <div className="grid gap-4 md:grid-cols-2">
           {certificates.map((certificate) => {
             const isPublic = certificate.publicSharingEnabled === true && certificate.publicNameConsent === true;
-            const credentialUrl = certificate.publicCredentialId ? `${typeof window !== "undefined" ? window.location.origin : "https://academy.efvertical.com"}/credentials/${certificate.publicCredentialId}` : "";
+            const credentialUrl = certificate.publicCredentialId ? `${typeof window !== "undefined" ? window.location.origin : "https://strategicvalueplus.com"}/credentials/${certificate.publicCredentialId}` : "";
             return <Card key={certificate.id}>
               <CardHeader>
-                <div className="flex items-center justify-between gap-2"><Award className="h-6 w-6 text-[#d3ac63]" /><Badge variant="secondary">{certificate.certificateNumber}</Badge></div>
+                <div className="flex items-center justify-between gap-2"><Award className="h-6 w-6 text-[#C9962B]" /><Badge variant="secondary">{certificate.certificateNumber}</Badge></div>
                 <CardTitle className="text-lg">{certificate.badgeTitle || `${certificate.courseCode} — ${certificate.courseTitle}`}</CardTitle>
                 <CardDescription>Issued {certificate.issuedAt ? new Date(certificate.issuedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "—"}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {certificate.studentDocumentId && <Button variant="outline" className="w-full" onClick={() => void download(certificate.studentDocumentId!, `${certificate.certificateNumber}.pdf`)}><Download className="mr-2 h-4 w-4" />Download EFVS certificate PDF</Button>}
+                {certificate.studentDocumentId && <Button variant="outline" className="w-full" onClick={() => void download(certificate.studentDocumentId!, `${certificate.certificateNumber}.pdf`)}><Download className="mr-2 h-4 w-4" />Download V+ certificate PDF</Button>}
                 <div className="space-y-3 rounded-md border p-3">
                   <div className="flex items-center justify-between gap-3"><div><p className="font-medium text-sm">Public credential page</p><p className="text-xs text-muted-foreground">Share a credential-only verification page; private profile and documents stay hidden.</p></div><Button size="sm" variant={isPublic ? "destructive" : "outline"} disabled={busyId === certificate.id} onClick={() => void setPublicSharing(certificate, !isPublic)}>{busyId === certificate.id ? <Loader2 className="h-4 w-4 animate-spin" /> : isPublic ? "Turn off" : "Enable"}</Button></div>
                   {!isPublic && <div className="flex items-start gap-2"><Checkbox id={`share-consent-${certificate.id}`} checked={consent[certificate.id] === true} onCheckedChange={(checked) => setConsent((current) => ({ ...current, [certificate.id]: checked === true }))} /><Label htmlFor={`share-consent-${certificate.id}`} className="text-xs font-normal leading-relaxed">I consent to display my name, course credential, issue date, credential ID, and verification status on a public page.</Label></div>}
-                  {isPublic && credentialUrl && <div className="space-y-2"><Link className="block break-all text-xs text-[#1478ac] underline" href={credentialUrl} target="_blank">{credentialUrl}</Link><div className="flex flex-wrap gap-2"><Button variant="outline" size="sm" asChild><Link href={credentialUrl} target="_blank"><ShieldCheck className="mr-2 h-4 w-4" />View verified badge</Link></Button><Button variant="outline" size="sm" onClick={() => void copyLinkedInDetails(certificate)}><Copy className="mr-2 h-4 w-4" />Copy LinkedIn details</Button>{addToProfileUrl && <Button variant="outline" size="sm" asChild><a href={addToProfileUrl} target="_blank" rel="noopener noreferrer"><ExternalLink className="mr-2 h-4 w-4" />Add to LinkedIn</a></Button>}</div><p className="text-xs text-muted-foreground">LinkedIn currently opens its certification form without prefilled details. Use “Copy LinkedIn details,” then paste the credential ID and verification URL.</p></div>}
+                  {isPublic && credentialUrl && <div className="space-y-2"><Link className="block break-all text-xs text-[#8A6212] underline" href={credentialUrl} target="_blank">{credentialUrl}</Link><div className="flex flex-wrap gap-2"><Button variant="outline" size="sm" asChild><Link href={credentialUrl} target="_blank"><ShieldCheck className="mr-2 h-4 w-4" />View verified badge</Link></Button><Button variant="outline" size="sm" onClick={() => void copyLinkedInDetails(certificate)}><Copy className="mr-2 h-4 w-4" />Copy LinkedIn details</Button>{addToProfileUrl && <Button variant="outline" size="sm" asChild><a href={addToProfileUrl} target="_blank" rel="noopener noreferrer"><ExternalLink className="mr-2 h-4 w-4" />Add to LinkedIn</a></Button>}</div><p className="text-xs text-muted-foreground">LinkedIn currently opens its certification form without prefilled details. Use “Copy LinkedIn details,” then paste the credential ID and verification URL.</p></div>}
                 </div>
-                <p className="text-xs text-muted-foreground">EFVS credentials document EFVS training completion; they are not FAA Remote Pilot Certificates.</p>
+                <p className="text-xs text-muted-foreground">V+ credentials document V+ training completion; they are not FAA Remote Pilot Certificates.</p>
               </CardContent>
             </Card>;
           })}

@@ -581,11 +581,6 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
-    // Book Call Leads — created via /api/leads (Admin SDK); admin-only management
-    match /bookCallLeads/{leadId} {
-      allow create: if false;
-      allow read, update, delete: if isAdmin();
-    }
 
     // Grant Builder — API/Admin SDK only (staff-gated via /api/grants)
     match /grantOpportunities/{docId} {

@@ -297,7 +297,7 @@ export function CourseContentDialog({ course, onClose }: CourseContentDialogProp
           {banks.map((bank) => (
             <div key={bank.id} className="flex items-center justify-between gap-2 border rounded-md px-3 py-2">
               <div className="flex items-center gap-2 min-w-0">
-                <Badge variant={bank.type === "exam" ? "default" : "outline"} className={bank.type === "exam" ? "bg-[#1478ac]" : ""}>
+                <Badge variant={bank.type === "exam" ? "default" : "outline"} className={bank.type === "exam" ? "bg-[#8A6212]" : ""}>
                   {bank.type}
                 </Badge>
                 <span className="text-sm truncate">{bank.title}</span>
@@ -328,7 +328,7 @@ export function CourseContentDialog({ course, onClose }: CourseContentDialogProp
 
         {/* ---------- Module editor (inline) ---------- */}
         {moduleEditing && (
-          <div className="space-y-3 rounded-md border border-[#1478ac]/40 bg-[#f8f7f1] p-4">
+          <div className="space-y-3 rounded-md border border-[#8A6212]/40 bg-[#F3F4F6] p-4">
             <p className="font-semibold text-sm">{moduleEditing.id ? "Edit lesson" : "New lesson"}</p>
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="space-y-1 sm:col-span-2">
@@ -378,7 +378,7 @@ export function CourseContentDialog({ course, onClose }: CourseContentDialogProp
               />
             </div>
             <div className="flex gap-2">
-              <Button onClick={saveModule} disabled={saving} className="bg-[#1478ac] hover:bg-[#318dc1]">
+              <Button onClick={saveModule} disabled={saving} className="bg-[#8A6212] hover:bg-[#8A6212]">
                 Save lesson
               </Button>
               <Button variant="outline" onClick={() => setModuleEditing(null)}>Cancel</Button>
@@ -388,7 +388,7 @@ export function CourseContentDialog({ course, onClose }: CourseContentDialogProp
 
         {/* ---------- Question bank editor (inline) ---------- */}
         {bankEditing && (
-          <div className="space-y-3 rounded-md border border-[#1478ac]/40 bg-[#f8f7f1] p-4">
+          <div className="space-y-3 rounded-md border border-[#8A6212]/40 bg-[#F3F4F6] p-4">
             <p className="font-semibold text-sm">{bankIsNew ? "New assessment" : "Edit assessment"}</p>
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="space-y-1 sm:col-span-2">
@@ -542,7 +542,7 @@ export function CourseContentDialog({ course, onClose }: CourseContentDialogProp
             </div>
 
             <div className="flex gap-2">
-              <Button onClick={saveBank} disabled={saving} className="bg-[#1478ac] hover:bg-[#318dc1]">
+              <Button onClick={saveBank} disabled={saving} className="bg-[#8A6212] hover:bg-[#8A6212]">
                 Save assessment
               </Button>
               <Button variant="outline" onClick={() => setBankEditing(null)}>Cancel</Button>

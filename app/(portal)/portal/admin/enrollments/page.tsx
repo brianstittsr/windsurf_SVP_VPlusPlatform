@@ -156,7 +156,7 @@ export default function AdminEnrollmentsPage() {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-[#1478ac] hover:bg-[#318dc1]">
+            <Button className="bg-[#8A6212] hover:bg-[#8A6212]">
               <Plus className="mr-2 h-4 w-4" /> Manual Enrollment
             </Button>
           </DialogTrigger>
@@ -211,7 +211,7 @@ export default function AdminEnrollmentsPage() {
               <Button
                 onClick={create}
                 disabled={!form.studentId || !form.courseId}
-                className="w-full bg-[#1478ac] hover:bg-[#318dc1]"
+                className="w-full bg-[#8A6212] hover:bg-[#8A6212]"
               >
                 Enroll
               </Button>

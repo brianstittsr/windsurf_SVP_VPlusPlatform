@@ -169,7 +169,7 @@ export default function CourseDetailPage() {
                     <ul className="space-y-2">
                       {course.learningOutcomes.map((item) => (
                         <li key={item} className="flex items-start gap-2">
-                          <ShieldCheck className="h-4 w-4 mt-0.5 text-[#1478ac] shrink-0" />
+                          <ShieldCheck className="h-4 w-4 mt-0.5 text-[#8A6212] shrink-0" />
                           <span>{item}</span>
                         </li>
                       ))}
@@ -204,7 +204,7 @@ export default function CourseDetailPage() {
                 )}
                 {course.badge?.issueOnCompletion && (
                   <p className="text-muted-foreground">
-                    An EFVS completion credential may be issued when the course completion requirements are met. It is not an FAA-issued certificate.
+                    An V+ completion credential may be issued when the course completion requirements are met. It is not an FAA-issued certificate.
                   </p>
                 )}
               </CardContent>
@@ -230,7 +230,7 @@ export default function CourseDetailPage() {
                 </div>
                 <Button
                   asChild
-                  className="w-full bg-[#1478ac] hover:bg-[#318dc1]"
+                  className="w-full bg-[#8A6212] hover:bg-[#8A6212]"
                 >
                   <Link href={`/portal/learn/${enrolled}`}>Start Learning</Link>
                 </Button>
@@ -252,12 +252,12 @@ export default function CourseDetailPage() {
                 )}
                 {course.purchaseMode === "registration" ? (
                   <>
-                    <div className="rounded-md border border-[#d9d8ce] bg-[#f8f7f1] p-3 text-sm">
+                    <div className="rounded-md border border-[#D8DCE2] bg-[#F3F4F6] p-3 text-sm">
                       <p className="font-medium">Registration and staff review are required.</p>
-                      <p className="mt-1 text-muted-foreground">Submit the signed registration form. EFVS will review your application and email a secure checkout link if approved.</p>
+                      <p className="mt-1 text-muted-foreground">Submit the signed registration form. V+ will review your application and email a secure checkout link if approved.</p>
                     </div>
                     <Button
-                      className="w-full bg-[#1478ac] hover:bg-[#318dc1]"
+                      className="w-full bg-[#8A6212] hover:bg-[#8A6212]"
                       onClick={startRegistration}
                       disabled={checkingOut}
                     >
@@ -271,7 +271,7 @@ export default function CourseDetailPage() {
                 ) : course.priceCents === 0 ? (
                   <>
                     <Button
-                      className="w-full bg-[#1478ac] hover:bg-[#318dc1]"
+                      className="w-full bg-[#8A6212] hover:bg-[#8A6212]"
                       onClick={enrollFree}
                       disabled={checkingOut}
                     >
@@ -295,7 +295,7 @@ export default function CourseDetailPage() {
                       />
                     </div>
                     <Button
-                      className="w-full bg-[#1478ac] hover:bg-[#318dc1]"
+                      className="w-full bg-[#8A6212] hover:bg-[#8A6212]"
                       onClick={buyCourse}
                       disabled={checkingOut}
                     >
@@ -303,7 +303,7 @@ export default function CourseDetailPage() {
                       Buy Now — ${(course.priceCents / 100).toFixed(2)}
                     </Button>
                     <p className="text-xs text-muted-foreground">
-                      Secure checkout by Stripe. Card and bank details are never stored by EFVS.
+                      Secure checkout by Stripe. Card and bank details are never stored by V+.
                     </p>
                   </>
                 )}

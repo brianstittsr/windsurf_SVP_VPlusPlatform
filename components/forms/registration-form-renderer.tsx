@@ -64,7 +64,7 @@ function SignatureCapture({
     canvas.height = 220;
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = "#071628";
+    ctx.strokeStyle = "#15181C";
     ctx.lineWidth = 3;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -339,7 +339,7 @@ export function RegistrationFormRenderer({ form, initialCourseId, onSubmitted }:
               return <label key={course.id} htmlFor={`${controlId}-${course.id}`} className={`flex items-start gap-3 rounded-lg border p-4 transition-colors ${blocked ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:bg-muted/40"}`}>
                 <Checkbox id={`${controlId}-${course.id}`} checked={checked} disabled={blocked} onCheckedChange={(state) => toggleCourse(course.id, state === true)} />
                 <span className="min-w-0 flex-1">
-                  <span className="flex flex-wrap items-center justify-between gap-2 font-semibold"><span>{course.code} — {course.title}</span><span className="text-[#1478ac]">{money(course.priceCents, course.currency)}</span></span>
+                  <span className="flex flex-wrap items-center justify-between gap-2 font-semibold"><span>{course.code} — {course.title}</span><span className="text-[#8A6212]">{money(course.priceCents, course.currency)}</span></span>
                   <span className="mt-1 block text-sm text-muted-foreground">{course.description}</span>
                   {course.estimatedHours ? <span className="mt-1 block text-xs text-muted-foreground">{course.estimatedHours} instructional hours</span> : null}
                   {(includedNames.length > 0 || course.bundleContents?.length) && <span className="mt-2 block text-xs text-muted-foreground">Includes: {[...includedNames, ...(course.bundleContents || [])].join(" · ")}</span>}
@@ -357,7 +357,7 @@ export function RegistrationFormRenderer({ form, initialCourseId, onSubmitted }:
       const address = (value && typeof value === "object" && !Array.isArray(value) ? value : {}) as AddressValue;
       return <fieldset key={field.id} className="space-y-2"><legend className="font-medium">{field.label}{required ? <span className="text-destructive"> *</span> : null}</legend><div className="space-y-3"><Input aria-label="Street address" placeholder="Street address" value={address.street || ""} onChange={(e) => setAnswer(field.id, { ...address, street: e.target.value })} /><div className="grid gap-3 sm:grid-cols-3"><Input aria-label="City" placeholder="City" value={address.city || ""} onChange={(e) => setAnswer(field.id, { ...address, city: e.target.value })} /><Input aria-label="State" placeholder="State" value={address.state || ""} onChange={(e) => setAnswer(field.id, { ...address, state: e.target.value })} /><Input aria-label="ZIP code" placeholder="ZIP code" value={address.zip || ""} onChange={(e) => setAnswer(field.id, { ...address, zip: e.target.value })} /></div></div>{field.helpText && <p className="text-xs text-muted-foreground">{field.helpText}</p>}</fieldset>;
     }
-    if (field.type === "consent") return <div key={field.id} className="flex items-start gap-3"><Checkbox id={controlId} checked={value === true} onCheckedChange={(checked) => setAnswer(field.id, checked === true)} /><div className="space-y-1">{label}{field.helpText && <p className="text-sm text-muted-foreground">{field.helpText}{field.helpLink ? <> <a href={field.helpLink.url} target="_blank" rel="noopener noreferrer" className="text-[#1478ac] underline">{field.helpLink.label}</a></> : null}</p>}</div></div>;
+    if (field.type === "consent") return <div key={field.id} className="flex items-start gap-3"><Checkbox id={controlId} checked={value === true} onCheckedChange={(checked) => setAnswer(field.id, checked === true)} /><div className="space-y-1">{label}{field.helpText && <p className="text-sm text-muted-foreground">{field.helpText}{field.helpLink ? <> <a href={field.helpLink.url} target="_blank" rel="noopener noreferrer" className="text-[#8A6212] underline">{field.helpLink.label}</a></> : null}</p>}</div></div>;
     if (["select", "radio", "yesNoPreferNot"].includes(field.type)) {
       const choices = field.type === "yesNoPreferNot" ? [{ label: "Yes", value: "yes" }, { label: "No", value: "no" }, { label: "Prefer not to answer", value: "prefer_not" }] : (field.options || []);
       return <div key={field.id} className="space-y-2">{label}{field.helpText && <p className="text-sm text-muted-foreground">{field.helpText}</p>}{field.type === "select" ? <select id={controlId} className="w-full rounded-md border border-input bg-background px-3 py-2" value={typeof value === "string" ? value : ""} onChange={(e) => setAnswer(field.id, e.target.value)}><option value="">Choose…</option>{choices.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select> : <RadioGroup value={typeof value === "string" ? value : ""} onValueChange={(next) => setAnswer(field.id, next)}>{choices.map((option) => <div key={option.value} className="flex items-center gap-2"><RadioGroupItem id={`${controlId}-${option.value}`} value={option.value} /><Label htmlFor={`${controlId}-${option.value}`} className="font-normal">{option.label}</Label></div>)}</RadioGroup>}</div>;
@@ -378,10 +378,10 @@ export function RegistrationFormRenderer({ form, initialCourseId, onSubmitted }:
         <CardHeader><CardTitle className="font-display">{form.name}</CardTitle><CardDescription>{form.description}</CardDescription></CardHeader>
         <CardContent className="space-y-6">
           {form.fields.map(renderField)}
-          <div className="rounded-md bg-[#e9f3f8] p-4 text-sm text-[#071628]">
-            <div className="flex gap-2"><ShieldCheck className="h-4 w-4 shrink-0 text-[#1478ac]" /><p>Payment details are not collected on this form. EFVS reviews registrations and sends approved students a secure Stripe checkout link. Course access begins after payment or approved sponsorship is confirmed.</p></div>
+          <div className="rounded-md bg-[#F4EAD3] p-4 text-sm text-[#15181C]">
+            <div className="flex gap-2"><ShieldCheck className="h-4 w-4 shrink-0 text-[#8A6212]" /><p>Payment details are not collected on this form. V+ reviews registrations and sends approved students a secure Stripe checkout link. Course access begins after payment or approved sponsorship is confirmed.</p></div>
           </div>
-          <Button type="submit" disabled={submitting || loadingCourses} className="w-full bg-[#1478ac] hover:bg-[#318dc1]">
+          <Button type="submit" disabled={submitting || loadingCourses} className="w-full bg-[#8A6212] hover:bg-[#8A6212]">
             {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Submitting…</> : "Submit signed registration"}
           </Button>
         </CardContent>

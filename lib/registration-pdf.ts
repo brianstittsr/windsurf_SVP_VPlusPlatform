@@ -59,7 +59,7 @@ export function generateSignedRegistrationPdf(input: RegistrationPdfInput): Uint
   pdf.setTextColor(7, 22, 40);
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(19);
-  pdf.text("EFVS UAS TRAINING ACADEMY", left, y);
+  pdf.text("V+ UAS TRAINING ACADEMY", left, y);
   y += 28;
   write(input.formName, { bold: true, size: 15, color: [20, 120, 172] });
   write(`Form version ${input.formVersion} · Submitted ${input.submittedAt.toLocaleString("en-US", { timeZone: "UTC" })} UTC`, { size: 9, color: [89, 101, 109] });
@@ -95,7 +95,7 @@ export function generateSignedRegistrationPdf(input: RegistrationPdfInput): Uint
     write(`${course.code} — ${course.title} | $${(course.priceCents / 100).toFixed(2)}`, { size: 10 });
   }
   write("Payment details are not collected on this document. Approved applicants receive a secure Stripe Checkout link.", { size: 9, color: [89, 101, 109] });
-  write("This registration record is stored in EFVS Academy for enrollment processing and student history.", { size: 9, color: [89, 101, 109] });
+  write("This registration record is stored in V+ Academy for enrollment processing and student history.", { size: 9, color: [89, 101, 109] });
 
   pdf.setDrawColor(211, 172, 99);
   pdf.setLineWidth(2);

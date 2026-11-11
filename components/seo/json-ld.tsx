@@ -1,16 +1,16 @@
-export function OrganizationJsonLd() {
+export function SvpOrganizationJsonLd() {
   const data = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Eagle Flight Vertical Solutions",
-    alternateName: "EFVS",
-    legalName: "Aviante HWC, Inc. dba Eagle Flight Vertical Solutions",
-    url: "https://www.efvertical.com",
-    logo: "https://academy.efvertical.com/images/efvs-logo.png",
-    email: "info@efvertical.com",
+    name: "Strategic Value Plus Solutions, LLC",
+    alternateName: "V+",
+    legalName: "Strategic Value Plus Solutions, LLC",
+    url: "https://strategicvalueplus.com",
+    logo: "https://strategicvalueplus.com/VPlus_logo.jpg",
+    email: "info@strategicvalueplus.com",
     telephone: "+1-805-584-1157",
     description:
-      "EFVS connects aviation regulation, infrastructure, operations, technology, and workforce development for UAS and Advanced Air Mobility.",
+      "Strategic Value+ helps U.S. manufacturers qualify, comply and grow through the Four Gates: quality systems, cybersecurity, operations and compliance.",
   };
   return (
     <script
@@ -24,11 +24,11 @@ export function WebsiteJsonLd() {
   const data = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "EFVS UAS Training Academy",
-    url: "https://academy.efvertical.com",
+    name: "V+ Academy",
+    url: "https://strategicvalueplus.com",
     publisher: {
       "@type": "Organization",
-      name: "Eagle Flight Vertical Solutions",
+      name: "Strategic Value Plus Solutions, LLC",
     },
   };
   return (
@@ -48,8 +48,8 @@ export function CourseJsonLd() {
       "Self-paced FAA Part 107 Remote Pilot certification preparation course covering regulations, airspace, weather, operations, and exam practice.",
     provider: {
       "@type": "Organization",
-      name: "Eagle Flight Vertical Solutions",
-      sameAs: "https://www.efvertical.com",
+      name: "Strategic Value Plus Solutions, LLC",
+      sameAs: "https://strategicvalueplus.com",
     },
   };
   return (

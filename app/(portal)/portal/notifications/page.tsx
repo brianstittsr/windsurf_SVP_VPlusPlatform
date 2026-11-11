@@ -171,7 +171,7 @@ export default function NotificationsPage() {
             <div className="space-y-4">
               {items.map((item) => (
                 <div key={item.id} className="flex items-start gap-4 p-4 rounded-lg border">
-                  <div className="w-10 h-10 rounded-full bg-[#1478ac]/10 flex items-center justify-center shrink-0 text-[#1478ac]">
+                  <div className="w-10 h-10 rounded-full bg-[#8A6212]/10 flex items-center justify-center shrink-0 text-[#8A6212]">
                     {ICONS[item.icon]}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -190,7 +190,7 @@ export default function NotificationsPage() {
               <p className="text-muted-foreground">No account activity yet</p>
               <p className="text-sm text-muted-foreground mt-1">
                 Enroll in a course to get started.{" "}
-                <Link href="/portal/courses" className="text-[#1478ac] underline">Browse the catalog</Link>
+                <Link href="/portal/courses" className="text-[#8A6212] underline">Browse the catalog</Link>
               </p>
             </div>
           )}

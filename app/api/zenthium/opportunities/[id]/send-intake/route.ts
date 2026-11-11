@@ -157,7 +157,7 @@ export async function POST(
 
     if (RESEND_API_KEY) {
       const emailPayload: Record<string, unknown> = {
-        from: "Zenthium Platform <noreply@efvertical.com>",
+        from: "Zenthium Platform <noreply@strategicvalueplus.com>",
         to: [toEmail],
         subject,
         html: htmlBody + (body.message ? `<br/><hr/><p>${body.message}</p>` : ""),
