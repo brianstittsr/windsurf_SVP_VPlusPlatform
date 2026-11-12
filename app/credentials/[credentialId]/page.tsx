@@ -27,7 +27,7 @@ export default async function PublicCredentialPage({ params }: { params: Promise
     <main className="min-h-screen bg-[#F3F4F6] text-[#15181C]">
       <section className="bg-[#15181C] text-white">
         <div className="container py-10">
-          <Link href="/" className="font-display text-sm tracking-[0.2em] text-[#D9AF52]">V+ UAS TRAINING ACADEMY</Link>
+          <Link href="/" className="font-display text-sm tracking-[0.2em] text-[#D9AF52]">STRATEGIC VALUE PLUS</Link>
         </div>
       </section>
       <div className="container max-w-3xl py-12">

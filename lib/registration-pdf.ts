@@ -59,7 +59,7 @@ export function generateSignedRegistrationPdf(input: RegistrationPdfInput): Uint
   pdf.setTextColor(7, 22, 40);
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(19);
-  pdf.text("V+ UAS TRAINING ACADEMY", left, y);
+  pdf.text("STRATEGIC VALUE PLUS", left, y);
   y += 28;
   write(input.formName, { bold: true, size: 15, color: [20, 120, 172] });
   write(`Form version ${input.formVersion} · Submitted ${input.submittedAt.toLocaleString("en-US", { timeZone: "UTC" })} UTC`, { size: 9, color: [89, 101, 109] });

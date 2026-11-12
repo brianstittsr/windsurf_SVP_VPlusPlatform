@@ -64,7 +64,7 @@ export default function ForgotPasswordPage() {
             </div>
             <div className="text-center mt-2">
               <p className="text-sm font-semibold tracking-[0.2em] text-[#8A6212] font-display">
-                UAS TRAINING ACADEMY
+                STRATEGIC VALUE PLUS
               </p>
             </div>
           </Link>

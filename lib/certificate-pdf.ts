@@ -22,7 +22,7 @@ export function createCertificatePdfBytes(cert: CertificateDoc): Uint8Array {
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(11);
   pdf.setTextColor(20, 120, 172);
-  pdf.text("UAS TRAINING ACADEMY", width / 2, 78, { align: "center" });
+  pdf.text("STRATEGIC VALUE PLUS", width / 2, 78, { align: "center" });
 
   pdf.setTextColor(7, 22, 40);
   pdf.setFont("helvetica", "bold");

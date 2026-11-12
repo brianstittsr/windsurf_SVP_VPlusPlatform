@@ -56,7 +56,7 @@ export default function PricingPage() {
       <section className="bg-[#15181C] text-white">
         <div className="container py-16 md:py-20">
           <p className="font-display text-sm font-semibold tracking-[0.2em] text-[#D9AF52]">
-            V+ UAS TRAINING ACADEMY
+            STRATEGIC VALUE PLUS
           </p>
           <h1 className="mt-3 max-w-3xl font-display text-4xl font-bold md:text-6xl">
             Courses and pricing

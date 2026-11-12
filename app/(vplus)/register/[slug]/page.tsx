@@ -64,7 +64,7 @@ function RegistrationPageContent() {
   return (
     <div className="container max-w-3xl space-y-6 py-10 md:py-14">
       <div>
-        <p className="font-display text-sm font-semibold tracking-[0.2em] text-[#8A6212]">V+ UAS TRAINING ACADEMY</p>
+        <p className="font-display text-sm font-semibold tracking-[0.2em] text-[#8A6212]">STRATEGIC VALUE PLUS</p>
         <h1 className="mt-2 font-display text-4xl font-bold text-[#15181C]">Student registration</h1>
         <p className="mt-3 text-muted-foreground">Complete the form for staff review. Approved applicants receive a secure account and checkout link.</p>
       </div>

@@ -29,22 +29,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   LayoutDashboard,
-  BookOpen,
-  GraduationCap,
-  Award,
-  BarChart3,
   Users,
-  CreditCard,
-  Tag,
-  FileText,
   Bell,
   Settings,
   LogOut,
   ChevronUp,
   User,
-  ClipboardList,
-  Package,
-  Database,
   Sparkles,
   Target,
   Kanban,
@@ -56,20 +46,9 @@ import {
   Inbox,
 } from "lucide-react";
 
-const studentItems = [
+const mainItems = [
   { title: "Dashboard", href: "/portal", icon: LayoutDashboard },
-  { title: "My Courses", href: "/portal/my-courses", icon: GraduationCap },
-  { title: "Course Catalog", href: "/portal/courses", icon: BookOpen },
-  { title: "Part 107 Study Guide", href: "/portal/study-guide", icon: BookOpen },
-  { title: "Pro Access", href: "/portal/pro", icon: Package },
-  { title: "Purchases & Documents", href: "/portal/documents", icon: FileText },
-  { title: "Certificates", href: "/portal/certificates", icon: Award },
   { title: "Notifications", href: "/portal/notifications", icon: Bell },
-];
-
-const instructorItems = [
-  { title: "Class Roster", href: "/portal/roster", icon: Users },
-  { title: "Grading", href: "/portal/grading", icon: ClipboardList },
 ];
 
 const captureItems = [
@@ -85,18 +64,8 @@ const captureItems = [
 ];
 
 const adminItems = [
-  { title: "Reports", href: "/portal/reports", icon: BarChart3 },
   { title: "Leads", href: "/portal/admin/leads", icon: Inbox },
   { title: "Users", href: "/portal/admin/users", icon: Users },
-  { title: "Courses", href: "/portal/admin/courses", icon: BookOpen },
-  { title: "Digital Products", href: "/portal/admin/products", icon: Package },
-  { title: "Forms", href: "/portal/admin/forms", icon: FileText },
-  { title: "Registrations", href: "/portal/admin/registrations", icon: ClipboardList },
-  { title: "SCORM Packages", href: "/portal/admin/scorm", icon: Package },
-  { title: "Enrollments", href: "/portal/admin/enrollments", icon: FileText },
-  { title: "Payments", href: "/portal/admin/payments", icon: CreditCard },
-  { title: "Discounts", href: "/portal/admin/discounts", icon: Tag },
-  { title: "Demo Data", href: "/portal/admin/seed", icon: Database },
 ];
 
 export function PortalSidebar() {
@@ -110,7 +79,7 @@ export function PortalSidebar() {
     router.push("/sign-in");
   };
 
-  const renderItems = (items: typeof studentItems) =>
+  const renderItems = (items: typeof mainItems) =>
     items.map((item) => (
       <SidebarMenuItem key={item.href}>
         <SidebarMenuButton
@@ -154,20 +123,11 @@ export function PortalSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Learning</SidebarGroupLabel>
+          <SidebarGroupLabel>Portal</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>{renderItems(studentItems)}</SidebarMenu>
+            <SidebarMenu>{renderItems(mainItems)}</SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        {isInstructor && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Instructor</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>{renderItems(instructorItems)}</SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
 
         {isInstructor && (
           <SidebarGroup>
